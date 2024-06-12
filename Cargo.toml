@@ -1,0 +1,10 @@
+[package]
+name = "deepcool-digital-linux"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+libc = "0.2.155"
+hidapi = "2.6.1"
+cpu-monitor = "0.1.1"
+clap = { version = "4.5.7", features = ["derive"] }
