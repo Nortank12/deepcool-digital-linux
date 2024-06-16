@@ -15,22 +15,7 @@ and run it in the command line. You will need root permission to send data to th
 I built the binary for `x86_64` architecture and tested on Debian. If you encounter any issues,
 let me know.
 
-# Usage
-You can run the program with or without providing any options.
-```bash
-$ sudo ./deepcool-digital-linux [OPTIONS]
-```
-```bash
-Options:
-  -m, --mode <MODE>  Change the display mode between "temp, usage, auto" [default: temp]
-  -f, --fahrenheit   Change temperature unit to Fahrenheit
-  -a, --alarm        Enable the alarm (80˚C or 176˚F)
-  -h, --help         Print help
-  -V, --version      Print version
-
-```
-
-# Supported Devices
+## Supported Devices
 <table>
     <tr>
         <th>Model</th>
@@ -58,6 +43,46 @@ Options:
         <td align="center">✅</td>
     </tr>
 </table>
+
+# Usage
+You can run the program with or without providing any options.
+```bash
+sudo ./deepcool-digital-linux [OPTIONS]
+```
+```bash
+Options:
+  -m, --mode <MODE>  Change the display mode between "temp, usage, auto" [default: temp]
+  -f, --fahrenheit   Change temperature unit to Fahrenheit
+  -a, --alarm        Enable the alarm (80˚C or 176˚F)
+  -h, --help         Print help
+  -V, --version      Print version
+
+```
+
+# Automatic start
+1. Copy the `deepcool-digital-linux` to the `/usr/sbin/` folder.
+```bash
+sudo cp ./deepcool-digital-linux /usr/sbin/
+```
+2. Create the service file in the `/etc/systemd/system/` folder.
+```bash
+sudo nano /etc/systemd/system/deepcool-digital.service
+```
+3. Copy the contents:
+```properties
+[Unit]
+Description=Deepcool Digital
+
+[Service]
+ExecStart=/usr/sbin/deepcool-digital-linux # arguments here
+
+[Install]
+WantedBy=multi-user.target
+```
+4. Enable the service
+```bash
+sudo systemctl enable deepcool-digital
+```
 
 # Debug Information
 If you want to test your device, this chart shows how the raw data looks like for the AK
