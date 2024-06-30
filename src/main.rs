@@ -1,5 +1,5 @@
 mod device;
-use device::{startup_message, status_message};
+use device::{find_cpu_sensor, startup_message, status_message};
 
 use std::process::exit;
 use libc::geteuid;
@@ -60,6 +60,9 @@ fn main() {
     // Connect
     let device = api.open(VENDOR, product_id).expect("Failed to open HID device");
 
+    // Find CPU temp. sensor
+    let cpu_hwmon_path = find_cpu_sensor();
+
     // Start
     device.write(&startup_message()).expect("Failed to write data");
 
@@ -78,15 +81,18 @@ fn main() {
     if args.mode == "auto" {
         loop {
             for _ in 0..8 {
-                device.write(&status_message("temp", args.fahrenheit, args.alarm)).expect("Failed to write data");
+                device.write(&status_message(&cpu_hwmon_path, "temp", args.fahrenheit, args.alarm))
+                    .expect("Failed to write data");
             }
             for _ in 0..8 {
-                device.write(&status_message("usage", args.fahrenheit, args.alarm)).expect("Failed to write data");
+                device.write(&status_message(&cpu_hwmon_path, "usage", args.fahrenheit, args.alarm))
+                    .expect("Failed to write data");
             }
         }
     } else {
         loop {
-            device.write(&status_message(&args.mode, args.fahrenheit, args.alarm)).expect("Failed to write data");
+            device.write(&status_message(&cpu_hwmon_path, &args.mode, args.fahrenheit, args.alarm))
+                .expect("Failed to write data");
         }
     }
 }
