@@ -12,7 +12,7 @@ If you think you could collaborate, please write an issue so we can get in touch
 Simply download the latest [release](https://github.com/Nortank12/deepcool-digital-linux/releases)
 and run it in the command line. You will need root permission to send data to the device.
 
-I built the binary for `x86_64` architecture and tested on Debian. If you encounter any issues,
+I built the binary for `x86_64` architecture and tested on Debian and Gentoo. If you encounter any issues,
 let me know.
 
 ## Supported Devices
@@ -60,6 +60,8 @@ Options:
 ```
 
 # Automatic start
+
+## Systemd (Arch, Debian, Ubuntu, Fedora, etc.)
 1. Copy the `deepcool-digital-linux` to the `/usr/sbin/` folder.
 ```bash
 sudo cp ./deepcool-digital-linux /usr/sbin/
@@ -82,6 +84,34 @@ WantedBy=multi-user.target
 4. Enable the service
 ```bash
 sudo systemctl enable deepcool-digital
+```
+
+## OpenRC (Gentoo) `#root`
+1. Copy the `deepcool-digital-linux` to the `/usr/sbin/` folder.
+```bash
+cp ./deepcool-digital-linux /usr/sbin/
+```
+2. Create the service file in the `/etc/init.d/` folder.
+```bash
+nano /etc/init.d/deepcool-digital
+```
+3. Copy the contents:
+```properties
+#!/sbin/openrc-run
+
+description="Deepcool Digital"
+command="/usr/sbin/deepcool-digital-linux"
+command_args="" # arguments here
+command_background=1
+pidfile="/run/deepcool-digital.pid"
+```
+4. Allow execution on the service file
+```bash
+chmod +x /etc/init.d/deepcool-digital
+```
+5. Enable the service
+```bash
+rc-update add deepcool-digital default
 ```
 
 # Debug Information
