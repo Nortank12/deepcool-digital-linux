@@ -18,29 +18,82 @@ let me know.
 ## Supported Devices
 <table>
     <tr>
+        <th>PID</th>
         <th>Model</th>
         <th>Added</th>
         <th>Tested</th>
     </tr>
     <tr>
+        <td>1</td>
         <td>AK400 DIGITAL</td>
         <td align="center">✅</td>
         <td align="center"></td>
     </tr>
     <tr>
+        <td>2</td>
         <td>AK620 DIGITAL</td>
         <td align="center">✅</td>
         <td align="center"></td>
     </tr>
     <tr>
+        <td>3</td>
         <td>AK500 DIGITAL</td>
         <td align="center">✅</td>
         <td align="center"></td>
     </tr>
     <tr>
+        <td>4</td>
         <td>AK500S DIGITAL</td>
         <td align="center">✅</td>
         <td align="center">✅</td>
+    </tr>
+    <tr>
+        <td>5</td>
+        <td>CH560 DIGITAL</td>
+        <td align="center"></td>
+        <td align="center"></td>
+    </tr>
+    <tr>
+        <td>6</td>
+        <td>LS720 SE DIGITAL</td>
+        <td align="center"></td>
+        <td align="center"></td>
+    </tr>
+    <tr>
+        <td>7</td>
+        <td>??</td>
+        <td align="center"></td>
+        <td align="center"></td>
+    </tr>
+    <tr>
+        <td>8</td>
+        <td>AG400 DIGITAL</td>
+        <td align="center"></td>
+        <td align="center"></td>
+    </tr>
+    <tr>
+        <td>9</td>
+        <td>??</td>
+        <td align="center"></td>
+        <td align="center"></td>
+    </tr>
+    <tr>
+        <td>10</td>
+        <td>LD240</td>
+        <td align="center"></td>
+        <td align="center"></td>
+    </tr>
+    <tr>
+        <td>...</td>
+        <td>...</td>
+        <td align="center"></td>
+        <td align="center"></td>
+    </tr>
+    <tr>
+        <td>21</td>
+        <td>CH360 DIGITAL</td>
+        <td align="center"></td>
+        <td align="center"></td>
     </tr>
 </table>
 
