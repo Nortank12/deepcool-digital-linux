@@ -92,7 +92,7 @@ impl Display {
         // Status bar
         data[2] = (usage as f32 / 10 as f32).round() as u8;
         // Alarm
-        data[6] = (self.alarm && temp > if self.fahrenheit {176} else {80}) as u8;
+        data[6] = (self.alarm && temp > if self.fahrenheit {185} else {85}) as u8;
 
         data
     }
