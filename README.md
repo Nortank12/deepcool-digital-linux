@@ -1,19 +1,17 @@
 # About
-I have created a small program to replicate the functionality of the original `DeepCool Digital`
-Windows program.
+This program is meant to replicate the functionality of the original `DeepCool Digital`
+Windows program and I am gradually adding support to new devices.
 
-Currently, I have tested it with my AK series cooler and the rest of the devices
-should be compatible. I plan to add support for cases as well, but I am lacking information.
-
-If you have a different device and can provide some information, please write me an issue.
-If you think you could collaborate, please write an issue so we can get in touch.
+If you have a device that has not been added or tested yet, please read the notes below the
+supported devices.
+If you think you can collaborate, please write an issue so we can get in touch.
 
 # Installation
 Simply download the latest [release](https://github.com/Nortank12/deepcool-digital-linux/releases)
 and run it in the command line. You will need root permission to send data to the device.
 
-I built the binary for `x86_64` architecture and tested on Debian and Gentoo. If you encounter any issues,
-let me know.
+I built the binary for `x86_64` architecture and tested it on Arch, Debian, and Gentoo but it should
+work on any other Linux distribution.
 
 ## Supported Devices
 <table>
@@ -97,6 +95,12 @@ let me know.
     </tr>
 </table>
 
+- *If your device is not on the list, you can still run the program and see if it detects it.*
+
+- *If your device is on the list, please try to check all the features if they work as expected.*
+
+*In any case, you can create an issue or add a comment to an existing one.*
+
 # Usage
 You can run the program with or without providing any options.
 ```bash
@@ -106,7 +110,7 @@ sudo ./deepcool-digital-linux [OPTIONS]
 Options:
   -m, --mode <MODE>  Change the display mode between "temp, usage, auto" [default: temp]
   -f, --fahrenheit   Change temperature unit to Fahrenheit
-  -a, --alarm        Enable the alarm (80˚C or 176˚F)
+  -a, --alarm        Enable the alarm (85˚C | 185˚F)
   -h, --help         Print help
   -V, --version      Print version
 
@@ -138,15 +142,16 @@ WantedBy=multi-user.target
 ```bash
 sudo systemctl enable deepcool-digital
 ```
+*Note: The program will run automatically after the next boot.*
 
-## OpenRC (Gentoo) `#root`
+## OpenRC (Gentoo)
 1. Copy the `deepcool-digital-linux` to the `/usr/sbin/` folder.
 ```bash
-cp ./deepcool-digital-linux /usr/sbin/
+sudo cp ./deepcool-digital-linux /usr/sbin/
 ```
 2. Create the service file in the `/etc/init.d/` folder.
 ```bash
-nano /etc/init.d/deepcool-digital
+sudo nano /etc/init.d/deepcool-digital
 ```
 3. Copy the contents:
 ```properties
@@ -160,76 +165,81 @@ pidfile="/run/deepcool-digital.pid"
 ```
 4. Allow execution on the service file
 ```bash
-chmod +x /etc/init.d/deepcool-digital
+sudo chmod +x /etc/init.d/deepcool-digital
 ```
 5. Enable the service
 ```bash
-rc-update add deepcool-digital default
+sudo rc-update add deepcool-digital default
 ```
+*Note: The program will run automatically after the next boot.*
 
 # Debug Information
-If you want to test your device, this chart shows how the raw data looks like for the AK
-series displays.
-<table>
-    <tr>
-        <th>DATA BYTE</th>
-        <th>VALUE</th>
-        <th>FUNCTION</th>
-    </tr>
-    <tr>
-        <td>D0</td>
-        <td>16</td>
-        <td>REPORT ID</td>
-    </tr>
-    <tr>
-        <td rowspan="4">D1</td>
-        <td>170</td>
-        <td>STATUS BAR ANIMATION</td>
-    </tr>
-    <tr>
-        <td>19</td>
-        <td>TEMPERATURE MODE ˚C</td>
-    </tr>
-    <tr>
-        <td>35</td>
-        <td>TEMPERATURE MODE ˚F</td>
-    </tr>
-    <tr>
-        <td>76</td>
-        <td>USAGE MODE</td>
-    </tr>
-    <tr>
-        <td>D2</td>
-        <td>1-10</td>
-        <td>STATUS BAR VALUE</td>
-    </tr>
-    <tr>
-        <td rowspan="2">D3</td>
-        <td>141</td>
-        <td>MINUS SIGN</td>
-    </tr>
-    <tr>
-        <td>1-9</td>
-        <td>NUMERIC DISPLAY || Oxx</td>
-    </tr>
-    <tr>
-        <td>D4</td>
-        <td>1-9</td>
-        <td>NUMERIC DISPLAY || xOx</td>
-    </tr>
-    <tr>
-        <td>D5</td>
-        <td>1-9</td>
-        <td>NUMERIC DISPLAY || xxO</td>
-    </tr>
-    <tr>
-        <td>D6</td>
-        <td>1</td>
-        <td>ALARM ON</td>
-    </tr>
+<details>
+    <summary>AK Series</summary>
+    <table>
         <tr>
-        <td>...</td>
-        <td>...</td>
-        <td>- NOT USED -</td>
-    </tr>
-</table>
+            <th>DATA BYTE</th>
+            <th>VALUE</th>
+            <th>FUNCTION</th>
+        </tr>
+        <tr>
+            <td>D0</td>
+            <td>16</td>
+            <td>REPORT ID</td>
+        </tr>
+        <tr>
+            <td rowspan="4">D1</td>
+            <td>170</td>
+            <td>STATUS BAR ANIMATION</td>
+        </tr>
+        <tr>
+            <td>19</td>
+            <td>TEMPERATURE MODE ˚C</td>
+        </tr>
+        <tr>
+            <td>35</td>
+            <td>TEMPERATURE MODE ˚F</td>
+        </tr>
+        <tr>
+            <td>76</td>
+            <td>USAGE MODE</td>
+        </tr>
+        <tr>
+            <td>D2</td>
+            <td>1-10</td>
+            <td>STATUS BAR VALUE</td>
+        </tr>
+        <tr>
+            <td rowspan="2">D3</td>
+            <td>141</td>
+            <td>MINUS SIGN</td>
+        </tr>
+        <tr>
+            <td>1-9</td>
+            <td>NUMERIC DISPLAY || Oxx</td>
+        </tr>
+        <tr>
+            <td>D4</td>
+            <td>1-9</td>
+            <td>NUMERIC DISPLAY || xOx</td>
+        </tr>
+        <tr>
+            <td>D5</td>
+            <td>1-9</td>
+            <td>NUMERIC DISPLAY || xxO</td>
+        </tr>
+        <tr>
+            <td>D6</td>
+            <td>1</td>
+            <td>ALARM ON</td>
+        </tr>
+            <tr>
+            <td>...</td>
+            <td>...</td>
+            <td>- NOT USED -</td>
+        </tr>
+    </table>
+</details>
+
+# Development
+### LD Series: [asdfzdfj](https://github.com/asdfzdfj) / [deepcool-ld-digital-hidapi](https://github.com/asdfzdfj/deepcool-ld-digital-hidapi)
