@@ -1,5 +1,5 @@
 # About
-I have created a small program to replicate the functionality of the original `Deepcol Digital`
+I have created a small program to replicate the functionality of the original `DeepCool Digital`
 Windows program.
 
 Currently, I have tested it with my AK series cooler and the rest of the devices
@@ -80,7 +80,7 @@ let me know.
     <tr>
         <td>10</td>
         <td>LD240</td>
-        <td align="center"></td>
+        <td align="center">✅</td>
         <td align="center"></td>
     </tr>
     <tr>
@@ -126,7 +126,7 @@ sudo nano /etc/systemd/system/deepcool-digital.service
 3. Copy the contents:
 ```properties
 [Unit]
-Description=Deepcool Digital
+Description=DeepCool Digital
 
 [Service]
 ExecStart=/usr/sbin/deepcool-digital-linux # arguments here
@@ -152,7 +152,7 @@ nano /etc/init.d/deepcool-digital
 ```properties
 #!/sbin/openrc-run
 
-description="Deepcool Digital"
+description="DeepCool Digital"
 command="/usr/sbin/deepcool-digital-linux"
 command_args="" # arguments here
 command_background=1

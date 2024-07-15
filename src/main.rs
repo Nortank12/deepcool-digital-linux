@@ -21,7 +21,7 @@ struct Args {
     #[arg(short, long)]
     fahrenheit: bool,
 
-    /// Enable the alarm (80˚C or 176˚F)
+    /// Enable the alarm (85˚C | 185˚F)
     #[arg(short, long)]
     alarm: bool,
 }
@@ -54,7 +54,7 @@ fn main() {
         }
     }
     if product_id == 0 {
-        println!("Device not found!");
+        println!("No DeepCool device found!");
         exit(1);
     }
     
@@ -77,6 +77,21 @@ fn main() {
             // Display loop
             let ak_device = devices::ak_series::Display::new(product_id, args.fahrenheit, args.alarm);
             ak_device.run(&api, &args.mode, &cpu_hwmon_path);
+        },
+        10 => {
+            // Write info
+            println!("DISP. MODE: not supported");
+            if args.mode != "usage" {
+                println!("TEMP. UNIT: {}", if args.fahrenheit {"˚F"} else {"˚C"});
+            }
+            println!("ALARM:      built-in (85˚C | 185˚F)");
+            println!("-----");
+            println!("Update interval: 1 second");
+            println!("\nPress Ctrl + C to terminate");
+
+            // Display loop
+            let ld_device = devices::ld_series::Display::new(product_id, args.fahrenheit);
+            ld_device.run(&api, &cpu_hwmon_path);
         },
         _ => {
             println!("Device not yet supported!");
