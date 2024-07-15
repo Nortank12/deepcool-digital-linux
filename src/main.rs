@@ -1,6 +1,7 @@
-mod device;
-use device::{find_cpu_sensor, startup_message, status_message};
+mod monitor;
+mod devices;
 
+use monitor::cpu::find_temp_sensor;
 use std::process::exit;
 use libc::geteuid;
 use hidapi::HidApi;
@@ -8,7 +9,6 @@ use clap::Parser;
 
 
 const VENDOR: u16 = 0x3633;
-const PRODUCT_NAMES: [&str; 4] = ["AK400", "AK620", "AK500", "AK500S"];
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -48,7 +48,8 @@ fn main() {
     for device in api.device_list() {
         if device.vendor_id() == VENDOR {
             product_id = device.product_id();
-            println!("Device found: {}-DIGITAL", PRODUCT_NAMES[(product_id - 1) as usize]);
+            println!("Device found: {}", device.product_string().unwrap());
+            println!("-----");
             break;
         }
     }
@@ -57,42 +58,35 @@ fn main() {
         exit(1);
     }
     
-    // Connect
-    let device = api.open(VENDOR, product_id).expect("Failed to open HID device");
-
     // Find CPU temp. sensor
-    let cpu_hwmon_path = find_cpu_sensor();
+    let cpu_hwmon_path = find_temp_sensor();
 
-    // Start
-    device.write(&startup_message()).expect("Failed to write data");
-
-    // Write info
-    println!("-----");
-    println!("DISP. MODE: {}", args.mode);
-    if args.mode != "usage" {
-        println!("TEMP. UNIT: {}", if args.fahrenheit {"˚F"} else {"˚C"});
-    }
-    println!("ALARM:      {}", if args.alarm {"on"} else {"off"});
-    println!("-----");
-    println!("Update interval: 750ms");
-    println!("\nPress Ctrl + C to terminate");
-
-    // Display loop
-    if args.mode == "auto" {
-        loop {
-            for _ in 0..8 {
-                device.write(&status_message(&cpu_hwmon_path, "temp", args.fahrenheit, args.alarm))
-                    .expect("Failed to write data");
+    // Connect to device and send datastream
+    match product_id {
+        1..=4 => {
+            // Write info
+            println!("DISP. MODE: {}", args.mode);
+            if args.mode != "usage" {
+                println!("TEMP. UNIT: {}", if args.fahrenheit {"˚F"} else {"˚C"});
             }
-            for _ in 0..8 {
-                device.write(&status_message(&cpu_hwmon_path, "usage", args.fahrenheit, args.alarm))
-                    .expect("Failed to write data");
-            }
-        }
-    } else {
-        loop {
-            device.write(&status_message(&cpu_hwmon_path, &args.mode, args.fahrenheit, args.alarm))
-                .expect("Failed to write data");
+            println!("ALARM:      {}", if args.alarm {"on"} else {"off"});
+            println!("-----");
+            println!("Update interval: 750ms");
+            println!("\nPress Ctrl + C to terminate");
+
+            // Display loop
+            let ak_device = devices::ak_series::Display::new(product_id, args.fahrenheit, args.alarm);
+            ak_device.run(&api, &args.mode, &cpu_hwmon_path);
+        },
+        _ => {
+            println!("Device not yet supported!");
+            println!("\nPlease create an issue on GitHub providing your device name and the following information:");
+            let device = api.open(VENDOR, product_id).unwrap();
+            let info = device.get_device_info().unwrap();
+            println!("Vendor ID: {}", info.vendor_id());
+            println!("Device ID: {}", info.product_id());
+            println!("Vendor name: {}", info.manufacturer_string().unwrap());
+            println!("Device name: {}", info.product_string().unwrap());
         }
     }
 }
