@@ -79,7 +79,7 @@ work on any other Linux distribution.
         <td>10</td>
         <td>LD240</td>
         <td align="center">✅</td>
-        <td align="center"></td>
+        <td align="center">✅</td>
     </tr>
     <tr>
         <td>...</td>
