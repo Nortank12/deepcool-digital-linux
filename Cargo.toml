@@ -8,3 +8,7 @@ libc = "0.2.155"
 hidapi = "2.6.1"
 cpu-monitor = "0.1.1"
 clap = { version = "4.5.7", features = ["derive"] }
+
+[profile.release]
+opt-level = 3
+lto = true
