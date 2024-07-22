@@ -13,7 +13,7 @@ pub fn find_temp_sensor() -> String {
         match read_to_string(format!("/sys/class/hwmon/hwmon{i}/name")) {
             Ok(data) => {
                 let hwname = data.trim_end();
-                if hwname == "k10temp" || hwname == "coretemp" {
+                if ["k10temp", "coretemp", "zenpower"].contains(&hwname) {
                     return format!("/sys/class/hwmon/hwmon{i}/temp1_input");
                 }
             },
