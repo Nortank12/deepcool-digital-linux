@@ -1,10 +1,7 @@
 //! Reads live CPU data from the Linux kernel.
 
-use std::{
-    fs::read_to_string,
-    process::exit
-};
 use cpu_monitor::CpuInstant;
+use std::{fs::read_to_string, process::exit};
 
 /// Looks for the appropriate CPU temperature sensor datastream in the hwmon folder.
 pub fn find_temp_sensor() -> String {
@@ -13,14 +10,14 @@ pub fn find_temp_sensor() -> String {
         match read_to_string(format!("/sys/class/hwmon/hwmon{i}/name")) {
             Ok(data) => {
                 let hwname = data.trim_end();
-                if ["k10temp", "coretemp", "zenpower"].contains(&hwname) {
+                if ["coretemp", "k10temp", "zenpower"].contains(&hwname) {
                     return format!("/sys/class/hwmon/hwmon{i}/temp1_input");
                 }
-            },
+            }
             Err(_) => {
                 println!("CPU temperature sensor not found!");
                 exit(1);
-            },
+            }
         }
         i += 1;
     }
@@ -34,17 +31,17 @@ pub fn get_temp(temp_sensor: &str, fahrenheit: bool) -> u8 {
     // Calculate temperature
     let mut temp = data.trim_end().parse::<u32>().unwrap();
     if fahrenheit {
-        temp = temp * 9/5 + 32000
+        temp = temp * 9 / 5 + 32000
     }
-    
-    (temp as f32 / 1000 as f32).round() as u8
+
+    (temp as f32 / 1000.0).round() as u8
 }
 
-/// Reads the energy consumption of the CPU in microjoules. 
+/// Reads the energy consumption of the CPU in microjoules.
 pub fn read_energy() -> u64 {
     let data = read_to_string("/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj")
         .expect("CPU energy consumption cannot be read!");
-    
+
     data.trim_end().parse::<u64>().unwrap()
 }
 

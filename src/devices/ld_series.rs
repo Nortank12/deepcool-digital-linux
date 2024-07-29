@@ -1,9 +1,6 @@
-use hidapi::HidApi;
 use crate::monitor::cpu;
-use std::{
-    thread::sleep,
-    time::Duration
-};
+use hidapi::HidApi;
+use std::{thread::sleep, time::Duration};
 
 const VENDOR: u16 = 0x3633;
 const POLLING_RATE: u64 = 1000;
@@ -15,10 +12,7 @@ pub struct Display {
 
 impl Display {
     pub fn new(product_id: u16, fahrenheit: bool) -> Self {
-        Display {
-            product_id,
-            fahrenheit,
-        }
+        Display { product_id, fahrenheit }
     }
 
     pub fn run(&self, api: &HidApi, cpu_temp_sensor: &str) {
@@ -70,7 +64,7 @@ impl Display {
 
             // Temperature
             let temp = (cpu::get_temp(cpu_temp_sensor, self.fahrenheit) as f32).to_be_bytes();
-            status_data[10] = if self.fahrenheit {1} else {0};
+            status_data[10] = if self.fahrenheit { 1 } else { 0 };
             status_data[11] = temp[0];
             status_data[12] = temp[1];
             status_data[13] = temp[2];

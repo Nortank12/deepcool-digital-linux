@@ -1,12 +1,11 @@
-mod monitor;
 mod devices;
+mod monitor;
 
+use clap::Parser;
+use hidapi::HidApi;
+use libc::geteuid;
 use monitor::cpu::find_temp_sensor;
 use std::process::exit;
-use libc::geteuid;
-use hidapi::HidApi;
-use clap::Parser;
-
 
 const VENDOR: u16 = 0x3633;
 
@@ -57,7 +56,7 @@ fn main() {
         println!("No DeepCool device found!");
         exit(1);
     }
-    
+
     // Find CPU temp. sensor
     let cpu_hwmon_path = find_temp_sensor();
 
@@ -67,9 +66,9 @@ fn main() {
             // Write info
             println!("DISP. MODE: {}", args.mode);
             if args.mode != "usage" {
-                println!("TEMP. UNIT: {}", if args.fahrenheit {"˚F"} else {"˚C"});
+                println!("TEMP. UNIT: {}", if args.fahrenheit { "˚F" } else { "˚C" });
             }
-            println!("ALARM:      {}", if args.alarm {"on"} else {"off"});
+            println!("ALARM:      {}", if args.alarm { "on" } else { "off" });
             println!("-----");
             println!("Update interval: 750ms");
             println!("\nPress Ctrl + C to terminate");
@@ -77,12 +76,12 @@ fn main() {
             // Display loop
             let ak_device = devices::ak_series::Display::new(product_id, args.fahrenheit, args.alarm);
             ak_device.run(&api, &args.mode, &cpu_hwmon_path);
-        },
+        }
         10 => {
             // Write info
             println!("DISP. MODE: not supported");
             if args.mode != "usage" {
-                println!("TEMP. UNIT: {}", if args.fahrenheit {"˚F"} else {"˚C"});
+                println!("TEMP. UNIT: {}", if args.fahrenheit { "˚F" } else { "˚C" });
             }
             println!("ALARM:      built-in (85˚C | 185˚F)");
             println!("-----");
@@ -92,7 +91,7 @@ fn main() {
             // Display loop
             let ld_device = devices::ld_series::Display::new(product_id, args.fahrenheit);
             ld_device.run(&api, &cpu_hwmon_path);
-        },
+        }
         _ => {
             println!("Device not yet supported!");
             println!("\nPlease create an issue on GitHub providing your device name and the following information:");

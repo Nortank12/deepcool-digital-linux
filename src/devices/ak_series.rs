@@ -1,9 +1,6 @@
-use hidapi::HidApi;
 use crate::monitor::cpu;
-use std::{
-    thread::sleep,
-    time::Duration
-};
+use hidapi::HidApi;
+use std::{thread::sleep, time::Duration};
 
 const VENDOR: u16 = 0x3633;
 const POLLING_RATE: u64 = 750;
@@ -11,7 +8,7 @@ const POLLING_RATE: u64 = 750;
 pub struct Display {
     product_id: u16,
     fahrenheit: bool,
-    alarm: bool
+    alarm: bool,
 }
 
 impl Display {
@@ -19,7 +16,7 @@ impl Display {
         Display {
             product_id,
             fahrenheit,
-            alarm
+            alarm,
         }
     }
 
@@ -42,17 +39,20 @@ impl Display {
         if mode == "auto" {
             loop {
                 for _ in 0..8 {
-                    device.write(&self.status_message(&data, "temp", &cpu_temp_sensor))
+                    device
+                        .write(&self.status_message(&data, "temp", &cpu_temp_sensor))
                         .expect("Failed to write data");
                 }
                 for _ in 0..8 {
-                    device.write(&self.status_message(&data, "usage", &cpu_temp_sensor))
+                    device
+                        .write(&self.status_message(&data, "usage", &cpu_temp_sensor))
                         .expect("Failed to write data");
                 }
             }
         } else {
             loop {
-                device.write(&self.status_message(&data, &mode, &cpu_temp_sensor))
+                device
+                    .write(&self.status_message(&data, &mode, &cpu_temp_sensor))
                     .expect("Failed to write data");
             }
         }
@@ -72,27 +72,27 @@ impl Display {
         // Calculate usage & temperature
         let usage = cpu::get_usage(cpu_instant);
         let temp = cpu::get_temp(cpu_temp_sensor, self.fahrenheit);
-        
+
         // Main display
         match mode {
             "temp" => {
-                data[1] = if self.fahrenheit {35} else {19};
+                data[1] = if self.fahrenheit { 35 } else { 19 };
                 data[3] = temp / 100;
                 data[4] = temp % 100 / 10;
                 data[5] = temp % 10;
-            },
+            }
             "usage" => {
                 data[1] = 76;
                 data[3] = usage / 100;
                 data[4] = usage % 100 / 10;
                 data[5] = usage % 10;
             }
-            _ => ()
+            _ => (),
         }
         // Status bar
         data[2] = (usage as f32 / 10 as f32).round() as u8;
         // Alarm
-        data[6] = (self.alarm && temp > if self.fahrenheit {185} else {85}) as u8;
+        data[6] = (self.alarm && temp > if self.fahrenheit { 185 } else { 85 }) as u8;
 
         data
     }
