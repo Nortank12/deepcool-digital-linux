@@ -13,6 +13,10 @@ and run it in the command line. You will need root permission to send data to th
 I built the binary for `x86_64` architecture and tested it on Arch, Debian, and Gentoo but it should
 work on any other Linux distribution.
 
+> [!TIP]
+> On AMD's Zen architecture CPUs, you can install the [zenpower3](https://git.exozy.me/a/zenpower3)
+> driver, to have a more accurate reading of the CPU die.
+
 ## Supported Devices
 <table>
     <tr>
@@ -37,7 +41,7 @@ work on any other Linux distribution.
         <td>3</td>
         <td>AK500 DIGITAL</td>
         <td align="center">✅</td>
-        <td align="center"></td>
+        <td align="center">✅</td>
     </tr>
     <tr>
         <td>4</td>
@@ -97,7 +101,7 @@ work on any other Linux distribution.
 
 - *If your device is not on the list, you can still run the program and see if it detects it.*
 
-- *If your device is on the list, please try to check all the features if they work as expected.*
+- *If your device is on the list but untested, please try to check all the features to see if they work as expected.*
 
 *In any case, you can create an issue or add a comment to an existing one.*
 
