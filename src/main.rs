@@ -77,6 +77,21 @@ fn main() {
             let ak_device = devices::ak_series::Display::new(product_id, args.fahrenheit, args.alarm);
             ak_device.run(&api, &args.mode, &cpu_hwmon_path);
         }
+        8 => {
+            // Write info
+            println!("DISP. MODE: {}", args.mode);
+            if args.mode != "usage" {
+                println!("TEMP. UNIT: ˚C (˚F not supported)");
+            }
+            println!("ALARM:      {}", if args.alarm { "on" } else { "off" });
+            println!("-----");
+            println!("Update interval: 750ms");
+            println!("\nPress Ctrl + C to terminate");
+
+            // Display loop
+            let ag_device = devices::ag_series::Display::new(product_id, args.alarm);
+            ag_device.run(&api, &args.mode, &cpu_hwmon_path);
+        }
         10 => {
             // Write info
             println!("DISP. MODE: not supported");
