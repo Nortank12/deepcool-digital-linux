@@ -68,8 +68,8 @@ impl Display {
             // Calculate & write usage
             let usage = cpu::get_usage(cpu_instant);
             data[1] = 76;
-            data[4] = if usage < 100 { usage % 100 / 10 } else { 9 };
-            data[5] = if usage < 100 { usage % 10 } else { 9 };
+            data[3] = if usage < 100 { usage % 100 / 10 } else { 9 };
+            data[4] = if usage < 100 { usage % 10 } else { 9 };
         } else {
             // If display mode is not usage, simply wait
             sleep(Duration::from_millis(POLLING_RATE));
@@ -81,12 +81,12 @@ impl Display {
         if mode == "temp" {
             // Write temperature
             data[1] = 19;
-            data[4] = if temp < 100 { temp % 100 / 10 } else { 9 };
-            data[5] = if temp < 100 { temp % 10 } else { 9 };
+            data[3] = if temp < 100 { temp % 100 / 10 } else { 9 };
+            data[4] = if temp < 100 { temp % 10 } else { 9 };
         }
 
         // Alarm
-        data[6] = (self.alarm && temp > 45) as u8; // Should be 85˚C
+        data[5] = (self.alarm && temp > 45) as u8; // Should be 85˚C
 
         data
     }
