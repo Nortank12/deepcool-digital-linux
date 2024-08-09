@@ -86,7 +86,7 @@ impl Display {
         }
 
         // Alarm
-        data[5] = (self.alarm && temp > 45) as u8; // Should be 85˚C
+        data[5] = (self.alarm && temp > 85) as u8;
 
         data
     }
