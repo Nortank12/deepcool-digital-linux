@@ -4,6 +4,7 @@ version = "0.2.2"
 edition = "2021"
 
 [dependencies]
+libloading = "0.8.5"
 libc = "0.2.155"
 hidapi = "2.6.1"
 cpu-monitor = "0.1.1"
