@@ -10,100 +10,77 @@ If you think you can collaborate, please write an issue so we can get in touch.
 Simply download the latest [release](https://github.com/Nortank12/deepcool-digital-linux/releases)
 and run it in the command line. You will need root permission to send data to the device.
 
-I built the binary for `x86_64` architecture and tested it on Arch, Debian, and Gentoo but it should
-work on any other Linux distribution.
-
 > [!TIP]
 > On AMD's Zen architecture CPUs, you can install the [zenpower3](https://git.exozy.me/a/zenpower3)
 > driver, to have a more accurate reading of the CPU die.
 
-## Supported Devices
+### CPU Coolers
 <table>
     <tr>
-        <th>PID</th>
-        <th>Model</th>
-        <th>Added</th>
-        <th>Tested</th>
+        <th>Name</th>
+        <th>Supported</th>
     </tr>
     <tr>
-        <td>1</td>
-        <td>AK400 DIGITAL</td>
-        <td align="center">✅</td>
-        <td align="center"></td>
-    </tr>
-    <tr>
-        <td>2</td>
-        <td>AK620 DIGITAL</td>
-        <td align="center">✅</td>
-        <td align="center"></td>
-    </tr>
-    <tr>
-        <td>3</td>
-        <td>AK500 DIGITAL</td>
-        <td align="center">✅</td>
-        <td align="center">✅</td>
-    </tr>
-    <tr>
-        <td>4</td>
-        <td>AK500S DIGITAL</td>
-        <td align="center">✅</td>
-        <td align="center">✅</td>
-    </tr>
-    <tr>
-        <td>5</td>
-        <td>CH560 DIGITAL</td>
-        <td align="center"></td>
-        <td align="center"></td>
-    </tr>
-    <tr>
-        <td>6</td>
-        <td>LS720 SE DIGITAL</td>
-        <td align="center"></td>
-        <td align="center"></td>
-    </tr>
-    <tr>
-        <td>7</td>
-        <td>??</td>
-        <td align="center"></td>
-        <td align="center"></td>
-    </tr>
-    <tr>
-        <td>8</td>
         <td>AG400 DIGITAL</td>
         <td align="center">✅</td>
+    </tr>
+    <tr>
+        <td>AG620 DIGITAL</td>
+        <td align="center">⚠️</td>
+    </tr>
+    <tr>
+        <td>AK400 DIGITAL</td>
         <td align="center">✅</td>
     </tr>
     <tr>
-        <td>9</td>
-        <td>??</td>
-        <td align="center"></td>
-        <td align="center"></td>
+        <td>AK500 DIGITAL</td>
+        <td align="center">✅</td>
     </tr>
     <tr>
-        <td>10</td>
+        <td>AK500S DIGITAL</td>
+        <td align="center">✅</td>
+    </tr>
+    <tr>
+        <td>AK620 DIGITAL</td>
+        <td align="center">✅</td>
+    </tr>
+    <tr>
         <td>LD240</td>
         <td align="center">✅</td>
-        <td align="center">✅</td>
     </tr>
     <tr>
-        <td>...</td>
-        <td>...</td>
-        <td align="center"></td>
-        <td align="center"></td>
-    </tr>
-    <tr>
-        <td>21</td>
-        <td>CH360 DIGITAL</td>
-        <td align="center"></td>
-        <td align="center"></td>
+        <td>LD360</td>
+        <td align="center">⚠️</td>
     </tr>
 </table>
 
-- *If your device is not on the list, you can still run the program and see if it detects it.*
+### Cases
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Supported</th>
+    </tr>
+    <tr>
+        <td>CH360 DIGITAL</td>
+        <td align="center">⚠️</td>
+    </tr>
+    <tr>
+        <td>CH560 DIGITAL</td>
+        <td align="center">⚠️</td>
+    </tr>
+    <tr>
+        <td>MORPHEUS</td>
+        <td align="center">⚠️</td>
+    </tr>
+</table>
 
-- *If your device is on the list but untested, please try to check all the features to see if they work as expected.*
+**✅: Fully supported &nbsp; ⚠️: Not tested**
 
-*In any case, you can create an issue or add a comment to an existing one.*
+> [!IMPORTANT]
+> - If your device is not on the list, you can still run the program and see if it detects it.
+> - If your device is on the list but untested, please try to check all the features to see if they work as expected.
+>
+> In any case, you can create an issue or add a comment to an existing one.
 
 # Usage
 You can run the program with or without providing any options.

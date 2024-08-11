@@ -62,6 +62,7 @@ fn main() {
 
     // Connect to device and send datastream
     match product_id {
+        // AK Series
         1..=4 => {
             // Write info
             println!("DISP. MODE: {}", args.mode);
@@ -70,13 +71,14 @@ fn main() {
             }
             println!("ALARM:      {}", if args.alarm { "on" } else { "off" });
             println!("-----");
-            println!("Update interval: 750ms");
+            println!("Update interval: 750 ms");
             println!("\nPress Ctrl + C to terminate");
 
             // Display loop
             let ak_device = devices::ak_series::Display::new(product_id, args.fahrenheit, args.alarm);
             ak_device.run(&api, &args.mode, &cpu_hwmon_path);
         }
+        // AG Series
         8 => {
             // Write info
             println!("DISP. MODE: {}", args.mode);
@@ -85,13 +87,14 @@ fn main() {
             }
             println!("ALARM:      {}", if args.alarm { "on" } else { "off" });
             println!("-----");
-            println!("Update interval: 750ms");
+            println!("Update interval: 750 ms");
             println!("\nPress Ctrl + C to terminate");
 
             // Display loop
             let ag_device = devices::ag_series::Display::new(product_id, args.alarm);
             ag_device.run(&api, &args.mode, &cpu_hwmon_path);
         }
+        // LD Series
         10 => {
             // Write info
             println!("DISP. MODE: not supported");
@@ -106,6 +109,22 @@ fn main() {
             // Display loop
             let ld_device = devices::ld_series::Display::new(product_id, args.fahrenheit);
             ld_device.run(&api, &cpu_hwmon_path);
+        }
+        // CH Series & MORPHEUS
+        5 | 7 | 21 => {
+            // Write info
+            println!("DISP. MODE: {}", args.mode);
+            if args.mode != "usage" {
+                println!("TEMP. UNIT: {}", if args.fahrenheit { "˚F" } else { "˚C" });
+            }
+            println!("ALARM:      not supported");
+            println!("-----");
+            println!("Update interval: 750 ms");
+            println!("\nPress Ctrl + C to terminate");
+
+            // Display loop
+            let ch_device = devices::ch_series::Display::new(product_id, args.fahrenheit, "nvidia");
+            ch_device.run(&api, &args.mode, &cpu_hwmon_path);
         }
         _ => {
             println!("Device not yet supported!");
