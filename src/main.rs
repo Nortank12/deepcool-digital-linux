@@ -123,7 +123,7 @@ fn main() {
             println!("\nPress Ctrl + C to terminate");
 
             // Display loop
-            let ch_device = devices::ch_series::Display::new(product_id, args.fahrenheit, "nvidia");
+            let ch_device = devices::ch_series::Display::new(product_id, args.fahrenheit);
             ch_device.run(&api, &args.mode, &cpu_hwmon_path);
         }
         _ => {

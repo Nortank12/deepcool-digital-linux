@@ -1,4 +1,4 @@
-use crate::monitor::{cpu, gpu::nvidia::Gpu as NvGpu};
+use crate::monitor::{cpu, gpu::Gpu};
 use hidapi::HidApi;
 use std::{thread::sleep, time::Duration};
 
@@ -8,17 +8,15 @@ const POLLING_RATE: u64 = 750;
 pub struct Display {
     product_id: u16,
     fahrenheit: bool,
-    nvidia_gpu: Option<NvGpu>,
+    gpu: Gpu,
 }
 
 impl Display {
-    pub fn new(product_id: u16, fahrenheit: bool, gpu: &str) -> Self {
-        let nv_gpu = if gpu == "nvidia" { Some(NvGpu::new()) } else { None };
-
+    pub fn new(product_id: u16, fahrenheit: bool) -> Self {
         Display {
             product_id,
             fahrenheit,
-            nvidia_gpu: nv_gpu,
+            gpu: Gpu::new(),
         }
     }
 
@@ -73,14 +71,14 @@ impl Display {
 
         // Calculate CPU & GPU usage
         let cpu_usage = cpu::get_usage(cpu_instant);
-        let gpu_usage = self.nvidia_gpu.as_ref().unwrap().get_usage();
+        let gpu_usage = self.gpu.get_usage();
 
         // Main display
         match mode {
             "temp" => {
                 let unit = if self.fahrenheit { 35 } else { 19 };
                 let cpu_temp = cpu::get_temp(cpu_temp_sensor, self.fahrenheit);
-                let gpu_temp = self.nvidia_gpu.as_ref().unwrap().get_temp(self.fahrenheit);
+                let gpu_temp = self.gpu.get_temp(self.fahrenheit);
                 // CPU
                 data[1] = unit;
                 data[3] = cpu_temp / 100;

@@ -9,10 +9,10 @@ pub struct Gpu {
 
 impl Gpu {
     pub fn new() -> Self {
-        let temp_sensor = find_temp_sensor();
-        let usage_file = find_card();
-
-        Gpu { temp_sensor, usage_file }
+        Gpu {
+            temp_sensor: find_temp_sensor(),
+            usage_file: find_card(),
+        }
     }
 
     /// Reads the value of the GPU temperature sensor and calculates it to be `˚C` or `˚F`.
@@ -67,7 +67,7 @@ fn find_card() -> String {
                     return format!("/sys/bus/pci/devices/0000:0{i}:00.0/gpu_busy_percent");
                 }
             }
-            Err(_) => ()
+            Err(_) => (),
         }
     }
     println!("AMD PCI data not found!");
