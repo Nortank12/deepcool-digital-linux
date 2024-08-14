@@ -105,8 +105,8 @@ impl Display {
             _ => (),
         }
         // Status bar
-        data[2] = if cpu_usage < 20 { 1 } else { (cpu_usage as f32 / 10 as f32).round() as u8 };
-        data[7] = if gpu_usage < 20 { 1 } else { (gpu_usage as f32 / 10 as f32).round() as u8 };
+        data[2] = if cpu_usage < 20 { 1 } else { (cpu_usage as f32 / 10.0).round() as u8 };
+        data[7] = if gpu_usage < 20 { 1 } else { (gpu_usage as f32 / 10.0).round() as u8 };
 
         data
     }

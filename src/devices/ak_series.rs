@@ -90,7 +90,7 @@ impl Display {
             _ => (),
         }
         // Status bar
-        data[2] = if usage < 20 { 1 } else { (usage as f32 / 10 as f32).round() as u8 };
+        data[2] = if usage < 20 { 1 } else { (usage as f32 / 10.0).round() as u8 };
         // Alarm
         data[6] = (self.alarm && temp > if self.fahrenheit { 185 } else { 85 }) as u8;
 
