@@ -1,6 +1,6 @@
 //! Reads live GPU data from the Linux kernel.
 
-use std::{fs::read_to_string, process::exit};
+use std::{fs::read_dir, fs::read_to_string, process::exit};
 
 pub struct Gpu {
     temp_sensor: String,
@@ -59,16 +59,22 @@ fn find_temp_sensor() -> String {
 
 /// Looks for the PCI device folder of the AMD GPU.
 fn find_card() -> String {
-    for i in 0..=20 {
-        match read_to_string(format!("/sys/bus/pci/devices/0000:0{i}:00.0/uevent")) {
-            Ok(data) => {
-                let driver = data.lines().next().unwrap();
-                if driver.ends_with("amdgpu") {
-                    return format!("/sys/bus/pci/devices/0000:0{i}:00.0/gpu_busy_percent");
+    match read_dir("/sys/bus/pci/devices") {
+        Ok(devices) => {
+            for device in devices {
+                let path = device.unwrap().path().to_str().unwrap().to_owned();
+                match read_to_string(format!("{path}/uevent")) {
+                    Ok(data) => {
+                        let driver = data.lines().next().unwrap();
+                        if driver.ends_with("amdgpu") {
+                            return format!("{path}/gpu_busy_percent");
+                        }
+                    }
+                    Err(_) => (),
                 }
             }
-            Err(_) => (),
         }
+        Err(_) => (),
     }
     println!("AMD PCI data not found!");
     exit(1);
