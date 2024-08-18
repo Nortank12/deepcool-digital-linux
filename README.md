@@ -26,7 +26,7 @@ and run it in the command line. You will need root permission to send data to th
     </tr>
     <tr>
         <td>AG620 DIGITAL</td>
-        <td align="center">⚠️</td>
+        <td align="center">✅</td>
     </tr>
     <tr>
         <td>AK400 DIGITAL</td>
@@ -70,7 +70,7 @@ and run it in the command line. You will need root permission to send data to th
     </tr>
     <tr>
         <td>MORPHEUS</td>
-        <td align="center">⚠️</td>
+        <td align="center">✅</td>
     </tr>
 </table>
 
