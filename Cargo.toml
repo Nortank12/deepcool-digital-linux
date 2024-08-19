@@ -1,14 +1,14 @@
 [package]
 name = "deepcool-digital-linux"
-version = "0.4.0"
+version = "0.4.1"
 edition = "2021"
 
 [dependencies]
 libloading = "0.8.5"
-libc = "0.2.155"
-hidapi = "2.6.1"
+libc = "0.2.158"
+hidapi = "2.6.3"
 cpu-monitor = "0.1.1"
-clap = { version = "4.5.7", features = ["derive"] }
+clap = { version = "4.5.16", features = ["derive"] }
 
 [profile.release]
 opt-level = 3

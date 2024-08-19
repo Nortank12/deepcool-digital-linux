@@ -39,22 +39,24 @@ impl Gpu {
 
 /// Looks for the appropriate CPU temperature sensor datastream in the hwmon folder.
 fn find_temp_sensor() -> String {
-    let mut i = 0;
-    loop {
-        match read_to_string(format!("/sys/class/hwmon/hwmon{i}/name")) {
-            Ok(data) => {
-                let hwname = data.trim_end();
-                if hwname == "amdgpu" {
-                    return format!("/sys/class/hwmon/hwmon{i}/temp1_input");
+    match read_dir("/sys/class/hwmon") {
+        Ok(sensors) => {
+            for sensor in sensors {
+                let path = sensor.unwrap().path().to_str().unwrap().to_owned();
+                match read_to_string(format!("{path}/name")) {
+                    Ok(name) => {
+                        if name.starts_with("amdgpu") {
+                            return format!("{path}/temp1_input");
+                        }
+                    }
+                    Err(_) => (),
                 }
             }
-            Err(_) => {
-                println!("AMD GPU temperature sensor not found!");
-                exit(1);
-            }
         }
-        i += 1;
+        Err(_) => (),
     }
+    println!("AMD GPU temperature sensor not found!");
+    exit(1);
 }
 
 /// Looks for the PCI device folder of the AMD GPU.

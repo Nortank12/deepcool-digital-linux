@@ -1,26 +1,28 @@
 //! Reads live CPU data from the Linux kernel.
 
 use cpu_monitor::CpuInstant;
-use std::{fs::read_to_string, process::exit};
+use std::{fs::read_dir, fs::read_to_string, process::exit};
 
 /// Looks for the appropriate CPU temperature sensor datastream in the hwmon folder.
 pub fn find_temp_sensor() -> String {
-    let mut i = 0;
-    loop {
-        match read_to_string(format!("/sys/class/hwmon/hwmon{i}/name")) {
-            Ok(data) => {
-                let hwname = data.trim_end();
-                if ["coretemp", "k10temp", "zenpower"].contains(&hwname) {
-                    return format!("/sys/class/hwmon/hwmon{i}/temp1_input");
+    match read_dir("/sys/class/hwmon") {
+        Ok(sensors) => {
+            for sensor in sensors {
+                let path = sensor.unwrap().path().to_str().unwrap().to_owned();
+                match read_to_string(format!("{path}/name")) {
+                    Ok(name) => {
+                        if ["coretemp", "k10temp", "zenpower"].contains(&name.trim_end()) {
+                            return format!("{path}/temp1_input");
+                        }
+                    }
+                    Err(_) => (),
                 }
             }
-            Err(_) => {
-                println!("CPU temperature sensor not found!");
-                exit(1);
-            }
         }
-        i += 1;
+        Err(_) => (),
     }
+    println!("CPU temperature sensor not found!");
+    exit(1);
 }
 
 /// Reads the value of the CPU temperature sensor and calculates it to be `˚C` or `˚F`.
