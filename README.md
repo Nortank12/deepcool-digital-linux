@@ -50,7 +50,7 @@ and run it in the command line. You will need root permission to send data to th
     </tr>
     <tr>
         <td>LD360</td>
-        <td align="center">⚠️</td>
+        <td align="center">✅</td>
     </tr>
 </table>
 
