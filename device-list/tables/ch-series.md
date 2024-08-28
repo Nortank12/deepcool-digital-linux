@@ -17,11 +17,12 @@
         <td rowspan="4">D1</td>
         <td>170</td>
         <td>STATUS BAR ANIMATION</td>
-        <td rowspan="8">CPU</td>
+        <td>BOTH</td>
     </tr>
     <tr>
         <td>19</td>
         <td>TEMPERATURE MODE ˚C</td>
+        <td rowspan="7">CPU</td>
     </tr>
     <tr>
         <td>35</td>
@@ -52,14 +53,10 @@
         <td>NUMERIC DISPLAY || xxO</td>
     </tr>
     <tr>
-        <td rowspan="4">D6</td>
-        <td>170</td>
-        <td>STATUS BAR ANIMATION</td>
-        <td rowspan="8">GPU</td>
-    </tr>
-    <tr>
+        <td rowspan="3">D6</td>
         <td>19</td>
         <td>TEMPERATURE MODE ˚C</td>
+        <td rowspan="7">GPU</td>
     </tr>
     <tr>
         <td>35</td>

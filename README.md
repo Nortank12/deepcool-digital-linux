@@ -11,7 +11,7 @@ Simply download the latest [release](https://github.com/Nortank12/deepcool-digit
 and run it in the command line. You will need root permission to send data to the device.
 
 > [!TIP]
-> On AMD's Zen architecture CPUs, you can install the [zenpower3](https://git.exozy.me/a/zenpower3)
+> On AMD's Zen architecture CPUs, you can install the [zenpower3](https://github.com/PutinVladimir/zenpower3)
 > driver, to have a more accurate reading of the CPU die.
 
 ### CPU Coolers
@@ -66,7 +66,7 @@ and run it in the command line. You will need root permission to send data to th
     </tr>
     <tr>
         <td>CH560 DIGITAL</td>
-        <td align="center">⚠️</td>
+        <td align="center">✅</td>
     </tr>
     <tr>
         <td>MORPHEUS</td>
