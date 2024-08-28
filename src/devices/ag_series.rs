@@ -1,4 +1,4 @@
-use crate::monitor::cpu;
+use crate::monitor::cpu::Cpu;
 use hidapi::HidApi;
 use std::{thread::sleep, time::Duration};
 
@@ -8,14 +8,19 @@ const POLLING_RATE: u64 = 750;
 pub struct Display {
     product_id: u16,
     alarm: bool,
+    cpu: Cpu,
 }
 
 impl Display {
     pub fn new(product_id: u16, alarm: bool) -> Self {
-        Display { product_id, alarm }
+        Display {
+            product_id,
+            alarm,
+            cpu: Cpu::new(),
+        }
     }
 
-    pub fn run(&self, api: &HidApi, mode: &str, cpu_temp_sensor: &str) {
+    pub fn run(&self, api: &HidApi, mode: &str) {
         // Connect to device
         let device = api.open(VENDOR, self.product_id).expect("Failed to open HID device");
 
@@ -35,38 +40,38 @@ impl Display {
             loop {
                 for _ in 0..8 {
                     device
-                        .write(&self.status_message(&data, "temp", &cpu_temp_sensor))
+                        .write(&self.status_message(&data, "temp"))
                         .expect("Failed to write data");
                 }
                 for _ in 0..8 {
                     device
-                        .write(&self.status_message(&data, "usage", &cpu_temp_sensor))
+                        .write(&self.status_message(&data, "usage"))
                         .expect("Failed to write data");
                 }
             }
         } else {
             loop {
                 device
-                    .write(&self.status_message(&data, &mode, &cpu_temp_sensor))
+                    .write(&self.status_message(&data, &mode))
                     .expect("Failed to write data");
             }
         }
     }
 
     /// Reads the CPU status information and returns the data packet.
-    fn status_message(&self, inital_data: &[u8; 64], mode: &str, cpu_temp_sensor: &str) -> [u8; 64] {
+    fn status_message(&self, inital_data: &[u8; 64], mode: &str) -> [u8; 64] {
         // Clone the data packet
         let mut data = inital_data.clone();
 
         if mode == "usage" {
             // Read CPU utilization
-            let cpu_instant = cpu::read_instant();
+            let cpu_instant = self.cpu.read_instant();
 
             // Wait
             sleep(Duration::from_millis(POLLING_RATE));
 
             // Calculate & write usage
-            let usage = cpu::get_usage(cpu_instant);
+            let usage = self.cpu.get_usage(cpu_instant);
             data[1] = 76;
             data[3] = if usage < 100 { usage % 100 / 10 } else { 9 };
             data[4] = if usage < 100 { usage % 10 } else { 9 };
@@ -76,7 +81,7 @@ impl Display {
         }
 
         // Calculate temperature
-        let temp = cpu::get_temp(cpu_temp_sensor, false);
+        let temp = self.cpu.get_temp(false);
 
         if mode == "temp" {
             // Write temperature

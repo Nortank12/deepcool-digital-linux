@@ -4,7 +4,6 @@ mod monitor;
 use clap::Parser;
 use hidapi::HidApi;
 use libc::geteuid;
-use monitor::cpu::find_temp_sensor;
 use std::process::exit;
 
 const VENDOR: u16 = 0x3633;
@@ -57,9 +56,6 @@ fn main() {
         exit(1);
     }
 
-    // Find CPU temp. sensor
-    let cpu_hwmon_path = find_temp_sensor();
-
     // Connect to device and send datastream
     match product_id {
         // AK Series
@@ -76,7 +72,7 @@ fn main() {
 
             // Display loop
             let ak_device = devices::ak_series::Display::new(product_id, args.fahrenheit, args.alarm);
-            ak_device.run(&api, &args.mode, &cpu_hwmon_path);
+            ak_device.run(&api, &args.mode);
         }
         // AG Series
         8 => {
@@ -92,7 +88,7 @@ fn main() {
 
             // Display loop
             let ag_device = devices::ag_series::Display::new(product_id, args.alarm);
-            ag_device.run(&api, &args.mode, &cpu_hwmon_path);
+            ag_device.run(&api, &args.mode);
         }
         // LD Series
         10 => {
@@ -108,7 +104,7 @@ fn main() {
 
             // Display loop
             let ld_device = devices::ld_series::Display::new(product_id, args.fahrenheit);
-            ld_device.run(&api, &cpu_hwmon_path);
+            ld_device.run(&api);
         }
         // CH Series & MORPHEUS
         5 | 7 | 21 => {
@@ -124,7 +120,7 @@ fn main() {
 
             // Display loop
             let ch_device = devices::ch_series::Display::new(product_id, args.fahrenheit);
-            ch_device.run(&api, &args.mode, &cpu_hwmon_path);
+            ch_device.run(&api, &args.mode);
         }
         _ => {
             println!("Device not yet supported!");

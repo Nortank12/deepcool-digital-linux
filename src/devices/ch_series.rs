@@ -1,4 +1,4 @@
-use crate::monitor::{cpu, gpu::Gpu};
+use crate::monitor::{cpu::Cpu, gpu::Gpu};
 use hidapi::HidApi;
 use std::{thread::sleep, time::Duration};
 
@@ -8,6 +8,7 @@ const POLLING_RATE: u64 = 750;
 pub struct Display {
     product_id: u16,
     fahrenheit: bool,
+    cpu: Cpu,
     gpu: Gpu,
 }
 
@@ -16,11 +17,12 @@ impl Display {
         Display {
             product_id,
             fahrenheit,
+            cpu: Cpu::new(),
             gpu: Gpu::new(),
         }
     }
 
-    pub fn run(&self, api: &HidApi, mode: &str, cpu_temp_sensor: &str) {
+    pub fn run(&self, api: &HidApi, mode: &str) {
         // Connect to device
         let device = api.open(VENDOR, self.product_id).expect("Failed to open HID device");
 
@@ -40,44 +42,44 @@ impl Display {
             loop {
                 for _ in 0..8 {
                     device
-                        .write(&self.status_message(&data, "temp", &cpu_temp_sensor))
+                        .write(&self.status_message(&data, "temp"))
                         .expect("Failed to write data");
                 }
                 for _ in 0..8 {
                     device
-                        .write(&self.status_message(&data, "usage", &cpu_temp_sensor))
+                        .write(&self.status_message(&data, "usage"))
                         .expect("Failed to write data");
                 }
             }
         } else {
             loop {
                 device
-                    .write(&self.status_message(&data, &mode, &cpu_temp_sensor))
+                    .write(&self.status_message(&data, &mode))
                     .expect("Failed to write data");
             }
         }
     }
 
     /// Reads the CPU status information and returns the data packet.
-    fn status_message(&self, inital_data: &[u8; 64], mode: &str, cpu_temp_sensor: &str) -> [u8; 64] {
+    fn status_message(&self, inital_data: &[u8; 64], mode: &str) -> [u8; 64] {
         // Clone the data packet
         let mut data = inital_data.clone();
 
         // Read CPU utilization
-        let cpu_instant = cpu::read_instant();
+        let cpu_instant = self.cpu.read_instant();
 
         // Wait
         sleep(Duration::from_millis(POLLING_RATE));
 
         // Calculate CPU & GPU usage
-        let cpu_usage = cpu::get_usage(cpu_instant);
+        let cpu_usage = self.cpu.get_usage(cpu_instant);
         let gpu_usage = self.gpu.get_usage();
 
         // Main display
         match mode {
             "temp" => {
                 let unit = if self.fahrenheit { 35 } else { 19 };
-                let cpu_temp = cpu::get_temp(cpu_temp_sensor, self.fahrenheit);
+                let cpu_temp = self.cpu.get_temp(self.fahrenheit);
                 let gpu_temp = self.gpu.get_temp(self.fahrenheit);
                 // CPU
                 data[1] = unit;

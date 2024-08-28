@@ -1,4 +1,4 @@
-use crate::monitor::cpu;
+use crate::monitor::cpu::Cpu;
 use hidapi::HidApi;
 use std::{thread::sleep, time::Duration};
 
@@ -8,14 +8,19 @@ const POLLING_RATE: u64 = 1000;
 pub struct Display {
     product_id: u16,
     fahrenheit: bool,
+    cpu: Cpu,
 }
 
 impl Display {
     pub fn new(product_id: u16, fahrenheit: bool) -> Self {
-        Display { product_id, fahrenheit }
+        Display {
+            product_id,
+            fahrenheit,
+            cpu: Cpu::new(),
+        }
     }
 
-    pub fn run(&self, api: &HidApi, cpu_temp_sensor: &str) {
+    pub fn run(&self, api: &HidApi) {
         // Connect to device
         let device = api.open(VENDOR, self.product_id).expect("Failed to open HID device");
 
@@ -50,20 +55,20 @@ impl Display {
             let mut status_data = data.clone();
 
             // Read CPU utilization & energy consumption
-            let cpu_instant = cpu::read_instant();
-            let cpu_energy = cpu::read_energy();
+            let cpu_instant = self.cpu.read_instant();
+            let cpu_energy = self.cpu.read_energy();
 
             // Wait
             sleep(Duration::from_millis(POLLING_RATE));
 
             // ----- Write data to the package -----
             // Power consumption
-            let power = (cpu::get_power(cpu_energy, POLLING_RATE)).to_be_bytes();
+            let power = (self.cpu.get_power(cpu_energy, POLLING_RATE)).to_be_bytes();
             status_data[8] = power[0];
             status_data[9] = power[1];
 
             // Temperature
-            let temp = (cpu::get_temp(cpu_temp_sensor, self.fahrenheit) as f32).to_be_bytes();
+            let temp = (self.cpu.get_temp(self.fahrenheit) as f32).to_be_bytes();
             status_data[10] = if self.fahrenheit { 1 } else { 0 };
             status_data[11] = temp[0];
             status_data[12] = temp[1];
@@ -71,7 +76,7 @@ impl Display {
             status_data[14] = temp[3];
 
             // Utilization
-            status_data[15] = cpu::get_usage(cpu_instant);
+            status_data[15] = self.cpu.get_usage(cpu_instant);
 
             // Checksum & termination byte
             let checksum: u16 = status_data[1..=15].iter().map(|&x| x as u16).sum();
