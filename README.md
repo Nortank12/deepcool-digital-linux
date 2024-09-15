@@ -97,6 +97,27 @@ Options:
 
 ```
 
+### Rootless mode
+If you need to run the program without root privilege, you can create a `udev` rule to access all necessary resources as a user.
+
+1. Locate your directory, it can be `/lib/udev/rules.d` or `/etc/udev/rules.d`.
+```bash
+cd /lib/udev/rules.d
+```
+2. Create a new file called `99-deepcool-digital.rules`.
+```bash
+sudo nano 99-deepcool-digital.rules
+```
+3. Copy the contents:
+```bash
+# Intel RAPL energy usage file
+ACTION=="add", SUBSYSTEM=="powercap", KERNEL=="intel-rapl:0", RUN+="/bin/chmod 444 /sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj"
+
+# DeepCool HID raw devices
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3633", MODE="0666"
+```
+4. Reboot your computer.
+
 # Automatic start
 
 ## Systemd (Arch, Debian, Ubuntu, Fedora, etc.)
@@ -125,7 +146,7 @@ sudo systemctl enable deepcool-digital
 ```
 *Note: The program will run automatically after the next boot.*
 
-## OpenRC (Gentoo)
+## OpenRC (Gentoo, Artix Linux, etc.)
 1. Copy the `deepcool-digital-linux` to the `/usr/sbin/` folder.
 ```bash
 sudo cp ./deepcool-digital-linux /usr/sbin/

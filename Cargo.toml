@@ -5,7 +5,6 @@ edition = "2021"
 
 [dependencies]
 libloading = "0.8.5"
-libc = "0.2.158"
 hidapi = "2.6.3"
 cpu-monitor = "0.1.1"
 clap = { version = "4.5.16", features = ["derive"] }

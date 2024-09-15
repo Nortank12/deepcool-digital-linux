@@ -3,7 +3,6 @@ mod monitor;
 
 use clap::Parser;
 use hidapi::HidApi;
-use libc::geteuid;
 use std::process::exit;
 
 const VENDOR: u16 = 0x3633;
@@ -25,14 +24,6 @@ struct Args {
 }
 
 fn main() {
-    // Check root
-    unsafe {
-        if geteuid() != 0 {
-            println!("Try to run the program as root!");
-            exit(1);
-        }
-    }
-
     // Read args
     let args = Args::parse();
     if !["temp", "usage", "auto"].contains(&args.mode.as_str()) {
