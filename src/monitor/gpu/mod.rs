@@ -1,6 +1,9 @@
+//! Reads live data from an AMD or NVIDIA GPU.
+
 mod amd;
 mod nvidia;
 
+use crate::error;
 use std::{fs::read_to_string, process::exit};
 
 pub enum Gpu {
@@ -14,7 +17,7 @@ impl Gpu {
             "amd" => Gpu::Amd(amd::Gpu::new()),
             "nvidia" => Gpu::Nvidia(nvidia::Gpu::new()),
             _ => {
-                println!("No supported GPU was found");
+                error!("No supported GPU was found");
                 exit(1);
             }
         }
@@ -37,7 +40,10 @@ impl Gpu {
 
 /// Get GPU vendor from PCI device list.
 fn get_vendor() -> String {
-    let pci_devices = read_to_string("/proc/bus/pci/devices").expect("Cannot read PCI devices");
+    let pci_devices = read_to_string("/proc/bus/pci/devices").unwrap_or_else(|_| {
+        error!("Cannot read PCI devices");
+        exit(1);
+    });
 
     for device in pci_devices.lines() {
         if device.ends_with("amdgpu") {

@@ -1,5 +1,6 @@
 //! Reads live GPU data from the Linux kernel.
 
+use crate::error;
 use std::{fs::read_dir, fs::read_to_string, process::exit};
 
 pub struct Gpu {
@@ -18,7 +19,10 @@ impl Gpu {
     /// Reads the value of the GPU temperature sensor and calculates it to be `˚C` or `˚F`.
     pub fn get_temp(&self, fahrenheit: bool) -> u8 {
         // Read sensor data
-        let data = read_to_string(&self.temp_sensor).expect("GPU temperature cannot be read!");
+        let data = read_to_string(&self.temp_sensor).unwrap_or_else(|_| {
+            error!("Failed to get GPU temperature (AMD)");
+            exit(1);
+        });
 
         // Calculate temperature
         let mut temp = data.trim_end().parse::<u32>().unwrap();
@@ -31,7 +35,10 @@ impl Gpu {
 
     /// Reads the value of the GPU usage in percentage.
     pub fn get_usage(&self) -> u8 {
-        let data = read_to_string(&self.usage_file).expect("GPU usage cannot be read!");
+        let data = read_to_string(&self.usage_file).unwrap_or_else(|_| {
+            error!("Failed to get GPU usage (AMD)");
+            exit(1);
+        });
 
         data.trim_end().parse::<u8>().unwrap()
     }
@@ -55,7 +62,7 @@ fn find_temp_sensor() -> String {
         }
         Err(_) => (),
     }
-    println!("AMD GPU temperature sensor not found!");
+    error!("Failed to locate GPU temperature sensor (AMD)");
     exit(1);
 }
 
@@ -78,6 +85,6 @@ fn find_card() -> String {
         }
         Err(_) => (),
     }
-    println!("AMD PCI data not found!");
+    error!("PCI data was not found (AMD)");
     exit(1);
 }

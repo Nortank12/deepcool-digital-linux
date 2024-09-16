@@ -1,5 +1,6 @@
 //! Reads live CPU data from the Linux kernel.
 
+use crate::error;
 use cpu_monitor::CpuInstant;
 use std::{fs::read_dir, fs::read_to_string, process::exit};
 
@@ -17,7 +18,10 @@ impl Cpu {
     /// Reads the value of the CPU temperature sensor and calculates it to be `˚C` or `˚F`.
     pub fn get_temp(&self, fahrenheit: bool) -> u8 {
         // Read sensor data
-        let data = read_to_string(&self.temp_sensor).expect("CPU temperature cannot be read!");
+        let data = read_to_string(&self.temp_sensor).unwrap_or_else(|_| {
+            error!("Failed to get CPU temperature");
+            exit(1);
+        });
 
         // Calculate temperature
         let mut temp = data.trim_end().parse::<u32>().unwrap();
@@ -30,8 +34,10 @@ impl Cpu {
 
     /// Reads the energy consumption of the CPU in microjoules.
     pub fn read_energy(&self) -> u64 {
-        let data = read_to_string("/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj")
-            .expect("CPU energy consumption cannot be read!");
+        let data = read_to_string("/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj").unwrap_or_else(|_| {
+            error!("Failed to get CPU power");
+            exit(1);
+        });
 
         data.trim_end().parse::<u64>().unwrap()
     }
@@ -47,7 +53,10 @@ impl Cpu {
 
     /// Reads the CPU instant and provides usage statistics.
     pub fn read_instant(&self) -> CpuInstant {
-        CpuInstant::now().expect("CPU time cannot be read!")
+        CpuInstant::now().unwrap_or_else(|_| {
+            error!("Failed to get CPU usage");
+            exit(1);
+        })
     }
 
     /// Reads the CPU instant one more time and calculates the utilization as a `0-100` number.
@@ -76,6 +85,6 @@ fn find_temp_sensor() -> String {
         }
         Err(_) => (),
     }
-    println!("CPU temperature sensor not found!");
+    error!("Failed to locate CPU temperature sensor");
     exit(1);
 }

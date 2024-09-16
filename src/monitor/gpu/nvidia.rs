@@ -1,5 +1,6 @@
 //! Reads live GPU data from the `libnvidia-ml` shared library.
 
+use crate::error;
 use libloading::{Library, Symbol};
 use std::{path::Path, process::exit, ptr::null_mut};
 
@@ -43,7 +44,7 @@ impl Gpu {
                         }
                     })
                     .unwrap_or_else(|| {
-                        println!("NVIDIA GPU library not found");
+                        error!("NVIDIA GPU library was not found");
                         exit(1);
                     })
             });
@@ -51,7 +52,7 @@ impl Gpu {
             // Initialize the library
             let init: Symbol<NvmlInit> = lib.get(b"nvmlInit_v2").unwrap();
             if init() != 0 {
-                println!("Failed to initialize NVML");
+                error!("Failed to initialize NVML");
                 exit(1);
             }
 
@@ -59,7 +60,7 @@ impl Gpu {
             let mut dev_count: u32 = 0;
             let get_device_count: Symbol<NvmlDeviceGetCount> = lib.get(b"nvmlDeviceGetCount").unwrap();
             if get_device_count(&mut dev_count as *mut u32) != 0 || dev_count < 1 {
-                println!("No NVIDIA GPU was found");
+                error!("No NVIDIA GPU was found");
                 exit(1);
             }
 
@@ -67,7 +68,7 @@ impl Gpu {
             let mut device: *mut u8 = null_mut();
             let get_handle: Symbol<NvmlDeviceGetHandleByIndex> = lib.get(b"nvmlDeviceGetHandleByIndex").unwrap();
             if get_handle(0, &mut device as *mut *mut u8) != 0 {
-                println!("Failed to get handle for GPU 0");
+                error!("Failed to get handle for GPU 0 (NVIDIA)");
                 exit(1);
             }
 
@@ -81,7 +82,7 @@ impl Gpu {
         unsafe {
             let get_temp: Symbol<NvmlDeviceGetTemperature> = self.lib.get(b"nvmlDeviceGetTemperature").unwrap();
             if get_temp(self.device, 0, &mut temp as *mut u32) != 0 {
-                println!("Failed to get GPU temperature");
+                error!("Failed to get GPU temperature (NVIDIA)");
                 exit(1);
             }
         }
@@ -99,7 +100,7 @@ impl Gpu {
             let get_usage: Symbol<NvmlDeviceGetUtilizationRates> =
                 self.lib.get(b"nvmlDeviceGetUtilizationRates").unwrap();
             if get_usage(self.device, &mut utilization as *mut Utilization) != 0 {
-                println!("Failed to get GPU usage");
+                error!("Failed to get GPU usage (NVIDIA)");
                 exit(1);
             }
         }

@@ -1,6 +1,6 @@
-use crate::monitor::cpu::Cpu;
+use crate::{error, monitor::cpu::Cpu};
 use hidapi::HidApi;
-use std::{thread::sleep, time::Duration};
+use std::{process::exit, thread::sleep, time::Duration};
 
 const VENDOR: u16 = 0x3633;
 const POLLING_RATE: u64 = 750;
@@ -22,7 +22,12 @@ impl Display {
 
     pub fn run(&self, api: &HidApi, mode: &str) {
         // Connect to device
-        let device = api.open(VENDOR, self.product_id).expect("Failed to open HID device");
+        let device = api.open(VENDOR, self.product_id).unwrap_or_else(|_| {
+            error!("Failed to access the USB device");
+            eprintln!("       Try to run the program as root or give permission to the neccesary resources.");
+            eprintln!("       You can find instructions about rootless mode on GitHub.");
+            exit(1);
+        });
 
         // Data packet
         let mut data: [u8; 64] = [0; 64];
@@ -32,28 +37,22 @@ impl Display {
         {
             let mut init_data = data.clone();
             init_data[1] = 170;
-            device.write(&init_data).expect("Failed to write data");
+            device.write(&init_data).unwrap();
         }
 
         // Display loop
         if mode == "auto" {
             loop {
                 for _ in 0..8 {
-                    device
-                        .write(&self.status_message(&data, "temp"))
-                        .expect("Failed to write data");
+                    device.write(&self.status_message(&data, "temp")).unwrap();
                 }
                 for _ in 0..8 {
-                    device
-                        .write(&self.status_message(&data, "usage"))
-                        .expect("Failed to write data");
+                    device.write(&self.status_message(&data, "usage")).unwrap();
                 }
             }
         } else {
             loop {
-                device
-                    .write(&self.status_message(&data, &mode))
-                    .expect("Failed to write data");
+                device.write(&self.status_message(&data, &mode)).unwrap();
             }
         }
     }

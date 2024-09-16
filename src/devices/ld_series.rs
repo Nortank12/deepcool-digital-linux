@@ -1,6 +1,6 @@
-use crate::monitor::cpu::Cpu;
+use crate::{error, monitor::cpu::Cpu};
 use hidapi::HidApi;
-use std::{thread::sleep, time::Duration};
+use std::{process::exit, thread::sleep, time::Duration};
 
 const VENDOR: u16 = 0x3633;
 const POLLING_RATE: u64 = 1000;
@@ -22,7 +22,12 @@ impl Display {
 
     pub fn run(&self, api: &HidApi) {
         // Connect to device
-        let device = api.open(VENDOR, self.product_id).expect("Failed to open HID device");
+        let device = api.open(VENDOR, self.product_id).unwrap_or_else(|_| {
+            error!("Failed to access the USB device");
+            eprintln!("       Try to run the program as root or give permission to the neccesary resources.");
+            eprintln!("       You can find instructions about rootless mode on GitHub.");
+            exit(1);
+        });
 
         // Data packet
         let mut data: [u8; 64] = [0; 64];
@@ -39,10 +44,10 @@ impl Display {
             init_data[6] = 1;
             init_data[7] = 112;
             init_data[8] = 22;
-            device.write(&init_data).expect("Failed to write data");
+            device.write(&init_data).unwrap();
             init_data[5] = 2;
             init_data[7] = 111;
-            device.write(&init_data).expect("Failed to write data");
+            device.write(&init_data).unwrap();
         }
 
         // Display loop
@@ -83,7 +88,7 @@ impl Display {
             status_data[16] = (checksum % 256) as u8;
             status_data[17] = 22;
 
-            device.write(&status_data).expect("Failed to write data");
+            device.write(&status_data).unwrap();
         }
     }
 }
