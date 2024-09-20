@@ -1,26 +1,15 @@
 mod devices;
 mod monitor;
 
-use clap::Parser;
 use colored::*;
 use hidapi::HidApi;
-use std::process::exit;
+use std::{env::args, process::exit};
 
 const VENDOR: u16 = 0x3633;
 
-#[derive(Parser, Debug)]
-#[command(version, about, long_about = None)]
 struct Args {
-    /// Change the display mode between "temp, usage, auto"
-    #[arg(short, long, default_value_t = String::from("temp"))]
     mode: String,
-
-    /// Change temperature unit to Fahrenheit
-    #[arg(short, long)]
     fahrenheit: bool,
-
-    /// Enable the alarm (85˚C | 185˚F)
-    #[arg(short, long)]
     alarm: bool,
 }
 
@@ -42,11 +31,7 @@ macro_rules! error {
 
 fn main() {
     // Read args
-    let args = Args::parse();
-    if !["temp", "usage", "auto"].contains(&args.mode.as_str()) {
-        error!("Invalid mode");
-        exit(1);
-    }
+    let args = read_args();
 
     // Find device
     let api = HidApi::new().unwrap_or_else(|err| {
@@ -158,5 +143,93 @@ fn main() {
             println!("Vendor name: {}", info.manufacturer_string().unwrap().bright_cyan());
             println!("Device name: {}", info.product_string().unwrap().bright_cyan());
         }
+    }
+}
+
+fn read_args() -> Args {
+    let args: Vec<String> = args().collect();
+    let mut mode = "temp".to_string();
+    let mut fahrenheit = false;
+    let mut alarm = false;
+
+    let mut i = 1;
+    while i < args.len() {
+        match args[i].as_str() {
+            "-m" | "--mode" => {
+                if i + 1 < args.len() {
+                    mode = args[i + 1].clone();
+                    if ["temp", "usage", "auto"].contains(&mode.as_str()) {
+                        i += 1;
+                    } else {
+                        error!("Invalid mode");
+                        exit(1);
+                    }
+                } else {
+                    error!("--mode requires a value");
+                    exit(1);
+                }
+            }
+            "-f" | "--fahrenheit" => {
+                fahrenheit = true;
+            }
+            "-a" | "--alarm" => {
+                alarm = true;
+            }
+            "-h" | "--help" => {
+                println!("{} [OPTIONS]\n", "Usage: test-app".bold());
+                println!("{}", "Options:".bold());
+                println!("  {}, {} <MODE>  Change the display mode between \"temp, usage, auto\" [default: temp]", "-m".bold(), "--mode".bold());
+                println!("  {}, {}   Change temperature unit to Fahrenheit", "-f".bold(), "--fahrenheit".bold());
+                println!("  {}, {}        Enable the alarm [85˚C | 185˚F]", "-a".bold(), "--alarm".bold());
+                println!("  {}, {}         Print help", "-h".bold(), "--help".bold());
+                println!("  {}, {}      Print version", "-v".bold(), "--version".bold());
+                exit(0);
+            }
+            "-v" | "--version" => {
+                println!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+                exit(0);
+            }
+            arg if arg.starts_with('-') && arg.len() > 1 => {
+                for c in arg.chars().skip(1) {
+                    match c {
+                        'm' => {
+                            if i + 1 < args.len() && args[i].ends_with('m') {
+                                if ["temp", "usage", "auto"].contains(&args[i + 1].as_str()) {
+                                    mode = args[i + 1].clone();
+                                    i += 1;
+                                } else {
+                                    error!("Invalid mode");
+                                    exit(1);
+                                }
+                            } else {
+                                error!("--mode requires a value");
+                                exit(1);
+                            }
+                        }
+                        'f' => fahrenheit = true,
+                        'a' => alarm = true,
+                        _ => {
+                            if arg.starts_with("--") {
+                                error!(format!("Invalid option {arg}"));
+                            } else {
+                                error!(format!("Invalid option -{c}"));
+                            }
+                            exit(1);
+                        }
+                    }
+                }
+            }
+            _ => {
+                error!(format!("Invalid option {}", args[i]));
+                exit(1);
+            }
+        }
+        i += 1;
+    }
+
+    Args {
+        mode,
+        fahrenheit,
+        alarm,
     }
 }

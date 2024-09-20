@@ -7,7 +7,6 @@ edition = "2021"
 libloading = "0.8.5"
 hidapi = "2.6.3"
 cpu-monitor = "0.1.1"
-clap = { version = "4.5.17", features = ["derive"] }
 colored = "=2.1.0"
 
 [profile.release]
