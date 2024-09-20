@@ -231,12 +231,13 @@ fn read_args() -> Args {
                 exit(0);
             }
             "-h" | "--help" => {
-                println!("{} [OPTIONS]\n", "Usage: deepcool-digital-linux".bold());
-                println!("{}", "Options:".bold());
+                println!("{} [OPTIONS]", "Usage: deepcool-digital-linux".bold());
+                println!("\n{}", "Options:".bold());
                 println!("  {}, {} <MODE>  Change the display mode between \"temp, usage, auto\" [default: temp]", "-m".bold(), "--mode".bold());
                 println!("      {} <ID>     Specify the Product ID if you use mutiple devices", "--pid".bold());
                 println!("  {}, {}   Change temperature unit to Fahrenheit", "-f".bold(), "--fahrenheit".bold());
                 println!("  {}, {}        Enable the alarm [85˚C | 185˚F]", "-a".bold(), "--alarm".bold());
+                println!("\n{}", "Commands:".bold());
                 println!("  {}, {}         Print Product ID of the connected devices", "-l".bold(), "--list".bold());
                 println!("  {}, {}         Print help", "-h".bold(), "--help".bold());
                 println!("  {}, {}      Print version", "-v".bold(), "--version".bold());

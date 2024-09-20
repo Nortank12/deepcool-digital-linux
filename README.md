@@ -116,6 +116,8 @@ Options:
       --pid <ID>     Specify the Product ID if you use mutiple devices
   -f, --fahrenheit   Change temperature unit to Fahrenheit
   -a, --alarm        Enable the alarm [85˚C | 185˚F]
+
+Commands:
   -l, --list         Print Product ID of the connected devices
   -h, --help         Print help
   -v, --version      Print version
