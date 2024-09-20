@@ -9,6 +9,7 @@ const VENDOR: u16 = 0x3633;
 
 struct Args {
     mode: String,
+    pid: u16,
     fahrenheit: bool,
     alarm: bool,
 }
@@ -41,14 +42,20 @@ fn main() {
     let mut product_id = 0;
     for device in api.device_list() {
         if device.vendor_id() == VENDOR {
-            product_id = device.product_id();
-            println!("Device found: {}", device.product_string().unwrap().bright_green());
-            println!("-----");
-            break;
+            if args.pid == 0 || device.product_id() == args.pid {
+                product_id = device.product_id();
+                println!("Device found: {}", device.product_string().unwrap().bright_green());
+                println!("-----");
+                break;
+            }
         }
     }
     if product_id == 0 {
-        error!("No DeepCool device was found");
+        if args.pid > 0 {
+            error!("No DeepCool device was found with the specified PID");
+        } else {
+            error!("No DeepCool device was found");
+        }
         exit(1);
     }
 
@@ -149,6 +156,7 @@ fn main() {
 fn read_args() -> Args {
     let args: Vec<String> = args().collect();
     let mut mode = "temp".to_string();
+    let mut pid = 0;
     let mut fahrenheit = false;
     let mut alarm = false;
 
@@ -169,18 +177,67 @@ fn read_args() -> Args {
                     exit(1);
                 }
             }
+            "--pid" => {
+                if i + 1 < args.len() {
+                    match args[i + 1].parse::<u16>() {
+                        Ok(id) => {
+                            if id > 0 {
+                                pid = id;
+                                i += 1;
+                            } else {
+                                error!("Invalid PID");
+                                exit(1);
+                            }
+                        }
+                        Err(_) => {
+                            error!("Invalid PID");
+                            exit(1);
+                        }
+                    }
+                } else {
+                    error!("--pid requires a value");
+                    exit(1);
+                }
+            }
             "-f" | "--fahrenheit" => {
                 fahrenheit = true;
             }
             "-a" | "--alarm" => {
                 alarm = true;
             }
+            "-l" | "--list" => {
+                println!("Device list [{} | {}]", "PID".bright_green().bold(), "Name".bright_green());
+                println!("-----");
+                let api = HidApi::new().unwrap_or_else(|err| {
+                    error!(err);
+                    exit(1);
+                });
+                let mut products = 0;
+                for device in api.device_list() {
+                    if device.vendor_id() == VENDOR {
+                        products += 1;
+                        println!(
+                            "{} | {}",
+                            device.product_id().to_string().bright_green().bold(),
+                            device.product_string().unwrap().bright_green()
+                        );
+                        break;
+                    }
+                }
+                if products == 0 {
+                    error!("No DeepCool device was found");
+                    exit(1);
+                }
+                exit(0);
+            }
             "-h" | "--help" => {
-                println!("{} [OPTIONS]\n", "Usage: test-app".bold());
+                println!("{} [OPTIONS]\n", "Usage: deepcool-digital-linux".bold());
                 println!("{}", "Options:".bold());
                 println!("  {}, {} <MODE>  Change the display mode between \"temp, usage, auto\" [default: temp]", "-m".bold(), "--mode".bold());
+                println!("      {} <ID>     Specify the Product ID if you use mutiple devices", "--pid".bold());
                 println!("  {}, {}   Change temperature unit to Fahrenheit", "-f".bold(), "--fahrenheit".bold());
                 println!("  {}, {}        Enable the alarm [85˚C | 185˚F]", "-a".bold(), "--alarm".bold());
+                println!("  {}, {}         Print Product ID of the connected devices", "-l".bold(), "--list".bold());
                 println!("  {}, {}         Print help", "-h".bold(), "--help".bold());
                 println!("  {}, {}      Print version", "-v".bold(), "--version".bold());
                 exit(0);
@@ -229,6 +286,7 @@ fn read_args() -> Args {
 
     Args {
         mode,
+        pid,
         fahrenheit,
         alarm,
     }

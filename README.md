@@ -14,6 +14,29 @@ and run it in the command line. You will need root permission to send data to th
 > On AMD's Zen architecture CPUs, you can install the [zenpower3](https://github.com/PutinVladimir/zenpower3)
 > driver, to have a more accurate reading of the CPU die.
 
+### Rootless mode (optional)
+If you need to run the program without root privilege, you can create a `udev` rule to access all necessary resources as a user.
+
+1. Locate your directory, it can be `/lib/udev/rules.d` or `/etc/udev/rules.d`.
+```bash
+cd /lib/udev/rules.d
+```
+2. Create a new file called `99-deepcool-digital.rules`.
+```bash
+sudo nano 99-deepcool-digital.rules
+```
+3. Copy the contents:
+```bash
+# Intel RAPL energy usage file
+ACTION=="add", SUBSYSTEM=="powercap", KERNEL=="intel-rapl:0", RUN+="/bin/chmod 444 /sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj"
+
+# DeepCool HID raw devices
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3633", MODE="0666"
+```
+4. Reboot your computer.
+
+# Supported devices
+
 ### CPU Coolers
 <table>
     <tr>
@@ -87,36 +110,42 @@ You can run the program with or without providing any options.
 ```bash
 sudo ./deepcool-digital-linux [OPTIONS]
 ```
-```bash
+```
 Options:
   -m, --mode <MODE>  Change the display mode between "temp, usage, auto" [default: temp]
+      --pid <ID>     Specify the Product ID if you use mutiple devices
   -f, --fahrenheit   Change temperature unit to Fahrenheit
-  -a, --alarm        Enable the alarm (85˚C | 185˚F)
+  -a, --alarm        Enable the alarm [85˚C | 185˚F]
+  -l, --list         Print Product ID of the connected devices
   -h, --help         Print help
-  -V, --version      Print version
-
+  -v, --version      Print version
 ```
 
-### Rootless mode
-If you need to run the program without root privilege, you can create a `udev` rule to access all necessary resources as a user.
-
-1. Locate your directory, it can be `/lib/udev/rules.d` or `/etc/udev/rules.d`.
+### Using multiple devices (optional)
+If you have multiple devices connected, you can run the following
+command to detect them:
 ```bash
-cd /lib/udev/rules.d
+sudo ./deepcool-digital-linux --list
 ```
-2. Create a new file called `99-deepcool-digital.rules`.
-```bash
-sudo nano 99-deepcool-digital.rules
 ```
-3. Copy the contents:
+Device list [PID | Name]
+-----
+4 | AK500S-DIGITAL
+7 | MORPHEUS
+```
+After identifying, you can run them separately by providing their Product ID:
 ```bash
-# Intel RAPL energy usage file
-ACTION=="add", SUBSYSTEM=="powercap", KERNEL=="intel-rapl:0", RUN+="/bin/chmod 444 /sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj"
+sudo ./deepcool-digital-linux --pid 4
+```
+```bash
+sudo ./deepcool-digital-linux --pid 7
+```
+If you want to run them automatically, you can create 2 services
+instead of 1.
 
-# DeepCool HID raw devices
-SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3633", MODE="0666"
-```
-4. Reboot your computer.
+For example:
+- `deepcool-digital-case.service`
+- `deepcool-digital-cooler.service`
 
 # Automatic start
 
