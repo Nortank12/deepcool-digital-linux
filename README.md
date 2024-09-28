@@ -209,5 +209,5 @@ sudo rc-update add deepcool-digital default
 # More information
 [Device List and USB Mapping Tables](device-list)
 
-# Development
+# Contribution
 LD Series: [asdfzdfj](https://github.com/asdfzdfj) / [deepcool-ld-digital-hidapi](https://github.com/asdfzdfj/deepcool-ld-digital-hidapi)
