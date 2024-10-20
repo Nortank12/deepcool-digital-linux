@@ -33,9 +33,14 @@
         </td>
     </tr>
     <tr>
-        <td>6</td>
+        <td rowspan="2">6</td>
+        <td>LS520 SE DIGITAL</td>
+        <td align="center" rowspan="2">
+            <a href="tables/ls-series.md">Mapping Table</a>
+        </td>
+    </tr>
+    <tr>
         <td>LS720 SE DIGITAL</td>
-        <td align="center">?</td>
     </tr>
     <tr>
         <td>7</td>

@@ -1,3 +1,14 @@
+# Table of Contents
+- [About](#about)
+- [Installation](#installation)
+- [Supported Devices](#supported-devices)
+- [Usage](#usage)
+- [Automatic Start](#automatic-start)
+    - [Systemd](#systemd-arch-debian-ubuntu-fedora-etc)
+    - [OpenRC](#openrc-gentoo-artix-linux-etc)
+- [Device List](#more-information)
+- [Contributions](#contributions)
+
 # About
 This program is meant to replicate the functionality of the original `DeepCool Digital`
 Windows program and I am gradually adding support to new devices.
@@ -14,7 +25,7 @@ and run it in the command line. You will need root permission to send data to th
 > On AMD's Zen architecture CPUs, you can install the [zenpower3](https://github.com/PutinVladimir/zenpower3)
 > driver, to have a more accurate reading of the CPU die.
 
-### Rootless mode (optional)
+### Rootless Mode <sup>(optional)</sup>
 If you need to run the program without root privilege, you can create a `udev` rule to access all necessary resources as a user.
 
 1. Locate your directory, it can be `/lib/udev/rules.d` or `/etc/udev/rules.d`.
@@ -35,7 +46,7 @@ SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3633", MODE="0666"
 ```
 4. Reboot your computer.
 
-# Supported devices
+# Supported Devices
 
 ### CPU Coolers
 <table>
@@ -123,7 +134,7 @@ Commands:
   -v, --version      Print version
 ```
 
-### Using multiple devices (optional)
+### Using Multiple Devices <sup>(optional)</sup>
 If you have multiple devices connected, you can run the following
 command to detect them:
 ```bash
@@ -149,7 +160,7 @@ For example:
 - `deepcool-digital-case.service`
 - `deepcool-digital-cooler.service`
 
-# Automatic start
+# Automatic Start
 
 ## Systemd (Arch, Debian, Ubuntu, Fedora, etc.)
 1. Copy the `deepcool-digital-linux` to the `/usr/sbin/` folder.
@@ -206,8 +217,8 @@ sudo rc-update add deepcool-digital default
 ```
 *Note: The program will run automatically after the next boot.*
 
-# More information
+# More Information
 [Device List and USB Mapping Tables](device-list)
 
-# Contribution
+# Contributions
 LD Series: [asdfzdfj](https://github.com/asdfzdfj) / [deepcool-ld-digital-hidapi](https://github.com/asdfzdfj/deepcool-ld-digital-hidapi)
