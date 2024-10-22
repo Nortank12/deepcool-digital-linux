@@ -86,6 +86,14 @@ SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3633", MODE="0666"
         <td>LD360</td>
         <td align="center">✅</td>
     </tr>
+    <tr>
+        <td>LS520 SE DIGITAL</td>
+        <td align="center">✅</td>
+    </tr>
+    <tr>
+        <td>LS720 SE DIGITAL</td>
+        <td align="center">✅</td>
+    </tr>
 </table>
 
 ### Cases
@@ -123,7 +131,7 @@ sudo ./deepcool-digital-linux [OPTIONS]
 ```
 ```
 Options:
-  -m, --mode <MODE>  Change the display mode between "temp, usage, auto" [default: temp]
+  -m, --mode <MODE>  Change the display mode between "temp, usage, power, auto" [default: temp]
       --pid <ID>     Specify the Product ID if you use mutiple devices
   -f, --fahrenheit   Change temperature unit to Fahrenheit
   -a, --alarm        Enable the alarm [85˚C | 185˚F]

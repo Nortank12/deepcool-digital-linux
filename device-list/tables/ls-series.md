@@ -59,8 +59,3 @@
         <td>- NOT USED -</td>
     </tr>
 </table>
-
-*This mapping table is an estimation, as I do not own these devices.*
-
-*If you have an LS520 or LS720 SE DIGITAL, I encourage you to modify the source code
-of the AK series for testing, as it has nearly identical functionalities.*

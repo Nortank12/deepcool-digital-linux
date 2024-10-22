@@ -63,6 +63,10 @@ fn main() {
     match product_id {
         // AK Series
         1..=4 => {
+            if args.mode == "power" {
+                error!("Display mode \"power\" is not supported on your device");
+                exit(1);
+            }
             // Write info
             println!("DISP. MODE: {}", args.mode.bright_cyan());
             if args.mode != "usage" {
@@ -79,6 +83,10 @@ fn main() {
         }
         // LS Series
         6 => {
+            if args.mode == "usage" {
+                error!("Display mode \"usage\" is not supported on your device");
+                exit(1);
+            }
             // Write info
             println!("DISP. MODE: {}", args.mode.bright_cyan());
             if args.mode != "usage" {
@@ -96,6 +104,10 @@ fn main() {
         }
         // AG Series
         8 => {
+            if args.mode == "power" {
+                error!("Display mode \"power\" is not supported on your device");
+                exit(1);
+            }
             // Write info
             println!("DISP. MODE: {}", args.mode.bright_cyan());
             if args.mode != "usage" {
@@ -135,6 +147,10 @@ fn main() {
         }
         // CH Series & MORPHEUS
         5 | 7 | 21 => {
+            if args.mode == "power" {
+                error!("Display mode \"power\" is not supported on your device");
+                exit(1);
+            }
             // Write info
             println!("DISP. MODE: {}", args.mode.bright_cyan());
             if args.mode != "usage" {
@@ -183,7 +199,7 @@ fn read_args() -> Args {
             "-m" | "--mode" => {
                 if i + 1 < args.len() {
                     mode = args[i + 1].clone();
-                    if ["temp", "usage", "auto"].contains(&mode.as_str()) {
+                    if ["temp", "usage", "power", "auto"].contains(&mode.as_str()) {
                         i += 1;
                     } else {
                         error!("Invalid mode");
@@ -250,7 +266,7 @@ fn read_args() -> Args {
             "-h" | "--help" => {
                 println!("{} [OPTIONS]", "Usage: deepcool-digital-linux".bold());
                 println!("\n{}", "Options:".bold());
-                println!("  {}, {} <MODE>  Change the display mode between \"temp, usage, auto\" [default: temp]", "-m".bold(), "--mode".bold());
+                println!("  {}, {} <MODE>  Change the display mode between \"temp, usage, power, auto\" [default: temp]", "-m".bold(), "--mode".bold());
                 println!("      {} <ID>     Specify the Product ID if you use mutiple devices", "--pid".bold());
                 println!("  {}, {}   Change temperature unit to Fahrenheit", "-f".bold(), "--fahrenheit".bold());
                 println!("  {}, {}        Enable the alarm [85˚C | 185˚F]", "-a".bold(), "--alarm".bold());

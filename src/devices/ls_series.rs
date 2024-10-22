@@ -49,7 +49,7 @@ impl Display {
                     device.write(&self.status_message(&data, "temp")).unwrap();
                 }
                 for _ in 0..8 {
-                    device.write(&self.status_message(&data, "usage")).unwrap();
+                    device.write(&self.status_message(&data, "power")).unwrap();
                 }
             }
         } else {
@@ -64,8 +64,11 @@ impl Display {
         // Clone the data packet
         let mut data = inital_data.clone();
 
-        // Read CPU utilization
+        // Read CPU utilization & energy consumption (if needed)
         let cpu_instant = self.cpu.read_instant();
+        let cpu_energy = if mode == "power" {
+            self.cpu.read_energy()
+        } else { 0 };
 
         // Wait
         sleep(Duration::from_millis(POLLING_RATE));
@@ -82,16 +85,8 @@ impl Display {
                 data[4] = temp % 100 / 10;
                 data[5] = temp % 10;
             }
-            "usage" => {
-                panic!("Usage mode is not supported yet.");
-                // data[1] = ?; //tested from 0 to 201,didn't display Usage
-                // data[3] = usage / 100;
-                // data[4] = usage % 100 / 10;
-                // data[5] = usage % 10;
-            }
             "power" => {
-                //panic!("Power mode is not supported yet.");
-                let power = self.cpu.get_power(0, POLLING_RATE) as u8;
+                let power = self.cpu.get_power(cpu_energy, POLLING_RATE) as u8;
                 data[1] = 76;
                 data[3] = power / 100;
                 data[4] = power % 100 / 10;
