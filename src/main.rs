@@ -77,6 +77,23 @@ fn main() {
             let ak_device = devices::ak_series::Display::new(product_id, args.fahrenheit, args.alarm);
             ak_device.run(&api, &args.mode);
         }
+        // LS Series
+        6 => {
+            // Write info
+            println!("DISP. MODE: {}", args.mode.bright_cyan());
+            if args.mode != "usage" {
+                println!("TEMP. UNIT: {} {}", "˚C".bright_cyan(), "˚F".bright_cyan().italic());
+            }
+            println!("ALARM:      {}", if args.alarm { "on".bright_green() } else { "off".bright_red() });
+            println!("-----");
+            println!("Update interval: {}", "750ms".bright_cyan());
+            println!("\nPress {} to terminate", "Ctrl+C".bold());
+
+            // Display loop
+            let ls_device = devices::ls_series::Display::new(product_id,args.fahrenheit, args.alarm);
+            ls_device.run(&api, &args.mode);
+
+        }
         // AG Series
         8 => {
             // Write info
@@ -95,26 +112,6 @@ fn main() {
             // Display loop
             let ag_device = devices::ag_series::Display::new(product_id, args.alarm);
             ag_device.run(&api, &args.mode);
-        }
-        // LS Series
-        6 => {
-            // Write info
-            println!("DISP. MODE: {}", args.mode.bright_cyan());
-            if args.mode != "usage" {
-                println!("TEMP. UNIT: {} {}", "˚C".bright_cyan(), "˚F".bright_cyan().italic());
-            }
-            println!("ALARM:      {}", if args.alarm { "on".bright_green() } else { "off".bright_red() });
-            println!("-----");
-            println!("Update interval: {}", "750ms".bright_cyan());
-            println!("\nPress {} to terminate", "Ctrl+C".bold());
-            if args.fahrenheit {
-                warning!("Displaying ˚F is not supported, value will be ignored");
-            }
-
-            // Display loop
-            let ls_device = devices::ls_series::Display::new(product_id,args.fahrenheit, args.alarm);
-            ls_device.run(&api, &args.mode);
-
         }
         // LD Series
         10 => {

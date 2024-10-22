@@ -83,10 +83,19 @@ impl Display {
                 data[5] = temp % 10;
             }
             "usage" => {
+                panic!("Usage mode is not supported yet.");
+                // data[1] = ?; //tested from 0 to 201,didn't display Usage
+                // data[3] = usage / 100;
+                // data[4] = usage % 100 / 10;
+                // data[5] = usage % 10;
+            }
+            "power" => {
+                //panic!("Power mode is not supported yet.");
+                let power = self.cpu.get_power(0, POLLING_RATE) as u8;
                 data[1] = 76;
-                data[3] = usage / 100;
-                data[4] = usage % 100 / 10;
-                data[5] = usage % 10;
+                data[3] = power / 100;
+                data[4] = power % 100 / 10;
+                data[5] = power % 10;
             }
             _ => (),
         }

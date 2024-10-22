@@ -25,7 +25,7 @@
         <td>TEMPERATURE MODE ˚F</td>
     </tr>
     <tr>
-        <td>??</td>
+        <td>76</td>
         <td>POWER MODE</td>
     </tr>
     <tr>
