@@ -1,4 +1,4 @@
-use crate::{error, monitor::cpu::Cpu};
+use crate::{error, monitor::cpu::Cpu, monitor::cpu::CpuType};
 use hidapi::HidApi;
 use std::{process::exit, thread::sleep, time::Duration};
 
@@ -64,9 +64,11 @@ impl Display {
         // Clone the data packet
         let mut data = inital_data.clone();
 
+        let cpu_type = self.cpu.get_type();
+
         // Read CPU utilization & energy consumption (if needed)
         let cpu_instant = self.cpu.read_instant();
-        let cpu_energy = if mode == "power" {
+        let cpu_energy = if mode == "power" && cpu_type == CpuType::Intel {
             self.cpu.read_energy()
         } else { 0 };
 
@@ -86,7 +88,19 @@ impl Display {
                 data[5] = temp % 10;
             }
             "power" => {
-                let power = self.cpu.get_power(cpu_energy, POLLING_RATE) as u8;
+                let mut power = 0;
+                match cpu_type {
+                    CpuType::Intel => {
+                        power = self.cpu.get_power(cpu_energy, POLLING_RATE) as u8;
+                    },
+                    CpuType::Amd => {
+                        power = self.cpu.get_power_with_command() as u8;
+                    },
+                    CpuType::Other => {
+                        error!("Unsupported CPU type");
+                        exit(1);
+                    }
+                }
                 data[1] = 76;
                 data[3] = power / 100;
                 data[4] = power % 100 / 10;
