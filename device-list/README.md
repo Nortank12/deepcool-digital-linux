@@ -68,7 +68,7 @@
         <td rowspan="2">10</td>
         <td>LD240</td>
         <td align="center" rowspan="2">
-            No Table Yet
+            <a href="tables/ld-series.md">Mapping Table</a>
         </td>
     </tr>
     <tr>
