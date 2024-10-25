@@ -48,15 +48,23 @@ SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3633", MODE="0666"
 
 # Supported Devices
 
-### CPU Coolers
+### CPU Air Coolers
 <table>
     <tr>
         <th>Name</th>
         <th>Supported</th>
     </tr>
     <tr>
+        <td>AG300 DIGITAL</td>
+        <td align="center">⚠️</td>
+    </tr>
+    <tr>
         <td>AG400 DIGITAL</td>
         <td align="center">✅</td>
+    </tr>
+    <tr>
+        <td>AG500 DIGITAL</td>
+        <td align="center">⚠️</td>
     </tr>
     <tr>
         <td>AG620 DIGITAL</td>
@@ -65,6 +73,10 @@ SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3633", MODE="0666"
     <tr>
         <td>AK400 DIGITAL</td>
         <td align="center">✅</td>
+    </tr>
+    <tr>
+        <td>AK400 DIGITAL PRO</td>
+        <td align="center">❓</td>
     </tr>
     <tr>
         <td>AK500 DIGITAL</td>
@@ -77,6 +89,18 @@ SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3633", MODE="0666"
     <tr>
         <td>AK620 DIGITAL</td>
         <td align="center">✅</td>
+    </tr>
+    <tr>
+        <td>AK620 DIGITAL PRO</td>
+        <td align="center">❓</td>
+    </tr>
+</table>
+
+### CPU Liquid Coolers
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Supported</th>
     </tr>
     <tr>
         <td>LD240</td>
@@ -103,8 +127,16 @@ SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3633", MODE="0666"
         <th>Supported</th>
     </tr>
     <tr>
+        <td>CH170 DIGITAL</td>
+        <td align="center">❓</td>
+    </tr>
+    <tr>
         <td>CH360 DIGITAL</td>
         <td align="center">⚠️</td>
+    </tr>
+    <tr>
+        <td>CH510 MESH DIGITAL</td>
+        <td align="center">❓</td>
     </tr>
     <tr>
         <td>CH560 DIGITAL</td>
@@ -116,11 +148,11 @@ SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3633", MODE="0666"
     </tr>
 </table>
 
-**✅: Fully supported &nbsp; ⚠️: Not tested**
+**✅: Fully supported &nbsp; ⚠️: Not tested &nbsp; ❓: Not added**
 
 > [!IMPORTANT]
-> - If your device is not on the list, you can still run the program and see if it detects it.
-> - If your device is on the list but untested, please try to check all the features to see if they work as expected.
+> - If your device is not added yet, you can still run the program and see if it detects it.
+> - If your device is not tested, please try to check all the features to see if they work as expected.
 >
 > In any case, you can create an issue or add a comment to an existing one.
 
