@@ -1,5 +1,6 @@
 mod devices;
 mod monitor;
+mod custom_mode;
 
 use colored::*;
 use hidapi::HidApi;
@@ -199,7 +200,7 @@ fn read_args() -> Args {
             "-m" | "--mode" => {
                 if i + 1 < args.len() {
                     mode = args[i + 1].clone();
-                    if ["temp", "usage", "power", "auto"].contains(&mode.as_str()) {
+                    if ["temp", "usage", "power", "auto"].contains(&mode.as_str()) || mode.starts_with("custom:") {
                         i += 1;
                     } else {
                         error!("Invalid mode");
