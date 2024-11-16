@@ -46,6 +46,30 @@ SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3633", MODE="0666"
 ```
 4. Reboot your computer.
 
+<details>
+<summary>On NixOS :</summary>
+    
+1. Add this to your `configuration.nix`:
+```nix
+  services.udev.extraRules = ''
+    # Intel RAPL energy usage file
+    ACTION=="add", SUBSYSTEM=="powercap", KERNEL=="intel-rapl:0", RUN+="${pkgs.coreutils}/bin/chmod 444 /sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj"
+
+    # DeepCool HID raw devices
+    SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3633", MODE="0666"
+  '';
+```
+2. Rebuild your system:
+```bash
+sudo nixos-rebuild switch  # After modifying configuration.nix
+```
+3. Then run :
+```bash
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+```
+</details>
+
 # Supported Devices
 
 ### CPU Air Coolers
