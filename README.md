@@ -29,11 +29,11 @@ and run it in the command line. You will need root permission to send data to th
 ### Rootless Mode <sup>(optional)</sup>
 If you need to run the program without root privilege, you can create a `udev` rule to access all necessary resources as a user.
 
-1. Locate your directory, it can be `/lib/udev/rules.d` or `/etc/udev/rules.d`.
+1. Locate your directory, it can be `/lib/udev/rules.d` or `/etc/udev/rules.d`
 ```bash
 cd /lib/udev/rules.d
 ```
-2. Create a new file called `99-deepcool-digital.rules`.
+2. Create a new file called `99-deepcool-digital.rules`
 ```bash
 sudo nano 99-deepcool-digital.rules
 ```
@@ -45,12 +45,12 @@ ACTION=="add", SUBSYSTEM=="powercap", KERNEL=="intel-rapl:0", RUN+="/bin/chmod 4
 # DeepCool HID raw devices
 SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3633", MODE="0666"
 ```
-4. Reboot your computer.
+4. Reboot your computer
 
 <details>
-<summary>Steps for NixOS</summary>
+<summary><b>Steps for NixOS</b></summary>
 
-1. Locate and edit your `configuration.nix` file.
+1. Locate and edit your `configuration.nix` file
 ```bash
 sudo nano /etc/nixos/configuration.nix
 ```
@@ -64,11 +64,11 @@ sudo nano /etc/nixos/configuration.nix
     SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3633", MODE="0666"
   '';
 ```
-3. Rebuild your system.
+3. Rebuild your system
 ```bash
 sudo nixos-rebuild switch
 ```
-4. Reboot your computer.
+4. Reboot your computer
 </details>
 
 # Supported Devices
@@ -257,11 +257,11 @@ sudo systemctl enable deepcool-digital
 *Note: The program will run automatically after the next boot.*
 
 ## OpenRC (Gentoo, Artix Linux, etc.)
-1. Copy the `deepcool-digital-linux` to the `/usr/sbin/` folder.
+1. Copy the `deepcool-digital-linux` to the `/usr/sbin/` folder
 ```bash
 sudo cp ./deepcool-digital-linux /usr/sbin/
 ```
-2. Create the service file in the `/etc/init.d/` folder.
+2. Create the service file in the `/etc/init.d/` folder
 ```bash
 sudo nano /etc/init.d/deepcool-digital
 ```
