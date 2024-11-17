@@ -127,8 +127,7 @@
         <td>22</td>
         <td>TERMINATION BYTE</td>
     </tr>
-    </tr>
-        <tr>
+    <tr>
         <td>...</td>
         <td>...</td>
         <td>- NOT USED -</td>

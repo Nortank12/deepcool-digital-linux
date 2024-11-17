@@ -53,7 +53,7 @@
         <td>1</td>
         <td>ALARM ON</td>
     </tr>
-        <tr>
+    <tr>
         <td>...</td>
         <td>...</td>
         <td>- NOT USED -</td>

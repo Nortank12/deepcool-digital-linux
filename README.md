@@ -2,6 +2,7 @@
 - [About](#about)
 - [Installation](#installation)
 - [Supported Devices](#supported-devices)
+    - [MYSTIQUE Series](#mystique-series)
 - [Usage](#usage)
 - [Automatic Start](#automatic-start)
     - [Systemd](#systemd-arch-debian-ubuntu-fedora-etc)
@@ -47,9 +48,13 @@ SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3633", MODE="0666"
 4. Reboot your computer.
 
 <details>
-<summary>On NixOS :</summary>
-    
-1. Add this to your `configuration.nix`:
+<summary>Steps for NixOS</summary>
+
+1. Locate and edit your `configuration.nix` file.
+```bash
+sudo nano /etc/nixos/configuration.nix
+```
+2. Insert the following:
 ```nix
   services.udev.extraRules = ''
     # Intel RAPL energy usage file
@@ -59,15 +64,11 @@ SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3633", MODE="0666"
     SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3633", MODE="0666"
   '';
 ```
-2. Rebuild your system:
+3. Rebuild your system.
 ```bash
-sudo nixos-rebuild switch  # After modifying configuration.nix
+sudo nixos-rebuild switch
 ```
-3. Then run :
-```bash
-sudo udevadm control --reload-rules
-sudo udevadm trigger
-```
+4. Reboot your computer.
 </details>
 
 # Supported Devices
@@ -179,6 +180,9 @@ sudo udevadm trigger
 > - If your device is not tested, please try to check all the features to see if they work as expected.
 >
 > In any case, you can create an issue or add a comment to an existing one.
+
+### MYSTIQUE Series
+These devices are unique since they have an LCD display, and I do not personally own one. However, DeadSurfer opened a [discussion](https://github.com/Nortank12/deepcool-digital-linux/discussions/18) and if you can figure out how to make it work, you can share it there or create a pull request.
 
 # Usage
 You can run the program with or without providing any options.

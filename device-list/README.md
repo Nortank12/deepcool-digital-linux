@@ -60,9 +60,14 @@
         <td>AG620 DIGITAL</td>
     </tr>
     <tr>
-        <td>9</td>
-        <td>?</td>
-        <td align="center">?</td>
+        <td rowspan="2">9</td>
+        <td>MYSTIQUE 240</td>
+        <td align="center" rowspan="2">
+            <a href="tables/mystique-series.md">Mapping Table</a>
+        </td>
+    </tr>
+    <tr>
+        <td>MYSTIQUE 360</td>
     </tr>
     <tr>
         <td rowspan="2">10</td>
