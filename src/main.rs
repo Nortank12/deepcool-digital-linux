@@ -90,7 +90,7 @@ fn main() {
             // Write info
             println!("DISP. MODE: {}", args.mode.bright_cyan());
             if args.mode != "usage" {
-                println!("TEMP. UNIT: {} {}", "˚C".bright_cyan(), "˚F".bright_cyan().italic());
+                println!("TEMP. UNIT: {}", if args.fahrenheit { "˚F".bright_cyan() } else { "˚C".bright_cyan() });
             }
             println!("ALARM:      {}", if args.alarm { "on".bright_green() } else { "off".bright_red() });
             println!("-----");

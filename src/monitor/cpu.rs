@@ -6,12 +6,14 @@ use std::{fs::read_dir, fs::read_to_string, process::exit};
 
 pub struct Cpu {
     temp_sensor: String,
+    pub rapl_max_uj: u64,
 }
 
 impl Cpu {
     pub fn new() -> Self {
         Cpu {
             temp_sensor: find_temp_sensor(),
+            rapl_max_uj: get_max_energy(),
         }
     }
 
@@ -46,7 +48,13 @@ impl Cpu {
     ///
     /// Formula: `W = ΔμJ / (Δms * 1000)`
     pub fn get_power(&self, initial_energy: u64, delta_millisec: u64) -> u16 {
-        let delta_energy = self.read_energy() - initial_energy;
+        let current_energy = self.read_energy();
+        let delta_energy = if current_energy > initial_energy {
+            current_energy - initial_energy
+        } else {
+            // Offset the current measurement if the counter resets
+            (self.rapl_max_uj + current_energy) - initial_energy
+        };
 
         (delta_energy as f64 / (delta_millisec * 1000) as f64).round() as u16
     }
@@ -87,4 +95,14 @@ fn find_temp_sensor() -> String {
     }
     error!("Failed to locate CPU temperature sensor");
     exit(1);
+}
+
+/// Gets the limit of the displayed energy value so it can be applied as an offset when the counter resets.
+///
+/// Errors will be handled per device since not all of them require power consumption readings.
+fn get_max_energy() -> u64 {
+    match read_to_string("/sys/class/powercap/intel-rapl/intel-rapl:0/max_energy_range_uj") {
+        Ok(data) => data.trim_end().parse::<u64>().unwrap(),
+        Err(_) => 0,
+    }
 }

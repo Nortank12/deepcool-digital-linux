@@ -29,6 +29,12 @@ impl Display {
             exit(1);
         });
 
+        // Check if `rapl_max_uj` was read correctly
+        if self.cpu.rapl_max_uj == 0 {
+            error!("Failed to get CPU power details");
+            exit(1);
+        }
+
         // Data packet
         let mut data: [u8; 64] = [0; 64];
         data[0] = 16;
