@@ -92,11 +92,11 @@ impl Display {
                 data[5] = temp % 10;
             }
             "power" => {
-                let power = self.cpu.get_power(cpu_energy, POLLING_RATE) as u8;
+                let power = self.cpu.get_power(cpu_energy, POLLING_RATE);
                 data[1] = 76;
-                data[3] = power / 100;
-                data[4] = power % 100 / 10;
-                data[5] = power % 10;
+                data[3] = (power / 100) as u8;
+                data[4] = (power % 100 / 10) as u8;
+                data[5] = (power % 10) as u8;
             }
             _ => (),
         }
