@@ -145,6 +145,26 @@ fn main() {
             let ld_device = devices::ld_series::Display::new(product_id, args.fahrenheit);
             ld_device.run(&api);
         }
+        // AK400 PRO
+        16 => {
+            // Write info
+            println!("DISP. MODE: {}", "not supported".bright_black().italic());
+            println!("TEMP. UNIT: {}", if args.fahrenheit { "˚F".bright_cyan() } else { "˚C".bright_cyan() });
+            println!("ALARM:      {}", "built-in".bright_cyan());
+            println!("-----");
+            println!("Update interval: {}", "750ms".bright_cyan());
+            println!("\nPress {} to terminate", "Ctrl+C".bold());
+            if args.mode != "temp" {
+                warning!("Display mode cannot be changed, value will be ignored");
+            }
+            if args.alarm {
+                warning!("The alarm is handled internally, value will be ignored");
+            }
+
+            // Display loop
+            let ak400_device = devices::ak400_pro::Display::new(product_id, args.fahrenheit);
+            ak400_device.run(&api);
+        }
         // CH Series & MORPHEUS
         5 | 7 | 21 => {
             if args.mode == "power" {
