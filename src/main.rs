@@ -70,9 +70,23 @@ fn main() {
             // Write info
             println!("DISP. MODE: {}", args.mode.bright_cyan());
             if args.mode != "usage" {
-                println!("TEMP. UNIT: {}", if args.fahrenheit { "˚F".bright_cyan() } else { "˚C".bright_cyan() });
+                println!(
+                    "TEMP. UNIT: {}",
+                    if args.fahrenheit {
+                        "˚F".bright_cyan()
+                    } else {
+                        "˚C".bright_cyan()
+                    }
+                );
             }
-            println!("ALARM:      {}", if args.alarm { "on".bright_green() } else { "off".bright_red() });
+            println!(
+                "ALARM:      {}",
+                if args.alarm {
+                    "on".bright_green()
+                } else {
+                    "off".bright_red()
+                }
+            );
             println!("-----");
             println!("Update interval: {}", "750ms".bright_cyan());
             println!("\nPress {} to terminate", "Ctrl+C".bold());
@@ -90,17 +104,30 @@ fn main() {
             // Write info
             println!("DISP. MODE: {}", args.mode.bright_cyan());
             if args.mode != "usage" {
-                println!("TEMP. UNIT: {}", if args.fahrenheit { "˚F".bright_cyan() } else { "˚C".bright_cyan() });
+                println!(
+                    "TEMP. UNIT: {}",
+                    if args.fahrenheit {
+                        "˚F".bright_cyan()
+                    } else {
+                        "˚C".bright_cyan()
+                    }
+                );
             }
-            println!("ALARM:      {}", if args.alarm { "on".bright_green() } else { "off".bright_red() });
+            println!(
+                "ALARM:      {}",
+                if args.alarm {
+                    "on".bright_green()
+                } else {
+                    "off".bright_red()
+                }
+            );
             println!("-----");
             println!("Update interval: {}", "750ms".bright_cyan());
             println!("\nPress {} to terminate", "Ctrl+C".bold());
 
             // Display loop
-            let ls_device = devices::ls_series::Display::new(product_id,args.fahrenheit, args.alarm);
+            let ls_device = devices::ls_series::Display::new(product_id, args.fahrenheit, args.alarm);
             ls_device.run(&api, &args.mode);
-
         }
         // AG Series
         8 => {
@@ -111,9 +138,20 @@ fn main() {
             // Write info
             println!("DISP. MODE: {}", args.mode.bright_cyan());
             if args.mode != "usage" {
-                println!("TEMP. UNIT: {} {}", "˚C".bright_cyan(), "(˚F not supported)".bright_black().italic());
+                println!(
+                    "TEMP. UNIT: {} {}",
+                    "˚C".bright_cyan(),
+                    "(˚F not supported)".bright_black().italic()
+                );
             }
-            println!("ALARM:      {}", if args.alarm { "on".bright_green() } else { "off".bright_red() });
+            println!(
+                "ALARM:      {}",
+                if args.alarm {
+                    "on".bright_green()
+                } else {
+                    "off".bright_red()
+                }
+            );
             println!("-----");
             println!("Update interval: {}", "750ms".bright_cyan());
             println!("\nPress {} to terminate", "Ctrl+C".bold());
@@ -129,7 +167,14 @@ fn main() {
         10 => {
             // Write info
             println!("DISP. MODE: {}", "not supported".bright_black().italic());
-            println!("TEMP. UNIT: {}", if args.fahrenheit { "˚F".bright_cyan() } else { "˚C".bright_cyan() });
+            println!(
+                "TEMP. UNIT: {}",
+                if args.fahrenheit {
+                    "˚F".bright_cyan()
+                } else {
+                    "˚C".bright_cyan()
+                }
+            );
             println!("ALARM:      {}", "built-in".bright_cyan());
             println!("-----");
             println!("Update interval: {}", "1s".bright_cyan());
@@ -154,7 +199,14 @@ fn main() {
             // Write info
             println!("DISP. MODE: {}", args.mode.bright_cyan());
             if args.mode != "usage" {
-                println!("TEMP. UNIT: {}", if args.fahrenheit { "˚F".bright_cyan() } else { "˚C".bright_cyan() });
+                println!(
+                    "TEMP. UNIT: {}",
+                    if args.fahrenheit {
+                        "˚F".bright_cyan()
+                    } else {
+                        "˚C".bright_cyan()
+                    }
+                );
             }
             println!("ALARM:      {}", "not supported".bright_black().italic());
             println!("-----");
@@ -266,12 +318,27 @@ fn read_args() -> Args {
             "-h" | "--help" => {
                 println!("{} [OPTIONS]", "Usage: deepcool-digital-linux".bold());
                 println!("\n{}", "Options:".bold());
-                println!("  {}, {} <MODE>  Change the display mode between \"temp, usage, power, auto\" [default: temp]", "-m".bold(), "--mode".bold());
-                println!("      {} <ID>     Specify the Product ID if you use mutiple devices", "--pid".bold());
-                println!("  {}, {}   Change temperature unit to Fahrenheit", "-f".bold(), "--fahrenheit".bold());
+                println!(
+                    "  {}, {} <MODE>  Change the display mode between \"temp, usage, power, auto\" [default: temp]",
+                    "-m".bold(),
+                    "--mode".bold()
+                );
+                println!(
+                    "      {} <ID>     Specify the Product ID if you use mutiple devices",
+                    "--pid".bold()
+                );
+                println!(
+                    "  {}, {}   Change temperature unit to Fahrenheit",
+                    "-f".bold(),
+                    "--fahrenheit".bold()
+                );
                 println!("  {}, {}        Enable the alarm [85˚C | 185˚F]", "-a".bold(), "--alarm".bold());
                 println!("\n{}", "Commands:".bold());
-                println!("  {}, {}         Print Product ID of the connected devices", "-l".bold(), "--list".bold());
+                println!(
+                    "  {}, {}         Print Product ID of the connected devices",
+                    "-l".bold(),
+                    "--list".bold()
+                );
                 println!("  {}, {}         Print help", "-h".bold(), "--help".bold());
                 println!("  {}, {}      Print version", "-v".bold(), "--version".bold());
                 exit(0);
