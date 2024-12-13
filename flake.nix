@@ -18,7 +18,6 @@
           {
             config,
             lib,
-            default,
             ...
           }:
           let
