@@ -13,7 +13,7 @@
     {
       packages = forAllSystems (system: rec {
         default = pkgs.${system}.callPackage ./default.nix { };
-        nixosModule = pkgs.${system}.callPackage ./module.nix { inherit default system; };
+        nixosModule = pkgs.${system}.callPackage ./module.nix { inherit default; };
       });
     };
 }
