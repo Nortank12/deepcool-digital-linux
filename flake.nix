@@ -1,5 +1,5 @@
 {
-  description = "Deepcool Digital";
+  description = "Deepcool Digital Module";
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   };
