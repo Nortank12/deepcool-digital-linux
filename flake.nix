@@ -21,6 +21,7 @@
           }:
           let
             cfg = config.services.deepcool-digital;
+            user = "deepcool-digital";
           in
           {
             options.services.deepcool-digital = {
@@ -53,17 +54,35 @@
             };
             config = lib.mkIf cfg.enable {
               environment.systemPackages = [ default ];
-
+              users.users.${user} = {
+                isSystemUser = true;
+                group = user;
+                home = "/var/empty";
+                shell = "${pkgs.${system}.util-linux}/bin/nologin";
+              };
+              users.groups.${user} = { };
               systemd.services = {
                 deepcool-digital = {
                   description = "Start up deepcool-digital";
                   script = ''
-                    ${default}/bin/deepcool-digital-linux --mode ${config.services.deepcool-digital.mode} ${
-                      lib.strings.optionalString (config.services.deepcool-digital.product_id != "")
-                        "--pid ${config.services.deepcool-digital.product_id} ${lib.strings.optionalString config.services.deepcool-digital.use_fahrenheit "-f"} ${lib.strings.optionalString config.services.deepcool-digital.alarm "-a"}"
-                    }
+                    ${default}/bin/deepcool-digital-linux \
+                      --mode ${config.services.deepcool-digital.mode} \
+                      ${
+                        lib.optionalString (
+                          config.services.deepcool-digital.product_id != ""
+                        ) "--pid ${config.services.deepcool-digital.product_id}"
+                      } \
+                      ${lib.optionalString config.services.deepcool-digital.use_fahrenheit "-f"} \
+                      ${lib.optionalString config.services.deepcool-digital.alarm "-a"}
                   '';
+
+                  serviceConfig = {
+                    User = user;
+                    Group = user;
+                  };
+
                 };
+
               };
             };
           };
