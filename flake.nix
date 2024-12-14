@@ -26,6 +26,7 @@
           {
             options.services.deepcool-digital = {
               enable = lib.mkEnableOption "deepcool-digital";
+
               mode = lib.mkOption {
                 type = lib.types.enum [
                   "temp"
@@ -54,6 +55,14 @@
             };
             config = lib.mkIf cfg.enable {
               environment.systemPackages = [ default ];
+              services.udev.extraRules = ''
+                # Intel RAPL energy usage file
+                ACTION=="add", SUBSYSTEM=="powercap", KERNEL=="intel-rapl:0", RUN+="${pkgs.${system}.coreutils}/bin/chmod 444 /sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj"
+
+                # DeepCool HID raw devices
+                SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3633", MODE="0666"
+              '';
+
               users.users.${user} = {
                 isSystemUser = true;
                 group = user;
@@ -66,14 +75,10 @@
                   description = "Start up deepcool-digital";
                   script = ''
                     ${default}/bin/deepcool-digital-linux \
-                      --mode ${config.services.deepcool-digital.mode} \
-                      ${
-                        lib.optionalString (
-                          config.services.deepcool-digital.product_id != ""
-                        ) "--pid ${config.services.deepcool-digital.product_id}"
-                      } \
-                      ${lib.optionalString config.services.deepcool-digital.use_fahrenheit "-f"} \
-                      ${lib.optionalString config.services.deepcool-digital.alarm "-a"}
+                      --mode ${cfg.mode} \
+                      ${lib.optionalString (cfg.product_id != "") "--pid ${cfg.product_id}"} \
+                      ${lib.optionalString cfg.use_fahrenheit "-f"} \
+                      ${lib.optionalString cfg.alarm "-a"}
                   '';
 
                   serviceConfig = {
