@@ -81,6 +81,7 @@
                       ${lib.optionalString cfg.alarm "-a"}
                   '';
 
+                  wantedBy = [ "multi-user.target" ];
                   serviceConfig = {
                     User = user;
                     Group = user;
