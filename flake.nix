@@ -21,37 +21,37 @@
             ...
           }:
           let
-            cfg = config.services.ravensiris-web;
-            user = "ravensiris-web";
-            dataDir = "/var/lib/ravensiris-web";
+            cfg = config.services.deepcool-digital;
           in
+          # user = "ravensiris-web";
+          # dataDir = "/var/lib/ravensiris-web";
           {
-            options.services.ravensiris-web = {
-              enable = lib.mkEnableOption "ravensiris-web";
+            options.services.deepcool-digital = {
+              enable = lib.mkEnableOption "deepcool-digital";
             };
             config = lib.mkIf cfg.enable {
               environment.systemPackages = [ default ];
 
-              users.users.${user} = {
-                isSystemUser = true;
-                group = user;
-                home = dataDir;
-                createHome = true;
-              };
-              users.groups.${user} = { };
+              # users.users.${user} = {
+              #   isSystemUser = true;
+              #   group = user;
+              #   home = dataDir;
+              #   createHome = true;
+              # };
+              # users.groups.${user} = { };
 
               systemd.services = {
-                ravensiris-web = {
-                  description = "Start up the homepage";
-                  wantedBy = [ "multi-user.target" ];
+                deepcool-digital = {
+                  description = "Start up deepcool-digital";
+                  #wantedBy = [ "multi-user.target" ];
                   script = ''
-                    echo 'ok'
+                    ${default}/bin/deepcool-digital-linux
                   '';
-                  serviceConfig = {
-                    User = user;
-                    WorkingDirectory = "${dataDir}";
-                    Group = user;
-                  };
+                  #  serviceConfig = {
+                  #    User = user;
+                  #    WorkingDirectory = "${dataDir}";
+                  #    Group = user;
+                  #  };
                 };
               };
             };
