@@ -13,7 +13,6 @@
     {
       packages = forAllSystems (system: rec {
         default = pkgs.${system}.callPackage ./default.nix { };
-        # nixosModule = pkgs.${system}.callPackage ./module.nix { inherit default; };
         nixosModule =
           {
             config,
@@ -22,36 +21,63 @@
           }:
           let
             cfg = config.services.deepcool-digital;
+            user = "deepcool-digital";
           in
-          # user = "ravensiris-web";
           # dataDir = "/var/lib/ravensiris-web";
           {
             options.services.deepcool-digital = {
               enable = lib.mkEnableOption "deepcool-digital";
+              mode = lib.mkOption {
+                type = lib.types.enum [
+                  "temp"
+                  "usage"
+                  "power"
+                  "auto"
+                ];
+                default = "temp";
+                description = "Change the display mode between temp, usage, power, auto. default: temp";
+              };
+              product_id = lib.mkOption {
+                type = lib.types.int;
+                description = "Specify the Product ID if you use mutiple devices";
+              };
+              use_fahrenheit = lib.mkOption {
+                type = lib.types.bool;
+                default = false;
+                description = "Change temperature unit to Fahrenheit";
+              };
+              alarm = lib.mkOption {
+                type = lib.types.bool;
+                default = false;
+                description = "Enable the alarm [85˚C | 185˚F]";
+              };
             };
             config = lib.mkIf cfg.enable {
               environment.systemPackages = [ default ];
 
-              # users.users.${user} = {
-              #   isSystemUser = true;
-              #   group = user;
-              #   home = dataDir;
-              #   createHome = true;
-              # };
-              # users.groups.${user} = { };
+              users.users.${user} = {
+                isSystemUser = true;
+                #group = user;
+                #home = dataDir;
+                #createHome = true;
+              };
+              #users.groups.${user} = { };
 
               systemd.services = {
                 deepcool-digital = {
                   description = "Start up deepcool-digital";
                   #wantedBy = [ "multi-user.target" ];
                   script = ''
-                    ${default}/bin/deepcool-digital-linux
+                    ${default}/bin/deepcool-digital-linux --mode ${config.services.deepcool-digital.mode} ${
+                      lib.strings.optionalString (config.services.deepcool-digital.product_id != "")
+                        "--pid ${config.services.deepcool-digital.product_id} ${lib.strings.optionalString config.services.deepcool-digital.use_fahrenheit "-f"} ${lib.strings.optionalString config.services.deepcool-digital.alarm "-a"}"
+                    }
                   '';
-                  #  serviceConfig = {
-                  #    User = user;
-                  #    WorkingDirectory = "${dataDir}";
-                  #    Group = user;
-                  #  };
+                  serviceConfig = {
+                    User = user;
+                    #WorkingDirectory = "${dataDir}";
+                    Group = user;
+                  };
                 };
               };
             };
