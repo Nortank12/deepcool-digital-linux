@@ -1,5 +1,14 @@
 debug/
 target/
-Cargo.lock
 **/*.rs.bk
 *.pdb
+# Devenv
+.devenv*
+devenv.local.nix
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
+/result

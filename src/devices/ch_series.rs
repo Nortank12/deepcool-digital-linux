@@ -1,4 +1,7 @@
-use crate::{error, monitor::{cpu::Cpu, gpu::Gpu}};
+use crate::{
+    error,
+    monitor::{cpu::Cpu, gpu::Gpu},
+};
 use hidapi::HidApi;
 use std::{process::exit, thread::sleep, time::Duration};
 
@@ -106,8 +109,16 @@ impl Display {
             _ => (),
         }
         // Status bar
-        data[2] = if cpu_usage < 15 { 1 } else { (cpu_usage as f32 / 10.0).round() as u8 };
-        data[7] = if gpu_usage < 15 { 1 } else { (gpu_usage as f32 / 10.0).round() as u8 };
+        data[2] = if cpu_usage < 15 {
+            1
+        } else {
+            (cpu_usage as f32 / 10.0).round() as u8
+        };
+        data[7] = if gpu_usage < 15 {
+            1
+        } else {
+            (gpu_usage as f32 / 10.0).round() as u8
+        };
 
         data
     }
