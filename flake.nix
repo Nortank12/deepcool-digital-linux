@@ -38,7 +38,8 @@
                 description = "Change the display mode between temp, usage, power, auto. default: temp";
               };
               product_id = lib.mkOption {
-                type = lib.types.int;
+                type = lib.types.str;
+                default = "";
                 description = "Specify the Product ID if you use mutiple devices";
               };
               use_fahrenheit = lib.mkOption {
