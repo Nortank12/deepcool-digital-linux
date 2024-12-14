@@ -57,11 +57,11 @@
 
               users.users.${user} = {
                 isSystemUser = true;
-                #group = user;
+                group = user;
                 #home = dataDir;
                 #createHome = true;
               };
-              #users.groups.${user} = { };
+              users.groups.${user} = { };
 
               systemd.services = {
                 deepcool-digital = {
