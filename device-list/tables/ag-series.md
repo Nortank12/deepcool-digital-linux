@@ -12,11 +12,7 @@
         <td>REPORT ID</td>
     </tr>
     <tr>
-        <td rowspan="3">D1</td>
-        <td>170</td>
-        <td>STATUS BAR ANIMATION</td>
-    </tr>
-    <tr>
+        <td rowspan="2">D1</td>
         <td>19</td>
         <td>TEMPERATURE MODE ˚C</td>
     </tr>

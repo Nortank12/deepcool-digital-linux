@@ -2,11 +2,13 @@
 
 <table>
     <tr>
+        <th>VID</th>
         <th>PID</th>
         <th>Model</th>
         <th>USB Data Bytes</th>
     </tr>
     <tr>
+        <td rowspan="16">13875</td>
         <td>1</td>
         <td>AK400 DIGITAL</td>
         <td align="center" rowspan="4">
@@ -82,13 +84,24 @@
     <tr>
         <td>...</td>
         <td>...</td>
-        <td align="center"></td>
+        <td></td>
     </tr>
     <tr>
         <td>21</td>
         <td>CH360 DIGITAL</td>
-        <td align="center" rowspan="2">
+        <td align="center">
             <a href="tables/ch-series.md">Mapping Table</a>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="4"></td>
+    </tr>
+    <tr>
+        <td>13523</td>
+        <td>4352</td>
+        <td>CH510 MESH DIGITAL</td>
+        <td align="center">
+            No Table Yet
         </td>
     </tr>
 </table>

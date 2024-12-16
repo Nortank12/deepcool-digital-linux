@@ -34,13 +34,6 @@ impl Display {
         let mut data: [u8; 64] = [0; 64];
         data[0] = 16;
 
-        // Init sequence
-        {
-            let mut init_data = data.clone();
-            init_data[1] = 170;
-            device.write(&init_data).unwrap();
-        }
-
         // Display loop
         if mode == "auto" {
             loop {
