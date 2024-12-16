@@ -2,7 +2,7 @@ use crate::{error, monitor::cpu::Cpu};
 use hidapi::HidApi;
 use std::{process::exit, thread::sleep, time::Duration};
 
-const VENDOR: u16 = 0x3633;
+const VENDOR: u16 = 13875;
 pub const POLLING_RATE: u64 = 1000;
 // The temperature limits are hard-coded in the device
 pub const TEMP_LIMIT_C: u8 = 85;

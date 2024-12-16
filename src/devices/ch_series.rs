@@ -2,7 +2,7 @@ use crate::{error, monitor::{cpu::Cpu, gpu::Gpu}};
 use hidapi::HidApi;
 use std::{process::exit, thread::sleep, time::Duration};
 
-const VENDOR: u16 = 0x3633;
+const VENDOR: u16 = 13875;
 pub const POLLING_RATE: u64 = 750;
 
 pub struct Display {

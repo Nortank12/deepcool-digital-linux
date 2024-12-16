@@ -5,7 +5,7 @@ use colored::*;
 use hidapi::HidApi;
 use std::{env::args, process::exit};
 
-const VENDOR: u16 = 0x3633;
+const VENDOR: u16 = 13875;
 
 enum TemperatureUnit {
     Celsius,

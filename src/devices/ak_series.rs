@@ -2,7 +2,7 @@ use crate::{error, monitor::cpu::Cpu};
 use hidapi::HidApi;
 use std::{process::exit, thread::sleep, time::Duration};
 
-const VENDOR: u16 = 0x3633;
+const VENDOR: u16 = 13875;
 pub const POLLING_RATE: u64 = 750;
 pub const TEMP_LIMIT_C: u8 = 90;
 pub const TEMP_LIMIT_F: u8 = 194;
