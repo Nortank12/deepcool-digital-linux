@@ -7,6 +7,32 @@ use std::{env::args, process::exit};
 
 const VENDOR: u16 = 0x3633;
 
+enum TemperatureUnit {
+    Celsius,
+    Fahrenheit,
+}
+
+impl TemperatureUnit {
+    fn symbol(&self) -> &'static str {
+        match self {
+            TemperatureUnit::Celsius => "°C",
+            TemperatureUnit::Fahrenheit => "°F",
+        }
+    }
+}
+
+enum AlarmState {
+    Auto,
+    On,
+    Off,
+    NotSupported,
+}
+
+struct Alarm {
+    state: AlarmState,
+    temp_limit: u8,
+}
+
 struct Args {
     mode: String,
     pid: u16,
@@ -68,15 +94,19 @@ fn main() {
                 exit(1);
             }
             // Write info
-            println!("DISP. MODE: {}", args.mode.bright_cyan());
-            if args.mode != "usage" {
-                println!("TEMP. UNIT: {}", if args.fahrenheit { "˚F".bright_cyan() } else { "˚C".bright_cyan() });
-            }
-            println!("ALARM:      {}", if args.alarm { "on".bright_green() } else { "off".bright_red() });
-            println!("-----");
-            println!("Update interval: {}", "750ms".bright_cyan());
-            println!("\nPress {} to terminate", "Ctrl+C".bold());
-
+            display_configuration_info(
+                &args.mode,
+                if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
+                Alarm {
+                    state: if args.alarm { AlarmState::On } else { AlarmState::Off },
+                    temp_limit: if args.fahrenheit {
+                        devices::ak_series::TEMP_LIMIT_F
+                    } else {
+                        devices::ak_series::TEMP_LIMIT_C
+                    },
+                },
+                devices::ak_series::POLLING_RATE,
+            );
             // Display loop
             let ak_device = devices::ak_series::Display::new(product_id, args.fahrenheit, args.alarm);
             ak_device.run(&api, &args.mode);
@@ -88,19 +118,22 @@ fn main() {
                 exit(1);
             }
             // Write info
-            println!("DISP. MODE: {}", args.mode.bright_cyan());
-            if args.mode != "usage" {
-                println!("TEMP. UNIT: {}", if args.fahrenheit { "˚F".bright_cyan() } else { "˚C".bright_cyan() });
-            }
-            println!("ALARM:      {}", if args.alarm { "on".bright_green() } else { "off".bright_red() });
-            println!("-----");
-            println!("Update interval: {}", "750ms".bright_cyan());
-            println!("\nPress {} to terminate", "Ctrl+C".bold());
-
+            display_configuration_info(
+                &args.mode,
+                if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
+                Alarm {
+                    state: if args.alarm { AlarmState::On } else { AlarmState::Off },
+                    temp_limit: if args.fahrenheit {
+                        devices::ls_series::TEMP_LIMIT_F
+                    } else {
+                        devices::ls_series::TEMP_LIMIT_C
+                    },
+                },
+                devices::ls_series::POLLING_RATE,
+            );
             // Display loop
-            let ls_device = devices::ls_series::Display::new(product_id,args.fahrenheit, args.alarm);
+            let ls_device = devices::ls_series::Display::new(product_id, args.fahrenheit, args.alarm);
             ls_device.run(&api, &args.mode);
-
         }
         // AG Series
         8 => {
@@ -109,18 +142,18 @@ fn main() {
                 exit(1);
             }
             // Write info
-            println!("DISP. MODE: {}", args.mode.bright_cyan());
-            if args.mode != "usage" {
-                println!("TEMP. UNIT: {} {}", "˚C".bright_cyan(), "(˚F not supported)".bright_black().italic());
-            }
-            println!("ALARM:      {}", if args.alarm { "on".bright_green() } else { "off".bright_red() });
-            println!("-----");
-            println!("Update interval: {}", "750ms".bright_cyan());
-            println!("\nPress {} to terminate", "Ctrl+C".bold());
+            display_configuration_info(
+                &args.mode,
+                TemperatureUnit::Celsius,
+                Alarm {
+                    state: if args.alarm { AlarmState::On } else { AlarmState::Off },
+                    temp_limit: devices::ag_series::TEMP_LIMIT_C,
+                },
+                devices::ag_series::POLLING_RATE,
+            );
             if args.fahrenheit {
                 warning!("Displaying ˚F is not supported, value will be ignored");
             }
-
             // Display loop
             let ag_device = devices::ag_series::Display::new(product_id, args.alarm);
             ag_device.run(&api, &args.mode);
@@ -128,19 +161,25 @@ fn main() {
         // LD Series
         10 => {
             // Write info
-            println!("DISP. MODE: {}", "not supported".bright_black().italic());
-            println!("TEMP. UNIT: {}", if args.fahrenheit { "˚F".bright_cyan() } else { "˚C".bright_cyan() });
-            println!("ALARM:      {}", "built-in".bright_cyan());
-            println!("-----");
-            println!("Update interval: {}", "1s".bright_cyan());
-            println!("\nPress {} to terminate", "Ctrl+C".bold());
+            display_configuration_info(
+                "auto",
+                if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
+                Alarm {
+                    state: AlarmState::Auto,
+                    temp_limit: if args.fahrenheit {
+                        devices::ld_series::TEMP_LIMIT_F
+                    } else {
+                        devices::ld_series::TEMP_LIMIT_C
+                    },
+                },
+                devices::ld_series::POLLING_RATE,
+            );
             if args.mode != "temp" {
                 warning!("Display mode cannot be changed, value will be ignored");
             }
             if args.alarm {
-                warning!("The alarm is handled internally, value will be ignored");
+                warning!("The alarm is hard-coded in your device, value will be ignored");
             }
-
             // Display loop
             let ld_device = devices::ld_series::Display::new(product_id, args.fahrenheit);
             ld_device.run(&api);
@@ -152,18 +191,15 @@ fn main() {
                 exit(1);
             }
             // Write info
-            println!("DISP. MODE: {}", args.mode.bright_cyan());
-            if args.mode != "usage" {
-                println!("TEMP. UNIT: {}", if args.fahrenheit { "˚F".bright_cyan() } else { "˚C".bright_cyan() });
-            }
-            println!("ALARM:      {}", "not supported".bright_black().italic());
-            println!("-----");
-            println!("Update interval: {}", "750ms".bright_cyan());
-            println!("\nPress {} to terminate", "Ctrl+C".bold());
+            display_configuration_info(
+                &args.mode,
+                if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
+                Alarm { state: AlarmState::NotSupported, temp_limit: 0 },
+                devices::ch_series::POLLING_RATE,
+            );
             if args.alarm {
                 warning!("Alarm is not supported, value will be ignored");
             }
-
             // Display loop
             let ch_device = devices::ch_series::Display::new(product_id, args.fahrenheit);
             ch_device.run(&api, &args.mode);
@@ -268,8 +304,8 @@ fn read_args() -> Args {
                 println!("\n{}", "Options:".bold());
                 println!("  {}, {} <MODE>  Change the display mode between \"temp, usage, power, auto\" [default: temp]", "-m".bold(), "--mode".bold());
                 println!("      {} <ID>     Specify the Product ID if you use mutiple devices", "--pid".bold());
-                println!("  {}, {}   Change temperature unit to Fahrenheit", "-f".bold(), "--fahrenheit".bold());
-                println!("  {}, {}        Enable the alarm [85˚C | 185˚F]", "-a".bold(), "--alarm".bold());
+                println!("  {}, {}   Change the temperature unit to °F", "-f".bold(), "--fahrenheit".bold());
+                println!("  {}, {}        Enable the alarm", "-a".bold(), "--alarm".bold());
                 println!("\n{}", "Commands:".bold());
                 println!("  {}, {}         Print Product ID of the connected devices", "-l".bold(), "--list".bold());
                 println!("  {}, {}         Print help", "-h".bold(), "--help".bold());
@@ -285,7 +321,7 @@ fn read_args() -> Args {
                     match c {
                         'm' => {
                             if i + 1 < args.len() && args[i].ends_with('m') {
-                                if ["temp", "usage", "auto"].contains(&args[i + 1].as_str()) {
+                                if ["temp", "usage", "power", "auto"].contains(&args[i + 1].as_str()) {
                                     mode = args[i + 1].clone();
                                     i += 1;
                                 } else {
@@ -324,4 +360,26 @@ fn read_args() -> Args {
         fahrenheit,
         alarm,
     }
+}
+
+fn display_configuration_info(mode: &str, temp_unit: TemperatureUnit, alarm: Alarm, polling_rate: u64) {
+    println!("DISP. MODE: {}", mode.bright_cyan());
+    println!("TEMP. UNIT: {}", temp_unit.symbol().bright_cyan());
+    match alarm.state {
+        AlarmState::Auto => println!(
+            "ALARM:      {} | {}",
+            "auto".bright_green(),
+            (alarm.temp_limit.to_string() + temp_unit.symbol()).bright_cyan()
+        ),
+        AlarmState::On => println!(
+            "ALARM:      {} | {}",
+            "on".bright_green(),
+            (alarm.temp_limit.to_string() + temp_unit.symbol()).bright_cyan()
+        ),
+        AlarmState::Off => println!("ALARM:      {}", "off".bright_red()),
+        AlarmState::NotSupported => println!("ALARM:      {}", "not supported".bright_black().italic()),
+    }
+    println!("-----");
+    println!("Update interval: {}", format!("{}ms", polling_rate).bright_cyan());
+    println!("\nPress {} to terminate", "Ctrl+C".bold());
 }

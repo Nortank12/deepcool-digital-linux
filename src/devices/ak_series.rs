@@ -3,7 +3,9 @@ use hidapi::HidApi;
 use std::{process::exit, thread::sleep, time::Duration};
 
 const VENDOR: u16 = 0x3633;
-const POLLING_RATE: u64 = 750;
+pub const POLLING_RATE: u64 = 750;
+pub const TEMP_LIMIT_C: u8 = 90;
+pub const TEMP_LIMIT_F: u8 = 194;
 
 pub struct Display {
     product_id: u16,
@@ -93,7 +95,7 @@ impl Display {
         // Status bar
         data[2] = if usage < 15 { 1 } else { (usage as f32 / 10.0).round() as u8 };
         // Alarm
-        data[6] = (self.alarm && temp > if self.fahrenheit { 185 } else { 85 }) as u8;
+        data[6] = (self.alarm && temp >= if self.fahrenheit { TEMP_LIMIT_F } else { TEMP_LIMIT_C }) as u8;
 
         data
     }

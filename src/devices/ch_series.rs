@@ -3,7 +3,7 @@ use hidapi::HidApi;
 use std::{process::exit, thread::sleep, time::Duration};
 
 const VENDOR: u16 = 0x3633;
-const POLLING_RATE: u64 = 750;
+pub const POLLING_RATE: u64 = 750;
 
 pub struct Display {
     product_id: u16,

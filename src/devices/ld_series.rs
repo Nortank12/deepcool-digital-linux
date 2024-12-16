@@ -3,7 +3,10 @@ use hidapi::HidApi;
 use std::{process::exit, thread::sleep, time::Duration};
 
 const VENDOR: u16 = 0x3633;
-const POLLING_RATE: u64 = 1000;
+pub const POLLING_RATE: u64 = 1000;
+// The temperature limits are hard-coded in the device
+pub const TEMP_LIMIT_C: u8 = 85;
+pub const TEMP_LIMIT_F: u8 = 185;
 
 pub struct Display {
     product_id: u16,

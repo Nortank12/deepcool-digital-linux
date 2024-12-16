@@ -81,7 +81,7 @@ sudo nixos-rebuild switch
     </tr>
     <tr>
         <td>AG300 DIGITAL</td>
-        <td align="center">⚠️</td>
+        <td align="center">✅</td>
     </tr>
     <tr>
         <td>AG400 DIGITAL</td>
@@ -89,7 +89,7 @@ sudo nixos-rebuild switch
     </tr>
     <tr>
         <td>AG500 DIGITAL</td>
-        <td align="center">⚠️</td>
+        <td align="center">✅</td>
     </tr>
     <tr>
         <td>AG620 DIGITAL</td>
@@ -157,7 +157,7 @@ sudo nixos-rebuild switch
     </tr>
     <tr>
         <td>CH360 DIGITAL</td>
-        <td align="center">⚠️</td>
+        <td align="center">✅</td>
     </tr>
     <tr>
         <td>CH510 MESH DIGITAL</td>
@@ -193,8 +193,8 @@ sudo ./deepcool-digital-linux [OPTIONS]
 Options:
   -m, --mode <MODE>  Change the display mode between "temp, usage, power, auto" [default: temp]
       --pid <ID>     Specify the Product ID if you use mutiple devices
-  -f, --fahrenheit   Change temperature unit to Fahrenheit
-  -a, --alarm        Enable the alarm [85˚C | 185˚F]
+  -f, --fahrenheit   Change the temperature unit to °F
+  -a, --alarm        Enable the alarm
 
 Commands:
   -l, --list         Print Product ID of the connected devices
