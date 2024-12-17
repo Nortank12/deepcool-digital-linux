@@ -1,36 +1,30 @@
 use crate::{error, monitor::cpu::Cpu};
+use super::{device_error, Mode};
 use hidapi::HidApi;
 use std::{process::exit, thread::sleep, time::Duration};
 
-const VENDOR: u16 = 13875;
+pub const DEFAULT_MODE: Mode = Mode::Auto;
 pub const POLLING_RATE: u64 = 1000;
 // The temperature limits are hard-coded in the device
 pub const TEMP_LIMIT_C: u8 = 85;
 pub const TEMP_LIMIT_F: u8 = 185;
 
 pub struct Display {
-    product_id: u16,
     fahrenheit: bool,
     cpu: Cpu,
 }
 
 impl Display {
-    pub fn new(product_id: u16, fahrenheit: bool) -> Self {
+    pub fn new(fahrenheit: bool) -> Self {
         Display {
-            product_id,
             fahrenheit,
             cpu: Cpu::new(),
         }
     }
 
-    pub fn run(&self, api: &HidApi) {
+    pub fn run(&self, api: &HidApi, vid: u16, pid: u16) {
         // Connect to device
-        let device = api.open(VENDOR, self.product_id).unwrap_or_else(|_| {
-            error!("Failed to access the USB device");
-            eprintln!("       Try to run the program as root or give permission to the neccesary resources.");
-            eprintln!("       You can find instructions about rootless mode on GitHub.");
-            exit(1);
-        });
+        let device = api.open(vid, pid).unwrap_or_else(|_| device_error());
 
         // Check if `rapl_max_uj` was read correctly
         if self.cpu.rapl_max_uj == 0 {

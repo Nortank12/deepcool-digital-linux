@@ -1,35 +1,40 @@
-use crate::{error, monitor::{cpu::Cpu, gpu::Gpu}};
+use crate::monitor::{cpu::Cpu, gpu::Gpu};
+use super::{device_error, Mode};
 use hidapi::HidApi;
-use std::{process::exit, thread::sleep, time::Duration};
+use std::{thread::sleep, time::Duration};
 
-const VENDOR: u16 = 13875;
+pub const DEFAULT_MODE: Mode = Mode::Temperature;
 pub const POLLING_RATE: u64 = 750;
 
 pub struct Display {
-    product_id: u16,
+    mode: Mode,
     fahrenheit: bool,
     cpu: Cpu,
     gpu: Gpu,
 }
 
 impl Display {
-    pub fn new(product_id: u16, fahrenheit: bool) -> Self {
+    pub fn new(mode: &Mode, fahrenheit: bool) -> Self {
+        // Verify the display mode
+        let mode = match mode {
+            Mode::Default => DEFAULT_MODE,
+            Mode::Auto => Mode::Auto,
+            Mode::Temperature => Mode::Temperature,
+            Mode::Usage => Mode::Usage,
+            _ => mode.support_error(),
+        };
+
         Display {
-            product_id,
+            mode,
             fahrenheit,
             cpu: Cpu::new(),
             gpu: Gpu::new(),
         }
     }
 
-    pub fn run(&self, api: &HidApi, mode: &str) {
+    pub fn run(&self, api: &HidApi, vid: u16, pid: u16) {
         // Connect to device
-        let device = api.open(VENDOR, self.product_id).unwrap_or_else(|_| {
-            error!("Failed to access the USB device");
-            eprintln!("       Try to run the program as root or give permission to the neccesary resources.");
-            eprintln!("       You can find instructions about rootless mode on GitHub.");
-            exit(1);
-        });
+        let device = api.open(vid, pid).unwrap_or_else(|_| device_error());
 
         // Data packet
         let mut data: [u8; 64] = [0; 64];
@@ -43,24 +48,23 @@ impl Display {
         }
 
         // Display loop
-        if mode == "auto" {
-            loop {
+        match self.mode {
+            Mode::Auto => loop {
                 for _ in 0..8 {
-                    device.write(&self.status_message(&data, "temp")).unwrap();
+                    device.write(&self.status_message(&data, &Mode::Temperature)).unwrap();
                 }
                 for _ in 0..8 {
-                    device.write(&self.status_message(&data, "usage")).unwrap();
+                    device.write(&self.status_message(&data, &Mode::Usage)).unwrap();
                 }
             }
-        } else {
-            loop {
-                device.write(&self.status_message(&data, &mode)).unwrap();
+            _ => loop {
+                device.write(&self.status_message(&data, &self.mode)).unwrap();
             }
         }
     }
 
     /// Reads the CPU status information and returns the data packet.
-    fn status_message(&self, inital_data: &[u8; 64], mode: &str) -> [u8; 64] {
+    fn status_message(&self, inital_data: &[u8; 64], mode: &Mode) -> [u8; 64] {
         // Clone the data packet
         let mut data = inital_data.clone();
 
@@ -76,7 +80,7 @@ impl Display {
 
         // Main display
         match mode {
-            "temp" => {
+            Mode::Temperature => {
                 let unit = if self.fahrenheit { 35 } else { 19 };
                 let cpu_temp = self.cpu.get_temp(self.fahrenheit);
                 let gpu_temp = self.gpu.get_temp(self.fahrenheit);
@@ -91,7 +95,7 @@ impl Display {
                 data[9] = gpu_temp % 100 / 10;
                 data[10] = gpu_temp % 10;
             }
-            "usage" => {
+            Mode::Usage => {
                 // CPU
                 data[1] = 76;
                 data[3] = cpu_usage / 100;

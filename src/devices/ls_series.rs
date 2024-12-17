@@ -1,37 +1,42 @@
 use crate::{error, monitor::cpu::Cpu};
+use super::{device_error, Mode};
 use hidapi::HidApi;
 use std::{process::exit, thread::sleep, time::Duration};
 
-const VENDOR: u16 = 13875;
+pub const DEFAULT_MODE: Mode = Mode::Temperature;
 pub const POLLING_RATE: u64 = 750;
 pub const TEMP_LIMIT_C: u8 = 90;
 pub const TEMP_LIMIT_F: u8 = 194;
 
 pub struct Display {
-    product_id: u16,
+    mode: Mode,
     fahrenheit: bool,
     alarm: bool,
     cpu: Cpu,
 }
 
 impl Display {
-    pub fn new(product_id: u16, fahrenheit: bool, alarm: bool) -> Self {
+    pub fn new(mode: &Mode, fahrenheit: bool, alarm: bool) -> Self {
+        // Verify the display mode
+        let mode = match mode {
+            Mode::Default => DEFAULT_MODE,
+            Mode::Auto => Mode::Auto,
+            Mode::Temperature => Mode::Temperature,
+            Mode::Power => Mode::Power,
+            _ => mode.support_error(),
+        };
+
         Display {
-            product_id,
+            mode,
             fahrenheit,
             alarm,
             cpu: Cpu::new(),
         }
     }
 
-    pub fn run(&self, api: &HidApi, mode: &str) {
+    pub fn run(&self, api: &HidApi, vid: u16, pid: u16) {
         // Connect to device
-        let device = api.open(VENDOR, self.product_id).unwrap_or_else(|_| {
-            error!("Failed to access the USB device");
-            eprintln!("       Try to run the program as root or give permission to the neccesary resources.");
-            eprintln!("       You can find instructions about rootless mode on GitHub.");
-            exit(1);
-        });
+        let device = api.open(vid, pid).unwrap_or_else(|_| device_error());
 
         // Check if `rapl_max_uj` was read correctly
         if self.cpu.rapl_max_uj == 0 {
@@ -51,30 +56,29 @@ impl Display {
         }
 
         // Display loop
-        if mode == "auto" {
-            loop {
+        match self.mode {
+            Mode::Auto => loop {
                 for _ in 0..8 {
-                    device.write(&self.status_message(&data, "temp")).unwrap();
+                    device.write(&self.status_message(&data, &Mode::Temperature)).unwrap();
                 }
                 for _ in 0..8 {
-                    device.write(&self.status_message(&data, "power")).unwrap();
+                    device.write(&self.status_message(&data, &Mode::Power)).unwrap();
                 }
             }
-        } else {
-            loop {
-                device.write(&self.status_message(&data, &mode)).unwrap();
+            _ => loop {
+                device.write(&self.status_message(&data, &self.mode)).unwrap();
             }
         }
     }
 
     /// Reads the CPU status information and returns the data packet.
-    fn status_message(&self, inital_data: &[u8; 64], mode: &str) -> [u8; 64] {
+    fn status_message(&self, inital_data: &[u8; 64], mode: &Mode) -> [u8; 64] {
         // Clone the data packet
         let mut data = inital_data.clone();
 
         // Read CPU utilization & energy consumption (if needed)
         let cpu_instant = self.cpu.read_instant();
-        let cpu_energy = if mode == "power" { self.cpu.read_energy() } else { 0 };
+        let cpu_energy = if mode == &Mode::Power { self.cpu.read_energy() } else { 0 };
 
         // Wait
         sleep(Duration::from_millis(POLLING_RATE));
@@ -85,13 +89,13 @@ impl Display {
 
         // Main display
         match mode {
-            "temp" => {
+            Mode::Temperature => {
                 data[1] = if self.fahrenheit { 35 } else { 19 };
                 data[3] = temp / 100;
                 data[4] = temp % 100 / 10;
                 data[5] = temp % 10;
             }
-            "power" => {
+            Mode::Power => {
                 let power = self.cpu.get_power(cpu_energy, POLLING_RATE);
                 data[1] = 76;
                 data[3] = (power / 100) as u8;

@@ -1,11 +1,26 @@
 mod devices;
 mod monitor;
 
+use devices::*;
 use colored::*;
 use hidapi::HidApi;
 use std::{env::args, process::exit};
 
-const VENDOR: u16 = 13875;
+#[macro_export]
+macro_rules! warning {
+    ($input:expr) => {
+        use colored::*;
+        eprintln!("{}", format!("{} {}", "Warning!".yellow(), $input).bold());
+    };
+}
+
+#[macro_export]
+macro_rules! error {
+    ($input:expr) => {
+        use colored::*;
+        eprintln!("{}", format!("{} {}", "Error!".red(), $input).bold());
+    };
+}
 
 enum TemperatureUnit {
     Celsius,
@@ -34,26 +49,10 @@ struct Alarm {
 }
 
 struct Args {
-    mode: String,
+    mode: Mode,
     pid: u16,
     fahrenheit: bool,
     alarm: bool,
-}
-
-#[macro_export]
-macro_rules! warning {
-    ($input:expr) => {
-        use colored::*;
-        eprintln!("{}", format!("{} {}", "Warning!".yellow(), $input).bold());
-    };
-}
-
-#[macro_export]
-macro_rules! error {
-    ($input:expr) => {
-        use colored::*;
-        eprintln!("{}", format!("{} {}", "Error!".red(), $input).bold());
-    };
 }
 
 fn main() {
@@ -67,7 +66,7 @@ fn main() {
     });
     let mut product_id = 0;
     for device in api.device_list() {
-        if device.vendor_id() == VENDOR {
+        if device.vendor_id() == DEFAULT_VENDOR {
             if args.pid == 0 || device.product_id() == args.pid {
                 product_id = device.product_id();
                 println!("Device found: {}", device.product_string().unwrap().bright_green());
@@ -89,125 +88,114 @@ fn main() {
     match product_id {
         // AK Series
         1..=4 => {
-            if args.mode == "power" {
-                error!("Display mode \"power\" is not supported on your device");
-                exit(1);
-            }
+            // Connect to device
+            let ak_device = ak_series::Display::new(&args.mode, args.fahrenheit, args.alarm);
             // Write info
             display_configuration_info(
-                &args.mode,
+                if args.mode == Mode::Default { ak_series::DEFAULT_MODE } else { args.mode },
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                 Alarm {
                     state: if args.alarm { AlarmState::On } else { AlarmState::Off },
                     temp_limit: if args.fahrenheit {
-                        devices::ak_series::TEMP_LIMIT_F
+                        ak_series::TEMP_LIMIT_F
                     } else {
-                        devices::ak_series::TEMP_LIMIT_C
+                        ak_series::TEMP_LIMIT_C
                     },
                 },
-                devices::ak_series::POLLING_RATE,
+                ak_series::POLLING_RATE,
             );
             // Display loop
-            let ak_device = devices::ak_series::Display::new(product_id, args.fahrenheit, args.alarm);
-            ak_device.run(&api, &args.mode);
+            ak_device.run(&api, DEFAULT_VENDOR, product_id);
         }
         // LS Series
         6 => {
-            if args.mode == "usage" {
-                error!("Display mode \"usage\" is not supported on your device");
-                exit(1);
-            }
+            // Connect to device
+            let ls_device = ls_series::Display::new(&args.mode, args.fahrenheit, args.alarm);
             // Write info
             display_configuration_info(
-                &args.mode,
+                if args.mode == Mode::Default { ls_series::DEFAULT_MODE } else { args.mode },
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                 Alarm {
                     state: if args.alarm { AlarmState::On } else { AlarmState::Off },
                     temp_limit: if args.fahrenheit {
-                        devices::ls_series::TEMP_LIMIT_F
+                        ls_series::TEMP_LIMIT_F
                     } else {
-                        devices::ls_series::TEMP_LIMIT_C
+                        ls_series::TEMP_LIMIT_C
                     },
                 },
-                devices::ls_series::POLLING_RATE,
+                ls_series::POLLING_RATE,
             );
             // Display loop
-            let ls_device = devices::ls_series::Display::new(product_id, args.fahrenheit, args.alarm);
-            ls_device.run(&api, &args.mode);
+            ls_device.run(&api, DEFAULT_VENDOR, product_id);
         }
         // AG Series
         8 => {
-            if args.mode == "power" {
-                error!("Display mode \"power\" is not supported on your device");
-                exit(1);
-            }
-            // Write info
+            // Connect to device
+            let ag_device = ag_series::Display::new(&args.mode, args.alarm);
+            // Write info & warnings
             display_configuration_info(
-                &args.mode,
+                if args.mode == Mode::Default { ag_series::DEFAULT_MODE } else { args.mode },
                 TemperatureUnit::Celsius,
                 Alarm {
                     state: if args.alarm { AlarmState::On } else { AlarmState::Off },
-                    temp_limit: devices::ag_series::TEMP_LIMIT_C,
+                    temp_limit: ag_series::TEMP_LIMIT_C,
                 },
-                devices::ag_series::POLLING_RATE,
+                ag_series::POLLING_RATE,
             );
             if args.fahrenheit {
                 warning!("Displaying ˚F is not supported, value will be ignored");
             }
             // Display loop
-            let ag_device = devices::ag_series::Display::new(product_id, args.alarm);
-            ag_device.run(&api, &args.mode);
+            ag_device.run(&api, DEFAULT_VENDOR, product_id);
         }
         // LD Series
         10 => {
-            // Write info
+            // Connect to device
+            let ld_device = ld_series::Display::new(args.fahrenheit);
+            // Write info & warnings
             display_configuration_info(
-                "auto",
+                ld_series::DEFAULT_MODE,
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                 Alarm {
                     state: AlarmState::Auto,
                     temp_limit: if args.fahrenheit {
-                        devices::ld_series::TEMP_LIMIT_F
+                        ld_series::TEMP_LIMIT_F
                     } else {
-                        devices::ld_series::TEMP_LIMIT_C
+                        ld_series::TEMP_LIMIT_C
                     },
                 },
-                devices::ld_series::POLLING_RATE,
+                ld_series::POLLING_RATE,
             );
-            if args.mode != "temp" {
+            if args.mode != Mode::Default {
                 warning!("Display mode cannot be changed, value will be ignored");
             }
             if args.alarm {
                 warning!("The alarm is hard-coded in your device, value will be ignored");
             }
             // Display loop
-            let ld_device = devices::ld_series::Display::new(product_id, args.fahrenheit);
-            ld_device.run(&api);
+            ld_device.run(&api, DEFAULT_VENDOR, product_id);
         }
         // CH Series & MORPHEUS
         5 | 7 | 21 => {
-            if args.mode == "power" {
-                error!("Display mode \"power\" is not supported on your device");
-                exit(1);
-            }
-            // Write info
+            // Connect to device
+            let ch_device = ch_series::Display::new(&args.mode, args.fahrenheit);
+            // Write info & warnings
             display_configuration_info(
-                &args.mode,
+                if args.mode == Mode::Default { ch_series::DEFAULT_MODE } else { args.mode },
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                 Alarm { state: AlarmState::NotSupported, temp_limit: 0 },
-                devices::ch_series::POLLING_RATE,
+                ch_series::POLLING_RATE,
             );
             if args.alarm {
                 warning!("Alarm is not supported, value will be ignored");
             }
             // Display loop
-            let ch_device = devices::ch_series::Display::new(product_id, args.fahrenheit);
-            ch_device.run(&api, &args.mode);
+            ch_device.run(&api, DEFAULT_VENDOR, product_id);
         }
         _ => {
             println!("Device not yet supported!");
             println!("\nPlease create an issue on GitHub providing your device name and the following information:");
-            let device = api.open(VENDOR, product_id).unwrap_or_else(|_| {
+            let device = api.open(DEFAULT_VENDOR, product_id).unwrap_or_else(|_| {
                 error!("Failed to access the USB device");
                 eprintln!("       Try to run the program as root or give permission to the neccesary resources.");
                 eprintln!("       You can find instructions about rootless mode on GitHub.");
@@ -224,7 +212,7 @@ fn main() {
 
 fn read_args() -> Args {
     let args: Vec<String> = args().collect();
-    let mut mode = "temp".to_string();
+    let mut mode = Mode::Default;
     let mut pid = 0;
     let mut fahrenheit = false;
     let mut alarm = false;
@@ -234,13 +222,14 @@ fn read_args() -> Args {
         match args[i].as_str() {
             "-m" | "--mode" => {
                 if i + 1 < args.len() {
-                    mode = args[i + 1].clone();
-                    if ["temp", "usage", "power", "auto"].contains(&mode.as_str()) {
-                        i += 1;
-                    } else {
-                        error!("Invalid mode");
-                        exit(1);
-                    }
+                    mode = match Mode::get(&args[i + 1]) {
+                        Some(mode) => mode,
+                        None => {
+                            error!("Invalid mode");
+                            exit(1);
+                        },
+                    };
+                    i +=1;
                 } else {
                     error!("--mode requires a value");
                     exit(1);
@@ -283,7 +272,7 @@ fn read_args() -> Args {
                 });
                 let mut products = 0;
                 for device in api.device_list() {
-                    if device.vendor_id() == VENDOR {
+                    if device.vendor_id() == DEFAULT_VENDOR {
                         products += 1;
                         println!(
                             "{} | {}",
@@ -321,13 +310,14 @@ fn read_args() -> Args {
                     match c {
                         'm' => {
                             if i + 1 < args.len() && args[i].ends_with('m') {
-                                if ["temp", "usage", "power", "auto"].contains(&args[i + 1].as_str()) {
-                                    mode = args[i + 1].clone();
-                                    i += 1;
-                                } else {
-                                    error!("Invalid mode");
-                                    exit(1);
-                                }
+                                mode = match Mode::get(&args[i + 1]) {
+                                    Some(mode) => mode,
+                                    None => {
+                                        error!("Invalid mode");
+                                        exit(1);
+                                    },
+                                };
+                                i +=1;
                             } else {
                                 error!("--mode requires a value");
                                 exit(1);
@@ -362,8 +352,8 @@ fn read_args() -> Args {
     }
 }
 
-fn display_configuration_info(mode: &str, temp_unit: TemperatureUnit, alarm: Alarm, polling_rate: u64) {
-    println!("DISP. MODE: {}", mode.bright_cyan());
+fn display_configuration_info(mode: Mode, temp_unit: TemperatureUnit, alarm: Alarm, polling_rate: u64) {
+    println!("DISP. MODE: {}", mode.symbol().bright_cyan());
     println!("TEMP. UNIT: {}", temp_unit.symbol().bright_cyan());
     match alarm.state {
         AlarmState::Auto => println!(
