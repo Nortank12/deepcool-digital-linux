@@ -191,7 +191,7 @@ sudo ./deepcool-digital-linux [OPTIONS]
 ```
 ```
 Options:
-  -m, --mode <MODE>  Change the display mode between "temp, usage, power, auto" [default: temp]
+  -m, --mode <MODE>  Change the display mode of your device
       --pid <ID>     Specify the Product ID if you use mutiple devices
   -f, --fahrenheit   Change the temperature unit to °F
   -a, --alarm        Enable the alarm
