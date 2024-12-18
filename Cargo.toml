@@ -1,13 +1,13 @@
 [package]
 name = "deepcool-digital-linux"
-version = "0.5.4"
+version = "0.6.0"
 edition = "2021"
 
 [dependencies]
-libloading = "0.8.5"
+libloading = "0.8.6"
 hidapi = "2.6.3"
 cpu-monitor = "0.1.1"
-colored = "=2.1.0"
+colored = "2.2.0"
 
 [profile.release]
 opt-level = 3
