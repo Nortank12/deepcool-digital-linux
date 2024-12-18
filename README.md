@@ -44,6 +44,9 @@ ACTION=="add", SUBSYSTEM=="powercap", KERNEL=="intel-rapl:0", RUN+="/bin/chmod 4
 
 # DeepCool HID raw devices
 SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3633", MODE="0666"
+
+# CH510 MESH DIGITAL
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="34d3", ATTRS{idProduct}=="1100", MODE="0666"
 ```
 4. Reboot your computer
 
@@ -62,6 +65,9 @@ sudo nano /etc/nixos/configuration.nix
 
     # DeepCool HID raw devices
     SUBSYSTEM=="hidraw", ATTRS{idVendor}=="3633", MODE="0666"
+
+    # CH510 MESH DIGITAL
+    SUBSYSTEM=="hidraw", ATTRS{idVendor}=="34d3", ATTRS{idProduct}=="1100", MODE="0666"
   '';
 ```
 3. Rebuild your system
@@ -161,7 +167,7 @@ sudo nixos-rebuild switch
     </tr>
     <tr>
         <td>CH510 MESH DIGITAL</td>
-        <td align="center">❓</td>
+        <td align="center">✅</td>
     </tr>
     <tr>
         <td>CH560 DIGITAL</td>

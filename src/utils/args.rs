@@ -1,4 +1,4 @@
-use crate::{devices::Mode, error, DEFAULT_VENDOR};
+use crate::{devices::Mode, error, CH510_PRODUCT_ID, CH510_VENDOR_ID, DEFAULT_VENDOR_ID};
 use colored::*;
 use hidapi::HidApi;
 use std::{env::args, process::exit};
@@ -73,14 +73,20 @@ impl Args {
                     });
                     let mut products = 0;
                     for device in api.device_list() {
-                        if device.vendor_id() == DEFAULT_VENDOR {
+                        if device.vendor_id() == DEFAULT_VENDOR_ID {
                             products += 1;
                             println!(
                                 "{} | {}",
                                 device.product_id().to_string().bright_green().bold(),
                                 device.product_string().unwrap().bright_green()
                             );
-                            break;
+                        } else if device.vendor_id() == CH510_VENDOR_ID && device.product_id() == CH510_PRODUCT_ID {
+                            products += 1;
+                            println!(
+                                "{} | {}",
+                                device.product_id().to_string().bright_green().bold(),
+                                "CH510-MESH-DIGITAL".bright_green()
+                            );
                         }
                     }
                     if products == 0 {

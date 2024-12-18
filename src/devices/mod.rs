@@ -1,6 +1,7 @@
 pub mod ag_series;
 pub mod ak_series;
 pub mod ch_series;
+pub mod ch510;
 pub mod ld_series;
 pub mod ls_series;
 
@@ -8,7 +9,9 @@ use crate::error;
 use std::process::exit;
 use hidapi::HidDevice;
 
-pub const DEFAULT_VENDOR: u16 = 13875;
+pub const DEFAULT_VENDOR_ID: u16 = 13875;
+pub const CH510_VENDOR_ID: u16 = 13523;
+pub const CH510_PRODUCT_ID: u16 = 4352;
 
 #[derive(PartialEq)]
 pub enum Mode {
@@ -17,6 +20,8 @@ pub enum Mode {
     Temperature,
     Usage,
     Power,
+    Cpu,
+    Gpu,
 }
 
 impl Mode {
@@ -27,6 +32,8 @@ impl Mode {
             Mode::Temperature => "temp",
             Mode::Usage => "usage",
             Mode::Power => "power",
+            Mode::Cpu => "cpu",
+            Mode::Gpu => "gpu",
         }
     }
 
@@ -36,6 +43,8 @@ impl Mode {
             "temp" => Some(Self::Temperature),
             "usage" => Some(Self::Usage),
             "power" => Some(Self::Power),
+            "cpu" => Some(Self::Cpu),
+            "gpu" => Some(Self::Gpu),
             _ => None,
         }
     }

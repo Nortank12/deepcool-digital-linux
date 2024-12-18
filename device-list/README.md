@@ -101,7 +101,7 @@
         <td>4352</td>
         <td>CH510 MESH DIGITAL</td>
         <td align="center">
-            No Table Yet
+            <a href="tables/ch510.md">Mapping Table</a>
         </td>
     </tr>
 </table>
