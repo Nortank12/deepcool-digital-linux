@@ -6,10 +6,10 @@ use std::{process::exit, thread::sleep, time::Duration};
 pub const DEFAULT_MODE: Mode = Mode::Auto;
 pub const POLLING_RATE: u64 = 750;
 // The temperature limits are hard-coded in the device
-// pub const TEMP_WARM_C: u8 = 80;
-// pub const TEMP_WARM_F: u8 = 176;
-pub const TEMP_HOT_C: u8 = 90;
-pub const TEMP_HOT_F: u8 = 194;
+pub const TEMP_WARNING_C: u8 = 80;
+pub const TEMP_WARNING_F: u8 = 176;
+pub const TEMP_LIMIT_C: u8 = 90;
+pub const TEMP_LIMIT_F: u8 = 194;
 
 
 pub struct Display {

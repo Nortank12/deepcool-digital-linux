@@ -8,7 +8,6 @@
     - [Systemd](#systemd-arch-debian-ubuntu-fedora-etc)
     - [OpenRC](#openrc-gentoo-artix-linux-etc)
 - [Device List](#more-information)
-- [Contributions](#contributions)
 
 # About
 This program is meant to replicate the functionality of the original `DeepCool Digital`
@@ -107,7 +106,7 @@ sudo nixos-rebuild switch
     </tr>
     <tr>
         <td>AK400 DIGITAL PRO</td>
-        <td align="center">❓</td>
+        <td align="center">✅</td>
     </tr>
     <tr>
         <td>AK500 DIGITAL</td>
@@ -293,6 +292,3 @@ sudo rc-update add deepcool-digital default
 
 # More Information
 [Device List and USB Mapping Tables](device-list)
-
-# Contributions
-LD Series: [asdfzdfj](https://github.com/asdfzdfj) / [deepcool-ld-digital-hidapi](https://github.com/asdfzdfj/deepcool-ld-digital-hidapi)

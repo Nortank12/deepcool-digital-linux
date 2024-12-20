@@ -88,7 +88,7 @@
     </tr>
     <tr>
         <td>16</td>
-        <td>AK400 PRO</td>
+        <td>AK400 DIGITAL PRO</td>
         <td align="center">
             <a href="tables/ak400-pro.md">Mapping Table</a>
         </td>

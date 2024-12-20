@@ -62,6 +62,7 @@ fn main() {
                     } else {
                         ak_series::TEMP_LIMIT_C
                     },
+                    temp_warning: 0,
                 },
                 ak_series::POLLING_RATE,
             );
@@ -84,6 +85,7 @@ fn main() {
                     } else {
                         ls_series::TEMP_LIMIT_C
                     },
+                    temp_warning: 0,
                 },
                 ls_series::POLLING_RATE,
             );
@@ -102,6 +104,7 @@ fn main() {
                 Alarm {
                     state: if args.alarm { AlarmState::On } else { AlarmState::Off },
                     temp_limit: ag_series::TEMP_LIMIT_C,
+                    temp_warning: 0,
                 },
                 ag_series::POLLING_RATE,
             );
@@ -127,6 +130,7 @@ fn main() {
                     } else {
                         ld_series::TEMP_LIMIT_C
                     },
+                    temp_warning: 0,
                 },
                 ld_series::POLLING_RATE,
             );
@@ -151,9 +155,14 @@ fn main() {
                     Alarm {
                         state: AlarmState::Auto,
                         temp_limit: if args.fahrenheit {
-                            ak400_pro::TEMP_HOT_F
+                            ak400_pro::TEMP_LIMIT_F
                         } else {
-                            ak400_pro::TEMP_HOT_C
+                            ak400_pro::TEMP_LIMIT_C
+                        },
+                        temp_warning: if args.fahrenheit {
+                            ak400_pro::TEMP_WARNING_F
+                        } else {
+                            ak400_pro::TEMP_WARNING_C
                         },
                     },
                     ak400_pro::POLLING_RATE,
@@ -176,7 +185,7 @@ fn main() {
             print_device_status(
                 if args.mode == Mode::Default { ch_series::DEFAULT_MODE } else { args.mode },
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
-                Alarm { state: AlarmState::NotSupported, temp_limit: 0 },
+                Alarm { state: AlarmState::NotSupported, temp_limit: 0, temp_warning: 0 },
                 ch_series::POLLING_RATE,
             );
             if args.alarm {
@@ -194,7 +203,7 @@ fn main() {
             print_device_status(
                 if args.mode == Mode::Default { ch510::DEFAULT_MODE } else { args.mode },
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
-                Alarm { state: AlarmState::NotSupported, temp_limit: 0 },
+                Alarm { state: AlarmState::NotSupported, temp_limit: 0, temp_warning: 0 },
                 ch510::POLLING_RATE,
             );
             if args.alarm {

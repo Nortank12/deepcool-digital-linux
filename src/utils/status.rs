@@ -25,6 +25,7 @@ pub enum AlarmState {
 pub struct Alarm {
     pub state: AlarmState,
     pub temp_limit: u8,
+    pub temp_warning: u8,
 }
 
 pub fn print_device_status(mode: Mode, temp_unit: TemperatureUnit, alarm: Alarm, polling_rate: u64) {
@@ -32,11 +33,22 @@ pub fn print_device_status(mode: Mode, temp_unit: TemperatureUnit, alarm: Alarm,
     println!("DISP. MODE: {}", mode.symbol().bright_cyan());
     println!("TEMP. UNIT: {}", temp_unit.symbol().bright_cyan());
     match alarm.state {
-        AlarmState::Auto => println!(
-            "ALARM:      {} | {}",
-            "auto".bright_green(),
-            (alarm.temp_limit.to_string() + temp_unit.symbol()).bright_cyan()
-        ),
+        AlarmState::Auto => {
+            if alarm.temp_warning > 0 {
+                println!(
+                    "ALARM:      {} | {} [warning: {}]",
+                    "auto".bright_green(),
+                    (alarm.temp_limit.to_string() + temp_unit.symbol()).bright_cyan(),
+                    (alarm.temp_warning.to_string() + temp_unit.symbol()).bright_cyan()
+                );
+            } else {
+                println!(
+                    "ALARM:      {} | {}",
+                    "auto".bright_green(),
+                    (alarm.temp_limit.to_string() + temp_unit.symbol()).bright_cyan()
+                );
+            }
+        }
         AlarmState::On => println!(
             "ALARM:      {} | {}",
             "on".bright_green(),
