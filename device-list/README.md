@@ -8,7 +8,7 @@
         <th>USB Data Bytes</th>
     </tr>
     <tr>
-        <td rowspan="16">13875</td>
+        <td rowspan="18">13875</td>
         <td>1</td>
         <td>AK400 DIGITAL</td>
         <td align="center" rowspan="4">
@@ -80,6 +80,18 @@
     </tr>
     <tr>
         <td>LD360</td>
+    </tr>
+    <tr>
+        <td>...</td>
+        <td>...</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>16</td>
+        <td>AK400 PRO</td>
+        <td align="center">
+            <a href="tables/ak400-pro.md">Mapping Table</a>
+        </td>
     </tr>
     <tr>
         <td>...</td>

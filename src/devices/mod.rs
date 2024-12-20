@@ -1,5 +1,6 @@
 pub mod ag_series;
 pub mod ak_series;
+pub mod ak400_pro;
 pub mod ch_series;
 pub mod ch510;
 pub mod ld_series;
