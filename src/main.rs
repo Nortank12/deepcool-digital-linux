@@ -139,6 +139,34 @@ fn main() {
             // Display loop
             ld_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
+        // AK400 PRO
+        16 => {
+            println!("Supported modes: {}", "auto".bold());
+            // Connect to device
+            let ak400_pro = devices::ak400_pro::Display::new(args.fahrenheit);
+            // Print current configuration & warnings
+            print_device_status(
+                ak400_pro::DEFAULT_MODE,
+                if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
+                    Alarm {
+                        state: AlarmState::Auto,
+                        temp_limit: if args.fahrenheit {
+                            ak400_pro::TEMP_HOT_F
+                        } else {
+                            ak400_pro::TEMP_HOT_C
+                        },
+                    },
+                    ak400_pro::POLLING_RATE,
+            );
+            if args.mode != Mode::Default {
+                warning!("Display mode cannot be changed, value will be ignored");
+            }
+            if args.alarm {
+                warning!("The alarm is hard-coded in your device, value will be ignored");
+            }
+            // Display loop
+            ak400_pro.run(&api, DEFAULT_VENDOR_ID, product_id);
+        }
         // CH Series & MORPHEUS
         5 | 7 | 21 => {
             println!("Supported modes: {} [default: {}]", "auto temp usage".bold(), ch_series::DEFAULT_MODE.symbol());
