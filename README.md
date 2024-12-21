@@ -7,6 +7,7 @@
 - [Automatic Start](#automatic-start)
     - [Systemd](#systemd-arch-debian-ubuntu-fedora-etc)
     - [OpenRC](#openrc-gentoo-artix-linux-etc)
+- [Building from Source](#building-from-source)
 - [Device List](#more-information)
 
 # About
@@ -36,7 +37,7 @@ cd /lib/udev/rules.d
 ```bash
 sudo nano 99-deepcool-digital.rules
 ```
-3. Copy the contents:
+3. Insert the following:
 ```bash
 # Intel RAPL energy usage file
 ACTION=="add", SUBSYSTEM=="powercap", KERNEL=="intel-rapl:0", RUN+="/bin/chmod 444 /sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj"
@@ -236,15 +237,15 @@ For example:
 # Automatic Start
 
 ## Systemd (Arch, Debian, Ubuntu, Fedora, etc.)
-1. Copy the `deepcool-digital-linux` to the `/usr/sbin/` folder.
+1. Copy the `deepcool-digital-linux` to the `/usr/sbin/` folder
 ```bash
 sudo cp ./deepcool-digital-linux /usr/sbin/
 ```
-2. Create the service file in the `/etc/systemd/system/` folder.
+2. Create the service file in the `/etc/systemd/system/` folder
 ```bash
 sudo nano /etc/systemd/system/deepcool-digital.service
 ```
-3. Copy the contents:
+3. Insert the following:
 ```properties
 [Unit]
 Description=DeepCool Digital
@@ -270,7 +271,7 @@ sudo cp ./deepcool-digital-linux /usr/sbin/
 ```bash
 sudo nano /etc/init.d/deepcool-digital
 ```
-3. Copy the contents:
+3. Insert the following:
 ```properties
 #!/sbin/openrc-run
 
@@ -289,6 +290,52 @@ sudo chmod +x /etc/init.d/deepcool-digital
 sudo rc-update add deepcool-digital default
 ```
 *Note: The program will run automatically after the next boot.*
+
+# Building from Source
+For testing or customization, you can build the binary by following
+the steps below.
+
+## Dependencies
+<details>
+<summary><b>Arch-based distributions</b></summary>
+
+1. Install the following packages
+```bash
+sudo pacman -S base-devel rustup
+```
+</details>
+
+<details>
+<summary><b>Debian-based distributions</b></summary>
+
+1. Install the following packages
+```bash
+sudo apt install build-essential pkg-config libudev-dev curl
+```
+2. Install [rustup](https://rustup.rs/) (required to have the latest Rust compiler)
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+3. Update your current shell
+```bash
+. "$HOME/.cargo/env"
+```
+</details>
+
+## Building
+1. Clone the repository
+```bash
+git clone https://github.com/Nortank12/deepcool-digital-linux
+```
+2. Open the folder
+```bash
+cd deepcool-digital-linux
+```
+3. Run the build command
+```bash
+cargo build -r
+```
+You can find the binary inside the `./target/release` folder.
 
 # More Information
 [Device List and USB Mapping Tables](device-list)
