@@ -2,6 +2,7 @@ pub mod ag_series;
 pub mod ak_series;
 pub mod ak400_pro;
 pub mod ch_series;
+pub mod ch170;
 pub mod ch510;
 pub mod ld_series;
 pub mod ls_series;
@@ -23,6 +24,7 @@ pub enum Mode {
     Power,
     Cpu,
     Gpu,
+    Psu,
 }
 
 impl Mode {
@@ -35,6 +37,7 @@ impl Mode {
             Mode::Power => "power",
             Mode::Cpu => "cpu",
             Mode::Gpu => "gpu",
+            Mode::Psu => "psu",
         }
     }
 
@@ -46,6 +49,7 @@ impl Mode {
             "power" => Some(Self::Power),
             "cpu" => Some(Self::Cpu),
             "gpu" => Some(Self::Gpu),
+            "psu" => Some(Self::Psu),
             _ => None,
         }
     }

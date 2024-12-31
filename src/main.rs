@@ -176,6 +176,29 @@ fn main() {
             // Display loop
             ak400_pro.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
+        // CH170 DIGITAL
+        19 => {
+            println!("Supported modes: {} [default: {}]", "cpu gpu psu".bold(), ch170::DEFAULT_MODE.symbol());
+            if args.mode == Mode::Default || args.mode == Mode::Cpu {
+                warning!("CPU fan speed monitoring is not supported yet");
+            } else if args.mode == Mode::Psu {
+                warning!("PSU monitoring is not supported yet");
+            }
+            // Connect to device
+            let ch170 = ch170::Display::new(&args.mode, args.fahrenheit);
+            // Print current configuration & warnings
+            print_device_status(
+                if args.mode == Mode::Default { ch170::DEFAULT_MODE } else { args.mode },
+                if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
+                Alarm { state: AlarmState::NotSupported, temp_limit: 0, temp_warning: 0 },
+                ch170::POLLING_RATE,
+            );
+            if args.alarm {
+                warning!("Alarm is not supported, value will be ignored");
+            }
+            // Display loop
+            ch170.run(&api, DEFAULT_VENDOR_ID, product_id);
+        }
         // CH Series & MORPHEUS
         5 | 7 | 21 => {
             println!("Supported modes: {} [default: {}]", "auto temp usage".bold(), ch_series::DEFAULT_MODE.symbol());
