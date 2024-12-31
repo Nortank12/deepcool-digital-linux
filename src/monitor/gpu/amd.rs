@@ -4,14 +4,14 @@ use crate::error;
 use std::{fs::read_dir, fs::read_to_string, process::exit};
 
 pub struct Gpu {
-    temp_sensor: String,
+    hwmon_dir: String,
     usage_file: String,
 }
 
 impl Gpu {
     pub fn new() -> Self {
         Gpu {
-            temp_sensor: find_temp_sensor(),
+            hwmon_dir: find_hwmon_dir(),
             usage_file: find_card(),
         }
     }
@@ -19,7 +19,7 @@ impl Gpu {
     /// Reads the value of the GPU temperature sensor and calculates it to be `˚C` or `˚F`.
     pub fn get_temp(&self, fahrenheit: bool) -> u8 {
         // Read sensor data
-        let data = read_to_string(&self.temp_sensor).unwrap_or_else(|_| {
+        let data = read_to_string(format!("{}/temp1_input", &self.hwmon_dir)).unwrap_or_else(|_| {
             error!("Failed to get GPU temperature (AMD)");
             exit(1);
         });
@@ -42,10 +42,32 @@ impl Gpu {
 
         data.trim_end().parse::<u8>().unwrap()
     }
+
+    /// Reads the value of the GPU power consumption in Watts.
+    pub fn get_power(&self) -> u16 {
+        let data = read_to_string(format!("{}/power1_average", &self.hwmon_dir)).unwrap_or_else(|_| {
+            error!("Failed to get GPU power (AMD)");
+            exit(1);
+        });
+        let power = data.trim_end().parse::<u64>().unwrap();
+
+        (power / 1_000_000) as u16
+    }
+
+    /// Reads the value of the GPU core frequency in MHz.
+    pub fn get_frequency(&self) -> u16 {
+        let data = read_to_string(format!("{}/freq1_input", &self.hwmon_dir)).unwrap_or_else(|_| {
+            error!("Failed to get GPU core frequency (AMD)");
+            exit(1);
+        });
+        let frequency = data.trim_end().parse::<u64>().unwrap();
+
+        (frequency / 1_000_000) as u16
+    }
 }
 
-/// Looks for the appropriate CPU temperature sensor datastream in the hwmon folder.
-fn find_temp_sensor() -> String {
+/// Looks for the hwmon folder of the AMD GPU.
+fn find_hwmon_dir() -> String {
     match read_dir("/sys/class/hwmon") {
         Ok(sensors) => {
             for sensor in sensors {
@@ -53,7 +75,7 @@ fn find_temp_sensor() -> String {
                 match read_to_string(format!("{path}/name")) {
                     Ok(name) => {
                         if name.starts_with("amdgpu") {
-                            return format!("{path}/temp1_input");
+                            return path;
                         }
                     }
                     Err(_) => (),

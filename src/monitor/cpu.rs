@@ -73,6 +73,27 @@ impl Cpu {
 
         (usage).round() as u8
     }
+
+    /// Reads the frequency of all CPU cores and returns the highest one in MHz.
+    pub fn get_frequency(&self) -> u16 {
+        let cpuinfo = read_to_string("/proc/cpuinfo").unwrap_or_else(|_| {
+            error!("Failed to get CPU clock");
+            exit(1);
+        });
+
+        let mut highest_core = 0.0;
+        for info in cpuinfo.lines() {
+            if info.starts_with("cpu MHz") {
+                let clock = info.split(":").nth(1).unwrap();
+                let clock = clock.trim().parse::<f32>().unwrap();
+                if clock > highest_core {
+                    highest_core = clock;
+                }
+            }
+        }
+
+        highest_core.round() as u16
+    }
 }
 
 /// Looks for the appropriate CPU temperature sensor datastream in the hwmon folder.

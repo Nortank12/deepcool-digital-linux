@@ -36,6 +36,20 @@ impl Gpu {
             Gpu::Nvidia(nvidia) => nvidia.get_usage(),
         }
     }
+
+    pub fn get_power(&self) -> u16 {
+        match &self {
+            Gpu::Amd(amd) => amd.get_power(),
+            Gpu::Nvidia(nvidia) => nvidia.get_power(),
+        }
+    }
+
+    pub fn get_frequency(&self) -> u16 {
+        match &self {
+            Gpu::Amd(amd) => amd.get_frequency(),
+            Gpu::Nvidia(nvidia) => nvidia.get_frequency(),
+        }
+    }
 }
 
 /// Get GPU vendor from PCI device list.

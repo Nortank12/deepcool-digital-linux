@@ -4,11 +4,13 @@ use crate::error;
 use libloading::{Library, Symbol};
 use std::{path::Path, process::exit, ptr::null_mut};
 
-type NvmlInit = unsafe extern "C" fn() -> i32;
-type NvmlDeviceGetCount = unsafe extern "C" fn(count: *mut u32) -> i32;
-type NvmlDeviceGetHandleByIndex = unsafe extern "C" fn(index: u32, device: *mut *mut u8) -> i32;
-type NvmlDeviceGetUtilizationRates = unsafe extern "C" fn(device: *mut u8, utilization: *mut Utilization) -> i32;
-type NvmlDeviceGetTemperature = unsafe extern "C" fn(device: *mut u8, sensor: u32, temp: *mut u32) -> i32;
+type NvmlInit = unsafe extern "C" fn() -> u16;
+type NvmlDeviceGetCount = unsafe extern "C" fn(count: *mut u32) -> u16;
+type NvmlDeviceGetHandleByIndex = unsafe extern "C" fn(index: u32, device: *mut *mut u8) -> u16;
+type NvmlDeviceGetUtilizationRates = unsafe extern "C" fn(device: *mut u8, utilization: *mut Utilization) -> u16;
+type NvmlDeviceGetTemperature = unsafe extern "C" fn(device: *mut u8, sensor: u32, temp: *mut u32) -> u16;
+type NvmlDeviceGetPowerUsage = unsafe extern "C" fn(device: *mut u8, power: *mut u32) -> u16;
+type NvmlDeviceGetClockInfo = unsafe extern "C" fn(device: *mut u8, clock_type: u32, clock: *mut u32) -> u16;
 
 #[repr(C)]
 struct Utilization {
@@ -112,5 +114,33 @@ impl Gpu {
         }
 
         utilization.gpu as u8
+    }
+
+    /// Reads the GPU power consumption from the API.
+    pub fn get_power(&self) -> u16 {
+        let mut power: u32 = 0;
+        unsafe {
+            let get_power: Symbol<NvmlDeviceGetPowerUsage> = self.lib.get(b"nvmlDeviceGetPowerUsage").unwrap();
+            if get_power(self.device, &mut power as *mut u32) != 0 {
+                error!("Failed to get GPU power (NVIDIA)");
+                exit(1);
+            }
+        }
+
+        (power as f32 / 1000.0).round() as u16
+    }
+
+    /// Reads the GPU core frequency from the API.
+    pub fn get_frequency(&self) -> u16 {
+        let mut clock: u32 = 0;
+        unsafe {
+            let get_clock: Symbol<NvmlDeviceGetClockInfo> = self.lib.get(b"nvmlDeviceGetClockInfo").unwrap();
+            if get_clock(self.device, 0, &mut clock as *mut u32) != 0 {
+                error!("Failed to get GPU core frequency (NVIDIA)");
+                exit(1);
+            }
+        }
+
+        clock as u16
     }
 }
