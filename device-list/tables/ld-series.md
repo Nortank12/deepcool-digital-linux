@@ -55,7 +55,7 @@
     <tr>
         <td>D1</td>
         <td>104</td>
-        <td rowspan="7">PREAMBLE BYTES <sup>UNCLARIFIED</sup></td>
+        <td rowspan="7">FIXED HEADER</td>
     </tr>
     <tr>
         <td>D2</td>

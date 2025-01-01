@@ -338,4 +338,4 @@ cargo build -r
 You can find the binary inside the `./target/release` folder.
 
 # More Information
-[Device List and USB Mapping Tables](device-list)
+[Device List and USB Mapping Tables](device-list/README.md)
