@@ -159,7 +159,7 @@ sudo nixos-rebuild switch
     </tr>
     <tr>
         <td>CH170 DIGITAL</td>
-        <td align="center">❓</td>
+        <td align="center">✅</td>
     </tr>
     <tr>
         <td>CH360 DIGITAL</td>
