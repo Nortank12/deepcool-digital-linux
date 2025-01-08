@@ -251,7 +251,7 @@ sudo nano /etc/systemd/system/deepcool-digital.service
 Description=DeepCool Digital
 
 [Service]
-ExecStart=/usr/sbin/deepcool-digital-linux # arguments here
+ExecStart=/usr/sbin/deepcool-digital-linux
 
 [Install]
 WantedBy=multi-user.target
@@ -277,7 +277,7 @@ sudo nano /etc/init.d/deepcool-digital
 
 description="DeepCool Digital"
 command="/usr/sbin/deepcool-digital-linux"
-command_args="" # arguments here
+command_args=""
 command_background=1
 pidfile="/run/deepcool-digital.pid"
 ```
