@@ -7,7 +7,7 @@ pub enum TemperatureUnit {
 }
 
 impl TemperatureUnit {
-    fn symbol(&self) -> &'static str {
+    const fn symbol(&self) -> &'static str {
         match self {
             TemperatureUnit::Celsius => "°C",
             TemperatureUnit::Fahrenheit => "°F",

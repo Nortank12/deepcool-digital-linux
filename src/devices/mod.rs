@@ -28,7 +28,7 @@ pub enum Mode {
 }
 
 impl Mode {
-    pub fn symbol(&self) -> &'static str {
+    pub const fn symbol(&self) -> &'static str {
         match self {
             Mode::Default => "",
             Mode::Auto => "auto",
