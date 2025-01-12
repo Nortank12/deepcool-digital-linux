@@ -143,6 +143,24 @@ fn main() {
             // Display loop
             ld_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
+        // LP Series
+        12 => {
+            println!("Supported modes: {} [default: {}]", "usage temp power".bold(), lp_series::DEFAULT_MODE.symbol());
+            // Connect to device
+            let lp_device = lp_series::Display::new(&args.mode, args.fahrenheit);
+            // Print current configuration & warnings
+            print_device_status(
+                if args.mode == Mode::Default { lp_series::DEFAULT_MODE } else { args.mode },
+                if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
+                Alarm { state: AlarmState::NotSupported, temp_limit: 0, temp_warning: 0 },
+                lp_series::POLLING_RATE,
+            );
+            if args.alarm {
+                warning!("Alarm is not supported, value will be ignored");
+            }
+            // Display loop
+            lp_device.run(&api, DEFAULT_VENDOR_ID, product_id);
+        }
         // AK400 PRO
         16 => {
             println!("Supported modes: {}", "auto".bold());

@@ -5,6 +5,7 @@ pub mod ch_series;
 pub mod ch170;
 pub mod ch510;
 pub mod ld_series;
+pub mod lp_series;
 pub mod ls_series;
 
 use crate::error;
