@@ -3,7 +3,7 @@ use super::{device_error, Mode};
 use hidapi::HidApi;
 use std::{thread::sleep, time::Duration};
 
-pub const DEFAULT_MODE: Mode = Mode::Temperature;
+pub const DEFAULT_MODE: Mode = Mode::CpuTemperature;
 pub const POLLING_RATE: u64 = 750;
 
 pub struct Display {
@@ -19,8 +19,8 @@ impl Display {
         let mode = match mode {
             Mode::Default => DEFAULT_MODE,
             Mode::Auto => Mode::Auto,
-            Mode::Temperature => Mode::Temperature,
-            Mode::Usage => Mode::Usage,
+            Mode::CpuTemperature => Mode::CpuTemperature,
+            Mode::CpuUsage => Mode::CpuUsage,
             _ => mode.support_error(),
         };
 
@@ -51,10 +51,10 @@ impl Display {
         match self.mode {
             Mode::Auto => loop {
                 for _ in 0..8 {
-                    device.write(&self.status_message(&data, &Mode::Temperature)).unwrap();
+                    device.write(&self.status_message(&data, &Mode::CpuTemperature)).unwrap();
                 }
                 for _ in 0..8 {
-                    device.write(&self.status_message(&data, &Mode::Usage)).unwrap();
+                    device.write(&self.status_message(&data, &Mode::CpuUsage)).unwrap();
                 }
             }
             _ => loop {
@@ -80,7 +80,7 @@ impl Display {
 
         // Main display
         match mode {
-            Mode::Temperature => {
+            Mode::CpuTemperature => {
                 let unit = if self.fahrenheit { 35 } else { 19 };
                 let cpu_temp = self.cpu.get_temp(self.fahrenheit);
                 let gpu_temp = self.gpu.get_temp(self.fahrenheit);
@@ -95,7 +95,7 @@ impl Display {
                 data[9] = gpu_temp % 100 / 10;
                 data[10] = gpu_temp % 10;
             }
-            Mode::Usage => {
+            Mode::CpuUsage => {
                 // CPU
                 data[1] = 76;
                 data[3] = cpu_usage / 100;

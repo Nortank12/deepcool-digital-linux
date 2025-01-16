@@ -143,7 +143,7 @@ mod dot_matrix {
     }
 }
 
-pub const DEFAULT_MODE: Mode = Mode::Usage;
+pub const DEFAULT_MODE: Mode = Mode::CpuUsage;
 pub const POLLING_RATE: u64 = 750;
 
 pub struct Display {
@@ -157,9 +157,9 @@ impl Display {
         // Verify the display mode
         let mode = match mode {
             Mode::Default => DEFAULT_MODE,
-            Mode::Usage => Mode::Usage,
-            Mode::Temperature => Mode::Temperature,
-            Mode::Power => Mode::Power,
+            Mode::CpuUsage => Mode::CpuUsage,
+            Mode::CpuTemperature => Mode::CpuTemperature,
+            Mode::CpuPower => Mode::CpuPower,
             _ => mode.support_error(),
         };
 
@@ -175,7 +175,7 @@ impl Display {
         let device = api.open(vid, pid).unwrap_or_else(|_| device_error());
 
         // Check if `rapl_max_uj` was read correctly
-        if self.mode == Mode::Power && self.cpu.rapl_max_uj == 0 {
+        if self.mode == Mode::CpuPower && self.cpu.rapl_max_uj == 0 {
             error!("Failed to get CPU power details");
             exit(1);
         }
@@ -199,7 +199,7 @@ impl Display {
             let mut unit = dot_matrix::Unit::Empty;
 
             match self.mode {
-                Mode::Usage => {
+                Mode::CpuUsage => {
                     // Get CPU instant & wait
                     let cpu_instant = self.cpu.read_instant();
                     sleep(Duration::from_millis(POLLING_RATE));
@@ -208,7 +208,7 @@ impl Display {
                     value = self.cpu.get_usage(cpu_instant) as u16;
                     unit = dot_matrix::Unit::Percent;
                 }
-                Mode::Temperature => {
+                Mode::CpuTemperature => {
                     // Wait
                     sleep(Duration::from_millis(POLLING_RATE));
 
@@ -216,7 +216,7 @@ impl Display {
                     value = self.cpu.get_temp(self.fahrenheit) as u16;
                     unit = if self.fahrenheit { dot_matrix::Unit::Fahrenheit } else { dot_matrix::Unit::Celsius };
                 }
-                Mode::Power => {
+                Mode::CpuPower => {
                     // Get CPU energy & wait
                     let cpu_energy = self.cpu.read_energy();
                     sleep(Duration::from_millis(POLLING_RATE));

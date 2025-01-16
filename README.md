@@ -142,6 +142,14 @@ sudo nixos-rebuild switch
         <td align="center">✅</td>
     </tr>
     <tr>
+        <td>LP240</td>
+        <td align="center">✅</td>
+    </tr>
+    <tr>
+        <td>LP360</td>
+        <td align="center">✅</td>
+    </tr>
+    <tr>
         <td>LS520 SE DIGITAL</td>
         <td align="center">✅</td>
     </tr>
@@ -159,7 +167,7 @@ sudo nixos-rebuild switch
     </tr>
     <tr>
         <td>CH170 DIGITAL</td>
-        <td align="center">✅</td>
+        <td align="center">✔️</td>
     </tr>
     <tr>
         <td>CH360 DIGITAL</td>
@@ -179,7 +187,12 @@ sudo nixos-rebuild switch
     </tr>
 </table>
 
-**✅: Fully supported &nbsp; ⚠️: Not tested &nbsp; ❓: Not added**
+**✅: Fully supported**
+
+**✔️: Partially supported**<br>
+*Some display modes are unavailable due to resource limitations.*
+
+**⚠️: Not tested &nbsp; ❓: Not added**
 
 > [!IMPORTANT]
 > - If your device is not added yet, you can still run the program and see if it detects it.

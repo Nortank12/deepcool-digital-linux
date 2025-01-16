@@ -48,7 +48,7 @@ fn main() {
     match product_id {
         // AK Series
         1..=4 => {
-            println!("Supported modes: {} [default: {}]", "auto temp usage".bold(), ak_series::DEFAULT_MODE.symbol());
+            println!("Supported modes: {} [default: {}]", "auto cpu_temp cpu_usage".bold(), ak_series::DEFAULT_MODE.symbol());
             // Connect to device
             let ak_device = ak_series::Display::new(&args.mode, args.fahrenheit, args.alarm);
             // Print current configuration
@@ -71,7 +71,7 @@ fn main() {
         }
         // LS Series
         6 => {
-            println!("Supported modes: {} [default: {}]", "auto temp power".bold(), ls_series::DEFAULT_MODE.symbol());
+            println!("Supported modes: {} [default: {}]", "auto cpu_temp cpu_power".bold(), ls_series::DEFAULT_MODE.symbol());
             // Connect to device
             let ls_device = ls_series::Display::new(&args.mode, args.fahrenheit, args.alarm);
             // Print current configuration
@@ -94,7 +94,7 @@ fn main() {
         }
         // AG Series
         8 => {
-            println!("Supported modes: {} [default: {}]", "auto temp usage".bold(), ag_series::DEFAULT_MODE.symbol());
+            println!("Supported modes: {} [default: {}]", "auto cpu_temp cpu_usage".bold(), ag_series::DEFAULT_MODE.symbol());
             // Connect to device
             let ag_device = ag_series::Display::new(&args.mode, args.alarm);
             // Print current configuration & warnings
@@ -145,7 +145,7 @@ fn main() {
         }
         // LP Series
         12 => {
-            println!("Supported modes: {} [default: {}]", "usage temp power".bold(), lp_series::DEFAULT_MODE.symbol());
+            println!("Supported modes: {} [default: {}]", "cpu_usage cpu_temp cpu_power".bold(), lp_series::DEFAULT_MODE.symbol());
             // Connect to device
             let lp_device = lp_series::Display::new(&args.mode, args.fahrenheit);
             // Print current configuration & warnings
@@ -196,8 +196,15 @@ fn main() {
         }
         // CH170 DIGITAL
         19 => {
-            println!("Supported modes: {} [default: {}]", "cpu gpu psu".bold(), ch170::DEFAULT_MODE.symbol());
-            if args.mode == Mode::Default || args.mode == Mode::Cpu {
+            println!(
+                "Supported modes: {} {} {} {} [default: {}]",
+                "cpu_freq".bold(),
+                "cpu_fan".bright_black().strikethrough(),
+                "gpu".bold(),
+                "psu".bright_black().strikethrough(),
+                ch170::DEFAULT_MODE.symbol()
+            );
+            if args.mode == Mode::CpuFan {
                 warning!("CPU fan speed monitoring is not supported yet");
             } else if args.mode == Mode::Psu {
                 warning!("PSU monitoring is not supported yet");
@@ -219,7 +226,7 @@ fn main() {
         }
         // CH Series & MORPHEUS
         5 | 7 | 21 => {
-            println!("Supported modes: {} [default: {}]", "auto temp usage".bold(), ch_series::DEFAULT_MODE.symbol());
+            println!("Supported modes: {} [default: {}]", "auto cpu_temp cpu_usage".bold(), ch_series::DEFAULT_MODE.symbol());
             // Connect to device
             let ch_device = ch_series::Display::new(&args.mode, args.fahrenheit);
             // Print current configuration & warnings
