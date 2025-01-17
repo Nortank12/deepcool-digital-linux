@@ -39,11 +39,11 @@ impl Display {
         data[0] = 16;
         data[1] = 104;
         data[2] = 1;
-        data[3] = 2;
-        data[4] = 11;
+        data[3] = 4;
+        data[4] = 13;
         data[5] = 1;
         data[6] = 2;
-        data[7] = 5;
+        data[7] = 8;
 
         // Display loop
         loop {
@@ -74,10 +74,15 @@ impl Display {
             // Utilization
             status_data[15] = self.cpu.get_usage(cpu_instant);
 
+            // Frequency
+            let frequency = (self.cpu.get_frequency()).to_be_bytes();
+            status_data[16] = frequency[0];
+            status_data[17] = frequency[1];
+
             // Checksum & termination byte
-            let checksum: u16 = status_data[1..=15].iter().map(|&x| x as u16).sum();
-            status_data[16] = (checksum % 256) as u8;
-            status_data[17] = 22;
+            let checksum: u16 = status_data[1..=17].iter().map(|&x| x as u16).sum();
+            status_data[18] = (checksum % 256) as u8;
+            status_data[19] = 22;
 
             device.write(&status_data).unwrap();
         }

@@ -114,6 +114,13 @@
         <td></td>
     </tr>
     <tr>
+        <td>18</td>
+        <td>AK620 DIGITAL PRO</td>
+        <td align="center">
+            <a href="tables/ak620-pro.md">Mapping Table</a>
+        </td>
+    </tr>
+    <tr>
         <td>19</td>
         <td>CH170 DIGITAL</td>
         <td align="center">

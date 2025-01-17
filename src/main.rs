@@ -223,6 +223,43 @@ fn main() {
             // Display loop
             ak400_pro.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
+        // AK620 PRO
+        18 => {
+            println!("Supported modes: {}", "auto".bold());
+            // Connect to device
+            let ak620_pro = devices::ak620_pro::Display::new(args.fahrenheit);
+            // Print current configuration & warnings
+            print_device_status(
+                &ak620_pro::DEFAULT_MODE,
+                None,
+                if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
+                    Alarm {
+                        state: AlarmState::Auto,
+                        temp_limit: if args.fahrenheit {
+                            ak620_pro::TEMP_LIMIT_F
+                        } else {
+                            ak620_pro::TEMP_LIMIT_C
+                        },
+                        temp_warning: if args.fahrenheit {
+                            ak620_pro::TEMP_WARNING_F
+                        } else {
+                            ak620_pro::TEMP_WARNING_C
+                        },
+                    },
+                    ak620_pro::POLLING_RATE,
+            );
+            if args.mode != Mode::Default {
+                warning!("Display mode cannot be changed, value will be ignored");
+            }
+            if args.secondary != Mode::Default {
+                warning!("Secondary display mode is not supported, value will be ignored");
+            }
+            if args.alarm {
+                warning!("The alarm is hard-coded in your device, value will be ignored");
+            }
+            // Display loop
+            ak620_pro.run(&api, DEFAULT_VENDOR_ID, product_id);
+        }
         // CH170 DIGITAL
         19 => {
             println!(
