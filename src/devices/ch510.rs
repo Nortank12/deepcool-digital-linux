@@ -7,7 +7,7 @@ pub const DEFAULT_MODE: Mode = Mode::Cpu;
 pub const POLLING_RATE: u64 = 750;
 
 pub struct Display {
-    mode: Mode,
+    pub mode: Mode,
     fahrenheit: bool,
     cpu: Cpu,
     gpu: Gpu,

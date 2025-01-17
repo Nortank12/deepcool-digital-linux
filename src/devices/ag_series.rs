@@ -3,12 +3,12 @@ use super::{device_error, Mode};
 use hidapi::HidApi;
 use std::{thread::sleep, time::Duration};
 
-pub const DEFAULT_MODE: Mode = Mode::Temperature;
+pub const DEFAULT_MODE: Mode = Mode::CpuTemperature;
 pub const POLLING_RATE: u64 = 750;
 pub const TEMP_LIMIT_C: u8 = 90;
 
 pub struct Display {
-    mode: Mode,
+    pub mode: Mode,
     alarm: bool,
     cpu: Cpu,
 }
@@ -19,8 +19,8 @@ impl Display {
         let mode = match mode {
             Mode::Default => DEFAULT_MODE,
             Mode::Auto => Mode::Auto,
-            Mode::Temperature => Mode::Temperature,
-            Mode::Usage => Mode::Usage,
+            Mode::CpuTemperature => Mode::CpuTemperature,
+            Mode::CpuUsage => Mode::CpuUsage,
             _ => mode.support_error(),
         };
 
@@ -43,10 +43,10 @@ impl Display {
         match self.mode {
             Mode::Auto => loop {
                 for _ in 0..8 {
-                    device.write(&self.status_message(&data, &Mode::Temperature)).unwrap();
+                    device.write(&self.status_message(&data, &Mode::CpuTemperature)).unwrap();
                 }
                 for _ in 0..8 {
-                    device.write(&self.status_message(&data, &Mode::Usage)).unwrap();
+                    device.write(&self.status_message(&data, &Mode::CpuUsage)).unwrap();
                 }
             }
             _ => loop {
@@ -60,7 +60,7 @@ impl Display {
         // Clone the data packet
         let mut data = inital_data.clone();
 
-        if mode == &Mode::Usage {
+        if mode == &Mode::CpuUsage {
             // Read CPU utilization
             let cpu_instant = self.cpu.read_instant();
 
@@ -80,7 +80,7 @@ impl Display {
         // Calculate temperature
         let temp = self.cpu.get_temp(false);
 
-        if mode == &Mode::Temperature {
+        if mode == &Mode::CpuTemperature {
             // Write temperature
             data[1] = 19;
             data[3] = if temp < 100 { temp % 100 / 10 } else { 9 };
