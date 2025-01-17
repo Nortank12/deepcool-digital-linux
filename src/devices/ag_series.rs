@@ -8,7 +8,7 @@ pub const POLLING_RATE: u64 = 750;
 pub const TEMP_LIMIT_C: u8 = 90;
 
 pub struct Display {
-    mode: Mode,
+    pub mode: Mode,
     alarm: bool,
     cpu: Cpu,
 }

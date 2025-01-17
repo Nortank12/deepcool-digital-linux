@@ -9,7 +9,7 @@ pub const TEMP_LIMIT_C: u8 = 90;
 pub const TEMP_LIMIT_F: u8 = 194;
 
 pub struct Display {
-    mode: Mode,
+    pub mode: Mode,
     fahrenheit: bool,
     alarm: bool,
     cpu: Cpu,

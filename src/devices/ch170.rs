@@ -7,7 +7,7 @@ pub const DEFAULT_MODE: Mode = Mode::CpuFrequency;
 pub const POLLING_RATE: u64 = 750;
 
 pub struct Display {
-    mode: Mode,
+    pub mode: Mode,
     fahrenheit: bool,
     cpu: Cpu,
     gpu: Gpu,
@@ -38,7 +38,7 @@ impl Display {
         let device = api.open(vid, pid).unwrap_or_else(|_| device_error());
 
         // Check if `rapl_max_uj` was read correctly
-        if (self.mode == Mode::CpuFrequency || self.mode == Mode::CpuFan) && self.cpu.rapl_max_uj == 0 {
+        if matches!(self.mode, Mode::CpuFrequency | Mode::CpuFan) && self.cpu.rapl_max_uj == 0 {
             error!("Failed to get CPU power details");
             exit(1);
         }

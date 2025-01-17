@@ -147,13 +147,14 @@ pub const DEFAULT_MODE: Mode = Mode::CpuUsage;
 pub const POLLING_RATE: u64 = 750;
 
 pub struct Display {
-    mode: Mode,
+    pub mode: Mode,
+    pub secondary: Option<Mode>,
     fahrenheit: bool,
     cpu: Cpu,
 }
 
 impl Display {
-    pub fn new(mode: &Mode, fahrenheit: bool) -> Self {
+    pub fn new(mode: &Mode, secondary: &Mode, fahrenheit: bool) -> Self {
         // Verify the display mode
         let mode = match mode {
             Mode::Default => DEFAULT_MODE,
@@ -163,8 +164,17 @@ impl Display {
             _ => mode.support_error(),
         };
 
+        let secondary = match secondary {
+            Mode::Default => None,
+            Mode::CpuUsage => Some(Mode::CpuUsage),
+            Mode::CpuTemperature => Some(Mode::CpuTemperature),
+            Mode::CpuPower => Some(Mode::CpuPower),
+            _ => Some(secondary.support_error_secondary()),
+        };
+
         Display {
             mode,
+            secondary,
             fahrenheit,
             cpu: Cpu::new(),
         }

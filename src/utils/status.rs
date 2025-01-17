@@ -28,9 +28,12 @@ pub struct Alarm {
     pub temp_warning: u8,
 }
 
-pub fn print_device_status(mode: Mode, temp_unit: TemperatureUnit, alarm: Alarm, polling_rate: u64) {
+pub fn print_device_status(mode: &Mode, secondary: Option<&Mode>, temp_unit: TemperatureUnit, alarm: Alarm, polling_rate: u64) {
     println!("-----");
-    println!("DISP. MODE: {}", mode.symbol().bright_cyan());
+    match secondary {
+        Some(s) => println!("DISP. MODE: {} | {}", mode.symbol().bright_cyan(), s.symbol().bright_cyan()),
+        None => println!("DISP. MODE: {}", mode.symbol().bright_cyan()),
+    }
     println!("TEMP. UNIT: {}", temp_unit.symbol().bright_cyan());
     match alarm.state {
         AlarmState::Auto => {

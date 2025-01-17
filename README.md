@@ -210,10 +210,11 @@ sudo ./deepcool-digital-linux [OPTIONS]
 ```
 ```
 Options:
-  -m, --mode <MODE>  Change the display mode of your device
-      --pid <ID>     Specify the Product ID if you use mutiple devices
-  -f, --fahrenheit   Change the temperature unit to °F
-  -a, --alarm        Enable the alarm
+  -m, --mode <MODE>       Change the display mode of your device
+  -s, --secondary <MODE>  Change the secondary display mode of your device (if supported)
+      --pid <ID>          Specify the Product ID if you use mutiple devices
+  -f, --fahrenheit        Change the temperature unit to °F
+  -a, --alarm             Enable the alarm
 
 Commands:
   -l, --list         Print Product ID of the connected devices

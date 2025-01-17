@@ -5,6 +5,7 @@ use std::{env::args, process::exit};
 
 pub struct Args {
     pub mode: Mode,
+    pub secondary: Mode,
     pub pid: u16,
     pub fahrenheit: bool,
     pub alarm: bool,
@@ -14,6 +15,7 @@ impl Args {
     pub fn read() -> Self {
         let args: Vec<String> = args().collect();
         let mut mode = Mode::Default;
+        let mut secondary = Mode::Default;
         let mut pid = 0;
         let mut fahrenheit = false;
         let mut alarm = false;
@@ -26,13 +28,28 @@ impl Args {
                         mode = match Mode::get(&args[i + 1]) {
                             Some(mode) => mode,
                             None => {
-                                error!("Invalid mode");
+                                error!("Invalid display mode");
                                 exit(1);
                             }
                         };
                         i += 1;
                     } else {
                         error!("--mode requires a value");
+                        exit(1);
+                    }
+                }
+                "-s" | "--secondary" => {
+                    if i + 1 < args.len() {
+                        secondary = match Mode::get(&args[i + 1]) {
+                            Some(mode) => mode,
+                            None => {
+                                error!("Invalid secondary display mode");
+                                exit(1);
+                            }
+                        };
+                        i += 1;
+                    } else {
+                        error!("--secondary requires a value");
                         exit(1);
                     }
                 }
@@ -98,10 +115,11 @@ impl Args {
                 "-h" | "--help" => {
                     println!("{} [OPTIONS]", "Usage: deepcool-digital-linux".bold());
                     println!("\n{}", "Options:".bold());
-                    println!("  {}, {} <MODE>  Change the display mode of your device", "-m".bold(), "--mode".bold());
-                    println!("      {} <ID>     Specify the Product ID if you use mutiple devices", "--pid".bold());
-                    println!("  {}, {}   Change the temperature unit to °F", "-f".bold(), "--fahrenheit".bold());
-                    println!("  {}, {}        Enable the alarm", "-a".bold(), "--alarm".bold());
+                    println!("  {}, {} <MODE>       Change the display mode of your device", "-m".bold(), "--mode".bold());
+                    println!("  {}, {} <MODE>  Change the secondary display mode of your device (if supported)", "-s".bold(), "--secondary".bold());
+                    println!("      {} <ID>          Specify the Product ID if you use mutiple devices", "--pid".bold());
+                    println!("  {}, {}        Change the temperature unit to °F", "-f".bold(), "--fahrenheit".bold());
+                    println!("  {}, {}             Enable the alarm", "-a".bold(), "--alarm".bold());
                     println!("\n{}", "Commands:".bold());
                     println!("  {}, {}         Print Product ID of the connected devices", "-l".bold(), "--list".bold());
                     println!("  {}, {}         Print help", "-h".bold(), "--help".bold());
@@ -120,13 +138,28 @@ impl Args {
                                     mode = match Mode::get(&args[i + 1]) {
                                         Some(mode) => mode,
                                         None => {
-                                            error!("Invalid mode");
+                                            error!("Invalid display mode");
                                             exit(1);
                                         }
                                     };
                                     i += 1;
                                 } else {
                                     error!("--mode requires a value");
+                                    exit(1);
+                                }
+                            }
+                            's' => {
+                                if i + 1 < args.len() && args[i].ends_with('s') {
+                                    secondary = match Mode::get(&args[i + 1]) {
+                                        Some(mode) => mode,
+                                        None => {
+                                            error!("Invalid secondary display mode");
+                                            exit(1);
+                                        }
+                                    };
+                                    i += 1;
+                                } else {
+                                    error!("--secondary requires a value");
                                     exit(1);
                                 }
                             }
@@ -153,6 +186,7 @@ impl Args {
 
         Args {
             mode,
+            secondary,
             pid,
             fahrenheit,
             alarm,

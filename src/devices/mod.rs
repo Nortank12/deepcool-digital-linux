@@ -74,6 +74,11 @@ impl Mode {
         error!(format!("Display mode \"{}\" is not supported on your device", self.symbol()));
         exit(1);
     }
+
+    pub fn support_error_secondary(&self) -> Mode {
+        error!(format!("Secondary display mode \"{}\" is not supported on your device", self.symbol()));
+        exit(1);
+    }
 }
 
 pub fn device_error() -> HidDevice {

@@ -51,9 +51,10 @@ fn main() {
             println!("Supported modes: {} [default: {}]", "auto cpu_temp cpu_usage".bold(), ak_series::DEFAULT_MODE.symbol());
             // Connect to device
             let ak_device = ak_series::Display::new(&args.mode, args.fahrenheit, args.alarm);
-            // Print current configuration
+            // Print current configuration & warnings
             print_device_status(
-                if args.mode == Mode::Default { ak_series::DEFAULT_MODE } else { args.mode },
+                &ak_device.mode,
+                None,
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                 Alarm {
                     state: if args.alarm { AlarmState::On } else { AlarmState::Off },
@@ -66,6 +67,9 @@ fn main() {
                 },
                 ak_series::POLLING_RATE,
             );
+            if args.secondary != Mode::Default {
+                warning!("Secondary display mode is not supported, value will be ignored");
+            }
             // Display loop
             ak_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -74,9 +78,10 @@ fn main() {
             println!("Supported modes: {} [default: {}]", "auto cpu_temp cpu_power".bold(), ls_series::DEFAULT_MODE.symbol());
             // Connect to device
             let ls_device = ls_series::Display::new(&args.mode, args.fahrenheit, args.alarm);
-            // Print current configuration
+            // Print current configuration & warnings
             print_device_status(
-                if args.mode == Mode::Default { ls_series::DEFAULT_MODE } else { args.mode },
+                &ls_device.mode,
+                None,
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                 Alarm {
                     state: if args.alarm { AlarmState::On } else { AlarmState::Off },
@@ -89,6 +94,9 @@ fn main() {
                 },
                 ls_series::POLLING_RATE,
             );
+            if args.secondary != Mode::Default {
+                warning!("Secondary display mode is not supported, value will be ignored");
+            }
             // Display loop
             ls_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -99,7 +107,8 @@ fn main() {
             let ag_device = ag_series::Display::new(&args.mode, args.alarm);
             // Print current configuration & warnings
             print_device_status(
-                if args.mode == Mode::Default { ag_series::DEFAULT_MODE } else { args.mode },
+                &ag_device.mode,
+                None,
                 TemperatureUnit::Celsius,
                 Alarm {
                     state: if args.alarm { AlarmState::On } else { AlarmState::Off },
@@ -108,6 +117,9 @@ fn main() {
                 },
                 ag_series::POLLING_RATE,
             );
+            if args.secondary != Mode::Default {
+                warning!("Secondary display mode is not supported, value will be ignored");
+            }
             if args.fahrenheit {
                 warning!("Displaying ˚F is not supported, value will be ignored");
             }
@@ -121,7 +133,8 @@ fn main() {
             let ld_device = ld_series::Display::new(args.fahrenheit);
             // Print current configuration & warnings
             print_device_status(
-                ld_series::DEFAULT_MODE,
+                &ld_series::DEFAULT_MODE,
+                None,
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                 Alarm {
                     state: AlarmState::Auto,
@@ -137,6 +150,9 @@ fn main() {
             if args.mode != Mode::Default {
                 warning!("Display mode cannot be changed, value will be ignored");
             }
+            if args.secondary != Mode::Default {
+                warning!("Secondary display mode is not supported, value will be ignored");
+            }
             if args.alarm {
                 warning!("The alarm is hard-coded in your device, value will be ignored");
             }
@@ -147,10 +163,11 @@ fn main() {
         12 => {
             println!("Supported modes: {} [default: {}]", "cpu_usage cpu_temp cpu_power".bold(), lp_series::DEFAULT_MODE.symbol());
             // Connect to device
-            let lp_device = lp_series::Display::new(&args.mode, args.fahrenheit);
+            let lp_device = lp_series::Display::new(&args.mode, &args.secondary, args.fahrenheit);
             // Print current configuration & warnings
             print_device_status(
-                if args.mode == Mode::Default { lp_series::DEFAULT_MODE } else { args.mode },
+                &lp_device.mode,
+                lp_device.secondary.as_ref(),
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                 Alarm { state: AlarmState::NotSupported, temp_limit: 0, temp_warning: 0 },
                 lp_series::POLLING_RATE,
@@ -168,7 +185,8 @@ fn main() {
             let ak400_pro = devices::ak400_pro::Display::new(args.fahrenheit);
             // Print current configuration & warnings
             print_device_status(
-                ak400_pro::DEFAULT_MODE,
+                &ak400_pro::DEFAULT_MODE,
+                None,
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                     Alarm {
                         state: AlarmState::Auto,
@@ -187,6 +205,9 @@ fn main() {
             );
             if args.mode != Mode::Default {
                 warning!("Display mode cannot be changed, value will be ignored");
+            }
+            if args.secondary != Mode::Default {
+                warning!("Secondary display mode is not supported, value will be ignored");
             }
             if args.alarm {
                 warning!("The alarm is hard-coded in your device, value will be ignored");
@@ -213,11 +234,15 @@ fn main() {
             let ch170 = ch170::Display::new(&args.mode, args.fahrenheit);
             // Print current configuration & warnings
             print_device_status(
-                if args.mode == Mode::Default { ch170::DEFAULT_MODE } else { args.mode },
+                &ch170.mode,
+                None,
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                 Alarm { state: AlarmState::NotSupported, temp_limit: 0, temp_warning: 0 },
                 ch170::POLLING_RATE,
             );
+            if args.secondary != Mode::Default {
+                warning!("Secondary display mode is not supported, value will be ignored");
+            }
             if args.alarm {
                 warning!("Alarm is not supported, value will be ignored");
             }
@@ -227,11 +252,13 @@ fn main() {
         // CH Series & MORPHEUS
         5 | 7 | 21 => {
             println!("Supported modes: {} [default: {}]", "auto cpu_temp cpu_usage".bold(), ch_series::DEFAULT_MODE.symbol());
+            println!("Supported secondary: {}", "gpu_temp gpu_usage".bold());
             // Connect to device
-            let ch_device = ch_series::Display::new(&args.mode, args.fahrenheit);
+            let ch_device = ch_series::Display::new(&args.mode, &args.secondary, args.fahrenheit);
             // Print current configuration & warnings
             print_device_status(
-                if args.mode == Mode::Default { ch_series::DEFAULT_MODE } else { args.mode },
+                &ch_device.mode,
+                Some(&ch_device.secondary),
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                 Alarm { state: AlarmState::NotSupported, temp_limit: 0, temp_warning: 0 },
                 ch_series::POLLING_RATE,
@@ -249,11 +276,15 @@ fn main() {
             let ch510 = ch510::Display::new(&args.mode, args.fahrenheit);
             // Print current configuration & warnings
             print_device_status(
-                if args.mode == Mode::Default { ch510::DEFAULT_MODE } else { args.mode },
+                &ch510.mode,
+                None,
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                 Alarm { state: AlarmState::NotSupported, temp_limit: 0, temp_warning: 0 },
                 ch510::POLLING_RATE,
             );
+            if args.secondary != Mode::Default {
+                warning!("Secondary display mode is not supported, value will be ignored");
+            }
             if args.alarm {
                 warning!("Alarm is not supported, value will be ignored");
             }
