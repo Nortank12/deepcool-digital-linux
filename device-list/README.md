@@ -89,7 +89,9 @@
     <tr>
         <td  rowspan="2">12</td>
         <td>LP240</td>
-        <td align="center"  rowspan="2">No Table Yet</td>
+        <td align="center"  rowspan="2">
+            <a href="tables/lp-series.md">Mapping Table</a>
+        </td>
     </tr>
     <tr>
         <td>LP360</td>

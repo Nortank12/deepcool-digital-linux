@@ -143,11 +143,11 @@ sudo nixos-rebuild switch
     </tr>
     <tr>
         <td>LP240</td>
-        <td align="center">✅</td>
+        <td align="center">⚠️</td>
     </tr>
     <tr>
         <td>LP360</td>
-        <td align="center">✅</td>
+        <td align="center">⚠️</td>
     </tr>
     <tr>
         <td>LS520 SE DIGITAL</td>

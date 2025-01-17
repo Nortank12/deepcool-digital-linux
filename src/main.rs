@@ -161,7 +161,15 @@ fn main() {
         }
         // LP Series
         12 => {
-            println!("Supported modes: {} [default: {}]", "cpu_usage cpu_temp cpu_power".bold(), lp_series::DEFAULT_MODE.symbol());
+            println!(
+                "Supported modes: {} [default: {}]",
+                "cpu_usage cpu_temp cpu_power gpu_usage gpu_temp gpu_power".bold(),
+                lp_series::DEFAULT_MODE.symbol()
+            );
+            println!(
+                "Supported secondary: {}",
+                "cpu_usage cpu_temp cpu_power gpu_usage gpu_temp gpu_power".bold()
+            );
             // Connect to device
             let lp_device = lp_series::Display::new(&args.mode, &args.secondary, args.fahrenheit);
             // Print current configuration & warnings
