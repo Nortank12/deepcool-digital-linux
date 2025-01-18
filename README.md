@@ -123,7 +123,7 @@ sudo nixos-rebuild switch
     </tr>
     <tr>
         <td>AK620 DIGITAL PRO</td>
-        <td align="center">❓</td>
+        <td align="center">✅</td>
     </tr>
 </table>
 

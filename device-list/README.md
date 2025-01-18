@@ -8,7 +8,7 @@
         <th>USB Data Bytes</th>
     </tr>
     <tr>
-        <td rowspan="23">13875</td>
+        <td rowspan="24">13875</td>
         <td>1</td>
         <td>AK400 DIGITAL</td>
         <td align="center" rowspan="4">
