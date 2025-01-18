@@ -1,5 +1,6 @@
 use crate::{error, monitor::{cpu::Cpu, gpu::Gpu}};
 use super::{device_error, Mode};
+use cpu_monitor::CpuInstant;
 use hidapi::HidApi;
 use std::{process::exit, thread::sleep, time::Duration};
 
@@ -229,7 +230,7 @@ impl Display {
         let device = api.open(vid, pid).unwrap_or_else(|_| device_error());
 
         // Check if `rapl_max_uj` was read correctly
-        if self.mode == Mode::CpuPower && self.cpu.rapl_max_uj == 0 {
+        if self.cpu.rapl_max_uj == 0 {
             error!("Failed to get CPU power details");
             exit(1);
         }
@@ -249,17 +250,31 @@ impl Display {
             let mut status_data = data.clone();
             let mut matrix = [[false; 14]; 14];
 
+            // Get initial CPU readings & wait
+            let cpu_instant = self.cpu.read_instant();
+            let cpu_energy = self.cpu.read_energy();
+            sleep(Duration::from_millis(POLLING_RATE));
+
             // Set the pixels and calculate the bytes for the display
             match &self.secondary {
                 Some(secondary) => {
-                    let (value, unit) = self.get_system_info(&self.mode);
-                    self.insert_to_matrix(&mut matrix, 1, value, unit);
-                    let (value, unit) = self.get_system_info(secondary);
-                    self.insert_to_matrix(&mut matrix, 8, value, unit);
+                    self.insert_data_to_matrix(
+                        &mut matrix,
+                        1,
+                        self.get_system_info(&self.mode, cpu_instant, cpu_energy)
+                    );
+                    self.insert_data_to_matrix(
+                        &mut matrix,
+                        8,
+                        self.get_system_info(secondary, cpu_instant, cpu_energy)
+                    );
                 },
                 None => {
-                    let (value, unit) = self.get_system_info(&self.mode);
-                    self.insert_to_matrix(&mut matrix, 5, value, unit);
+                    self.insert_data_to_matrix(
+                        &mut matrix,
+                        5,
+                        self.get_system_info(&self.mode, cpu_instant, cpu_energy)
+                    );
                 }
             }
             status_data[6..=33].copy_from_slice(&dot_matrix::matrix_to_bytes(matrix));
@@ -273,68 +288,38 @@ impl Display {
         }
     }
 
-    fn get_system_info(&self, mode: &Mode) -> (u16, dot_matrix::Unit) {
-        let mut value = 0;
-        let mut unit = dot_matrix::Unit::Empty;
-
+    fn get_system_info(&self, mode: &Mode, cpu_instant: CpuInstant, cpu_energy: u64) -> (u16, dot_matrix::Unit) {
         match mode {
-            Mode::CpuUsage => {
-                // Get CPU instant & wait
-                let cpu_instant = self.cpu.read_instant();
-                sleep(Duration::from_millis(POLLING_RATE));
-
-                // Set the data
-                value = self.cpu.get_usage(cpu_instant) as u16;
-                unit = dot_matrix::Unit::Percent;
-            }
-            Mode::CpuTemperature => {
-                // Wait
-                sleep(Duration::from_millis(POLLING_RATE));
-
-                // Set the data
-                value = self.cpu.get_temp(self.fahrenheit) as u16;
-                unit = if self.fahrenheit { dot_matrix::Unit::Fahrenheit } else { dot_matrix::Unit::Celsius };
-            }
-            Mode::CpuPower => {
-                // Get CPU energy & wait
-                let cpu_energy = self.cpu.read_energy();
-                sleep(Duration::from_millis(POLLING_RATE));
-
-                // Set the data
-                value = self.cpu.get_power(cpu_energy, POLLING_RATE);
-                unit = dot_matrix::Unit::Watt;
-            }
-            Mode::GpuUsage => {
-                // Wait
-                sleep(Duration::from_millis(POLLING_RATE));
-
-                // Set the data
-                value = self.gpu.get_usage() as u16;
-                unit = dot_matrix::Unit::Percent;
-            }
-            Mode::GpuTemperature => {
-                // Wait
-                sleep(Duration::from_millis(POLLING_RATE));
-
-                // Set the data
-                value = self.gpu.get_temp(self.fahrenheit) as u16;
-                unit = if self.fahrenheit { dot_matrix::Unit::Fahrenheit } else { dot_matrix::Unit::Celsius };
-            }
-            Mode::GpuPower => {
-                // Wait
-                sleep(Duration::from_millis(POLLING_RATE));
-
-                // Set the data
-                value = self.gpu.get_power();
-                unit = dot_matrix::Unit::Watt;
-            }
-            _ => (),
+            Mode::CpuUsage => (
+                self.cpu.get_usage(cpu_instant) as u16,
+                dot_matrix::Unit::Percent
+            ),
+            Mode::CpuTemperature => (
+                self.cpu.get_temp(self.fahrenheit) as u16,
+                if self.fahrenheit { dot_matrix::Unit::Fahrenheit } else { dot_matrix::Unit::Celsius }
+            ),
+            Mode::CpuPower => (
+                self.cpu.get_power(cpu_energy, POLLING_RATE),
+                dot_matrix::Unit::Watt
+            ),
+            Mode::GpuUsage => (
+                self.gpu.get_usage() as u16,
+                dot_matrix::Unit::Percent
+            ),
+            Mode::GpuTemperature => (
+                self.gpu.get_temp(self.fahrenheit) as u16,
+                if self.fahrenheit { dot_matrix::Unit::Fahrenheit } else { dot_matrix::Unit::Celsius }
+            ),
+            Mode::GpuPower => (
+                self.gpu.get_power(),
+                dot_matrix::Unit::Watt
+            ),
+            _ => (0, dot_matrix::Unit::Empty),
         }
-
-        (value, unit)
     }
 
-    fn insert_to_matrix(&self, matrix: &mut [[bool; 14]; 14], row_id: usize, value: u16, unit: dot_matrix::Unit) {
+    fn insert_data_to_matrix(&self, matrix: &mut [[bool; 14]; 14], row_id: usize, data: (u16, dot_matrix::Unit)) {
+        let (value, unit) = data;
         if value / 100 < 1 {
             // 2-digit number
             dot_matrix::insert_pattern(matrix, dot_matrix::get_number_pattern((value / 10) as u8), row_id, 1);
