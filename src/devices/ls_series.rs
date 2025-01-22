@@ -3,13 +3,13 @@ use super::{device_error, Mode};
 use hidapi::HidApi;
 use std::{process::exit, thread::sleep, time::Duration};
 
-pub const DEFAULT_MODE: Mode = Mode::Temperature;
+pub const DEFAULT_MODE: Mode = Mode::CpuTemperature;
 pub const POLLING_RATE: u64 = 750;
 pub const TEMP_LIMIT_C: u8 = 90;
 pub const TEMP_LIMIT_F: u8 = 194;
 
 pub struct Display {
-    mode: Mode,
+    pub mode: Mode,
     fahrenheit: bool,
     alarm: bool,
     cpu: Cpu,
@@ -21,8 +21,8 @@ impl Display {
         let mode = match mode {
             Mode::Default => DEFAULT_MODE,
             Mode::Auto => Mode::Auto,
-            Mode::Temperature => Mode::Temperature,
-            Mode::Power => Mode::Power,
+            Mode::CpuTemperature => Mode::CpuTemperature,
+            Mode::CpuPower => Mode::CpuPower,
             _ => mode.support_error(),
         };
 
@@ -59,10 +59,10 @@ impl Display {
         match self.mode {
             Mode::Auto => loop {
                 for _ in 0..8 {
-                    device.write(&self.status_message(&data, &Mode::Temperature)).unwrap();
+                    device.write(&self.status_message(&data, &Mode::CpuTemperature)).unwrap();
                 }
                 for _ in 0..8 {
-                    device.write(&self.status_message(&data, &Mode::Power)).unwrap();
+                    device.write(&self.status_message(&data, &Mode::CpuPower)).unwrap();
                 }
             }
             _ => loop {
@@ -78,7 +78,7 @@ impl Display {
 
         // Read CPU utilization & energy consumption (if needed)
         let cpu_instant = self.cpu.read_instant();
-        let cpu_energy = if mode == &Mode::Power { self.cpu.read_energy() } else { 0 };
+        let cpu_energy = if mode == &Mode::CpuPower { self.cpu.read_energy() } else { 0 };
 
         // Wait
         sleep(Duration::from_millis(POLLING_RATE));
@@ -89,13 +89,13 @@ impl Display {
 
         // Main display
         match mode {
-            Mode::Temperature => {
+            Mode::CpuTemperature => {
                 data[1] = if self.fahrenheit { 35 } else { 19 };
                 data[3] = temp / 100;
                 data[4] = temp % 100 / 10;
                 data[5] = temp % 10;
             }
-            Mode::Power => {
+            Mode::CpuPower => {
                 let power = self.cpu.get_power(cpu_energy, POLLING_RATE);
                 data[1] = 76;
                 data[3] = (power / 100) as u8;

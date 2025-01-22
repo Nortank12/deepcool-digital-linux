@@ -123,7 +123,7 @@ sudo nixos-rebuild switch
     </tr>
     <tr>
         <td>AK620 DIGITAL PRO</td>
-        <td align="center">❓</td>
+        <td align="center">✅</td>
     </tr>
 </table>
 
@@ -140,6 +140,14 @@ sudo nixos-rebuild switch
     <tr>
         <td>LD360</td>
         <td align="center">✅</td>
+    </tr>
+    <tr>
+        <td>LP240</td>
+        <td align="center">⚠️</td>
+    </tr>
+    <tr>
+        <td>LP360</td>
+        <td align="center">⚠️</td>
     </tr>
     <tr>
         <td>LS520 SE DIGITAL</td>
@@ -159,7 +167,7 @@ sudo nixos-rebuild switch
     </tr>
     <tr>
         <td>CH170 DIGITAL</td>
-        <td align="center">✅</td>
+        <td align="center">✔️</td>
     </tr>
     <tr>
         <td>CH360 DIGITAL</td>
@@ -179,7 +187,12 @@ sudo nixos-rebuild switch
     </tr>
 </table>
 
-**✅: Fully supported &nbsp; ⚠️: Not tested &nbsp; ❓: Not added**
+**✅: Fully supported**
+
+**✔️: Partially supported**<br>
+*Some display modes are unavailable due to resource limitations.*
+
+**⚠️: Not tested &nbsp; ❓: Not added**
 
 > [!IMPORTANT]
 > - If your device is not added yet, you can still run the program and see if it detects it.
@@ -197,10 +210,11 @@ sudo ./deepcool-digital-linux [OPTIONS]
 ```
 ```
 Options:
-  -m, --mode <MODE>  Change the display mode of your device
-      --pid <ID>     Specify the Product ID if you use mutiple devices
-  -f, --fahrenheit   Change the temperature unit to °F
-  -a, --alarm        Enable the alarm
+  -m, --mode <MODE>       Change the display mode of your device
+  -s, --secondary <MODE>  Change the secondary display mode of your device (if supported)
+      --pid <ID>          Specify the Product ID if you use mutiple devices
+  -f, --fahrenheit        Change the temperature unit to °F
+  -a, --alarm             Enable the alarm
 
 Commands:
   -l, --list         Print Product ID of the connected devices
@@ -251,7 +265,7 @@ sudo nano /etc/systemd/system/deepcool-digital.service
 Description=DeepCool Digital
 
 [Service]
-ExecStart=/usr/sbin/deepcool-digital-linux # arguments here
+ExecStart=/usr/sbin/deepcool-digital-linux
 
 [Install]
 WantedBy=multi-user.target
@@ -277,7 +291,7 @@ sudo nano /etc/init.d/deepcool-digital
 
 description="DeepCool Digital"
 command="/usr/sbin/deepcool-digital-linux"
-command_args="" # arguments here
+command_args=""
 command_background=1
 pidfile="/run/deepcool-digital.pid"
 ```

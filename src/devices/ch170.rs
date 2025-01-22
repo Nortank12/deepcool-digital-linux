@@ -3,11 +3,11 @@ use super::{device_error, Mode};
 use hidapi::HidApi;
 use std::{process::exit, thread::sleep, time::Duration};
 
-pub const DEFAULT_MODE: Mode = Mode::Cpu;
+pub const DEFAULT_MODE: Mode = Mode::CpuFrequency;
 pub const POLLING_RATE: u64 = 750;
 
 pub struct Display {
-    mode: Mode,
+    pub mode: Mode,
     fahrenheit: bool,
     cpu: Cpu,
     gpu: Gpu,
@@ -18,7 +18,8 @@ impl Display {
         // Verify the display mode
         let mode = match mode {
             Mode::Default => DEFAULT_MODE,
-            Mode::Cpu => Mode::Cpu,
+            Mode::CpuFrequency => Mode::CpuFrequency,
+            Mode::CpuFan => Mode::CpuFan,
             Mode::Gpu => Mode::Gpu,
             Mode::Psu => Mode::Psu,
             _ => mode.support_error(),
@@ -36,9 +37,8 @@ impl Display {
         // Connect to device
         let device = api.open(vid, pid).unwrap_or_else(|_| device_error());
 
-
         // Check if `rapl_max_uj` was read correctly
-        if self.mode == Mode::Cpu && self.cpu.rapl_max_uj == 0 {
+        if matches!(self.mode, Mode::CpuFrequency | Mode::CpuFan) && self.cpu.rapl_max_uj == 0 {
             error!("Failed to get CPU power details");
             exit(1);
         }
@@ -52,7 +52,8 @@ impl Display {
         data[4] = 35;
         data[5] = 1;
         data[6] = match self.mode {
-            Mode::Cpu => 2,
+            Mode::CpuFrequency => 2,
+            Mode::CpuFan => 3,
             Mode::Gpu => 4,
             Mode::Psu => 5,
             _ => 0,
@@ -65,7 +66,7 @@ impl Display {
             let mut status_data = data.clone();
 
             match self.mode {
-                Mode::Cpu => {
+                Mode::CpuFrequency | Mode::CpuFan => {
                     // Read CPU utilization & energy consumption
                     let cpu_instant = self.cpu.read_instant();
                     let cpu_energy = self.cpu.read_energy();
@@ -89,9 +90,11 @@ impl Display {
                     status_data[14] = self.cpu.get_usage(cpu_instant);
 
                     // Frequency
-                    let frequency = (self.cpu.get_frequency()).to_be_bytes();
-                    status_data[15] = frequency[0];
-                    status_data[16] = frequency[1];
+                    if self.mode == Mode::CpuFrequency {
+                        let frequency = (self.cpu.get_frequency()).to_be_bytes();
+                        status_data[15] = frequency[0];
+                        status_data[16] = frequency[1];
+                    }
                 }
                 Mode::Gpu => {
                     // Wait

@@ -8,7 +8,7 @@
         <th>USB Data Bytes</th>
     </tr>
     <tr>
-        <td rowspan="23">13875</td>
+        <td rowspan="24">13875</td>
         <td>1</td>
         <td>AK400 DIGITAL</td>
         <td align="center" rowspan="4">
@@ -89,7 +89,9 @@
     <tr>
         <td  rowspan="2">12</td>
         <td>LP240</td>
-        <td align="center"  rowspan="2">No Table Yet</td>
+        <td align="center"  rowspan="2">
+            <a href="tables/lp-series.md">Mapping Table</a>
+        </td>
     </tr>
     <tr>
         <td>LP360</td>
@@ -110,6 +112,13 @@
         <td>...</td>
         <td>...</td>
         <td></td>
+    </tr>
+    <tr>
+        <td>18</td>
+        <td>AK620 DIGITAL PRO</td>
+        <td align="center">
+            <a href="tables/ak620-pro.md">Mapping Table</a>
+        </td>
     </tr>
     <tr>
         <td>19</td>
