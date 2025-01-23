@@ -26,6 +26,9 @@ and run it in the command line. You will need root permission to send data to th
 > On AMD's Zen architecture CPUs, you can install the [zenpower3](https://github.com/PutinVladimir/zenpower3)
 > driver, to have a more accurate reading of the CPU die.
 
+> [!NOTE]
+> On Intel's Arc GPUs, you have to use at least kernel version 6.13.
+
 ### Rootless Mode <sup>(optional)</sup>
 If you need to run the program without root privilege, you can create a `udev` rule to access all necessary resources as a user.
 

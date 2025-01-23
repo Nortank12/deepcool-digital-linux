@@ -1,3 +1,5 @@
+//! Reads live GPU data from the Linux kernel.
+
 use crate::error;
 use std::{fs::read_dir, fs::read_to_string, process::exit};
 
