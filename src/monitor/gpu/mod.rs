@@ -1,7 +1,8 @@
-//! Reads live data from an AMD or NVIDIA GPU.
+//! Reads live data from an AMD, NVIDIA, or Intel Arc GPU.
 
 mod amd;
 mod nvidia;
+mod intel;
 
 use crate::error;
 use std::{fs::read_to_string, process::exit};
@@ -9,6 +10,7 @@ use std::{fs::read_to_string, process::exit};
 pub enum Gpu {
     Amd(amd::Gpu),
     Nvidia(nvidia::Gpu),
+    Intel(intel::Gpu),
 }
 
 impl Gpu {
@@ -16,6 +18,7 @@ impl Gpu {
         match get_vendor().as_str() {
             "amd" => Gpu::Amd(amd::Gpu::new()),
             "nvidia" => Gpu::Nvidia(nvidia::Gpu::new()),
+            "intel" => Gpu::Intel(intel::Gpu::new()),
             _ => {
                 error!("No supported GPU was found");
                 exit(1);
@@ -27,6 +30,7 @@ impl Gpu {
         match &self {
             Gpu::Amd(amd) => amd.get_temp(fahrenheit),
             Gpu::Nvidia(nvidia) => nvidia.get_temp(fahrenheit),
+            Gpu::Intel(intel) => intel.get_temp(fahrenheit),
         }
     }
 
@@ -34,6 +38,7 @@ impl Gpu {
         match &self {
             Gpu::Amd(amd) => amd.get_usage(),
             Gpu::Nvidia(nvidia) => nvidia.get_usage(),
+            Gpu::Intel(intel) => intel.get_usage(),
         }
     }
 
@@ -41,6 +46,7 @@ impl Gpu {
         match &self {
             Gpu::Amd(amd) => amd.get_power(),
             Gpu::Nvidia(nvidia) => nvidia.get_power(),
+            Gpu::Intel(intel) => intel.get_power(),
         }
     }
 
@@ -48,6 +54,7 @@ impl Gpu {
         match &self {
             Gpu::Amd(amd) => amd.get_frequency(),
             Gpu::Nvidia(nvidia) => nvidia.get_frequency(),
+            Gpu::Intel(intel) => intel.get_frequency(),
         }
     }
 }
@@ -64,6 +71,8 @@ fn get_vendor() -> String {
             return "amd".to_owned();
         } else if device.ends_with("nvidia") {
             return "nvidia".to_owned();
+        } else if device.contains("i915") {
+            return "intel".to_owned();
         }
     }
 
