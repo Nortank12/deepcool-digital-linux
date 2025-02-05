@@ -264,7 +264,7 @@ fn main() {
         19 => {
             println!(
                 "Supported modes: {} {} {} {} [default: {}]",
-                "cpu_freq".bold(),
+                "auto cpu_freq".bold(),
                 "cpu_fan".bright_black().strikethrough(),
                 "gpu".bold(),
                 "psu".bright_black().strikethrough(),
@@ -274,6 +274,8 @@ fn main() {
                 warning!("CPU fan speed monitoring is not supported yet");
             } else if args.mode == Mode::Psu {
                 warning!("PSU monitoring is not supported yet");
+            } else if args.mode == Mode::Auto {
+                warning!("Display mode \"auto\" only cycles between fully supported modes");
             }
             // Connect to device
             let ch170 = ch170::Display::new(&args.mode, args.fahrenheit);
