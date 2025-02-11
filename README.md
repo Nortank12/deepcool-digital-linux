@@ -11,7 +11,7 @@
 - [Device List](#more-information)
 
 # About
-This program is meant to replicate the functionality of the original `DeepCool Digital`
+This CLI program is meant to replicate the functionality of the original `DeepCool Digital`
 Windows program and I am gradually adding support to new devices.
 
 If you have a device that has not been added or tested yet, please read the notes below the
@@ -20,14 +20,18 @@ If you think you can collaborate, please write an issue so we can get in touch.
 
 # Installation
 Simply download the latest [release](https://github.com/Nortank12/deepcool-digital-linux/releases)
-and run it in the command line. You will need root permission to send data to the device.
+and make it executable:
+```bash
+chmod +x deepcool-digital-linux
+```
+You will need root permission to send data to the device.
 
 > [!TIP]
 > On AMD's Zen architecture CPUs, you can install the [zenpower3](https://github.com/PutinVladimir/zenpower3)
 > driver, to have a more accurate reading of the CPU die.
 
 > [!NOTE]
-> On Intel's Arc GPUs, you have to use at least kernel version 6.13.
+> On Intel's Arc GPUs, you have to use kernel version 6.13 or higher for proper temperature monitoring.
 
 ### Rootless Mode <sup>(optional)</sup>
 If you need to run the program without root privilege, you can create a `udev` rule to access all necessary resources as a user.
