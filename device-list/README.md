@@ -8,7 +8,7 @@
         <th>USB Data Bytes</th>
     </tr>
     <tr>
-        <td rowspan="24">13875</td>
+        <td rowspan="25">13875</td>
         <td>1</td>
         <td>AK400 DIGITAL</td>
         <td align="center" rowspan="4">
@@ -95,6 +95,16 @@
     </tr>
     <tr>
         <td>LP360</td>
+    </tr>
+    <tr>
+        <td  rowspan="2">13</td>
+        <td>LQ240</td>
+        <td align="center"  rowspan="2">
+            <a href="tables/lq-series.md">Mapping Table</a>
+        </td>
+    </tr>
+    <tr>
+        <td>LQ360</td>
     </tr>
     <tr>
         <td>...</td>

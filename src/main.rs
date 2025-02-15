@@ -186,6 +186,31 @@ fn main() {
             // Display loop
             lp_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
+        // LQ Series
+        13 => {
+            println!("Supported modes: {}", "auto".bold());
+            // Connect to device
+            let lq_device = devices::lq_series::Display::new(args.fahrenheit);
+            // Print current configuration & warnings
+            print_device_status(
+                &lq_series::DEFAULT_MODE,
+                None,
+                if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
+                Alarm { state: AlarmState::NotSupported, temp_limit: 0, temp_warning: 0 },
+                lq_series::POLLING_RATE,
+            );
+            if args.mode != Mode::Default {
+                warning!("Display mode cannot be changed, value will be ignored");
+            }
+            if args.secondary != Mode::Default {
+                warning!("Secondary display mode is not supported, value will be ignored");
+            }
+            if args.alarm {
+                warning!("Alarm is not supported, value will be ignored");
+            }
+            // Display loop
+            lq_device.run(&api, DEFAULT_VENDOR_ID, product_id);
+        }
         // AK400 PRO
         16 => {
             println!("Supported modes: {}", "auto".bold());
@@ -196,20 +221,20 @@ fn main() {
                 &ak400_pro::DEFAULT_MODE,
                 None,
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
-                    Alarm {
-                        state: AlarmState::Auto,
-                        temp_limit: if args.fahrenheit {
-                            ak400_pro::TEMP_LIMIT_F
-                        } else {
-                            ak400_pro::TEMP_LIMIT_C
-                        },
-                        temp_warning: if args.fahrenheit {
-                            ak400_pro::TEMP_WARNING_F
-                        } else {
-                            ak400_pro::TEMP_WARNING_C
-                        },
+                Alarm {
+                    state: AlarmState::Auto,
+                    temp_limit: if args.fahrenheit {
+                        ak400_pro::TEMP_LIMIT_F
+                    } else {
+                        ak400_pro::TEMP_LIMIT_C
                     },
-                    ak400_pro::POLLING_RATE,
+                    temp_warning: if args.fahrenheit {
+                        ak400_pro::TEMP_WARNING_F
+                    } else {
+                        ak400_pro::TEMP_WARNING_C
+                    },
+                },
+                ak400_pro::POLLING_RATE,
             );
             if args.mode != Mode::Default {
                 warning!("Display mode cannot be changed, value will be ignored");
@@ -233,20 +258,20 @@ fn main() {
                 &ak620_pro::DEFAULT_MODE,
                 None,
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
-                    Alarm {
-                        state: AlarmState::Auto,
-                        temp_limit: if args.fahrenheit {
-                            ak620_pro::TEMP_LIMIT_F
-                        } else {
-                            ak620_pro::TEMP_LIMIT_C
-                        },
-                        temp_warning: if args.fahrenheit {
-                            ak620_pro::TEMP_WARNING_F
-                        } else {
-                            ak620_pro::TEMP_WARNING_C
-                        },
+                Alarm {
+                    state: AlarmState::Auto,
+                    temp_limit: if args.fahrenheit {
+                        ak620_pro::TEMP_LIMIT_F
+                    } else {
+                        ak620_pro::TEMP_LIMIT_C
                     },
-                    ak620_pro::POLLING_RATE,
+                    temp_warning: if args.fahrenheit {
+                        ak620_pro::TEMP_WARNING_F
+                    } else {
+                        ak620_pro::TEMP_WARNING_C
+                    },
+                },
+                ak620_pro::POLLING_RATE,
             );
             if args.mode != Mode::Default {
                 warning!("Display mode cannot be changed, value will be ignored");
