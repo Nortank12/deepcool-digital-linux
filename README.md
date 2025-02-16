@@ -157,6 +157,14 @@ sudo nixos-rebuild switch
         <td align="center">⚠️</td>
     </tr>
     <tr>
+        <td>LQ240</td>
+        <td align="center">✅</td>
+    </tr>
+    <tr>
+        <td>LQ360</td>
+        <td align="center">✅</td>
+    </tr>
+    <tr>
         <td>LS520 SE DIGITAL</td>
         <td align="center">✅</td>
     </tr>
