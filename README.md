@@ -121,6 +121,10 @@ sudo nixos-rebuild switch
         <td align="center">✅</td>
     </tr>
     <tr>
+        <td>AK500 DIGITAL PRO</td>
+        <td align="center">❓</td>
+    </tr>
+    <tr>
         <td>AK500S DIGITAL</td>
         <td align="center">✅</td>
     </tr>
@@ -131,6 +135,10 @@ sudo nixos-rebuild switch
     <tr>
         <td>AK620 DIGITAL PRO</td>
         <td align="center">✅</td>
+    </tr>
+    <tr>
+        <td>ASSASSIN IV VC VISION</td>
+        <td align="center">❓</td>
     </tr>
 </table>
 
