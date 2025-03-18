@@ -4,13 +4,14 @@ mod amd;
 mod nvidia;
 mod intel;
 
-use crate::error;
+use crate::{error, warning};
 use std::{fs::read_to_string, process::exit};
 
 pub enum Gpu {
     Amd(amd::Gpu),
     Nvidia(nvidia::Gpu),
     Intel(intel::Gpu),
+    None,
 }
 
 impl Gpu {
@@ -20,8 +21,9 @@ impl Gpu {
             "nvidia" => Gpu::Nvidia(nvidia::Gpu::new()),
             "intel" => Gpu::Intel(intel::Gpu::new()),
             _ => {
-                error!("No supported GPU was found");
-                exit(1);
+                warning!("No dedicated GPU was found");
+                eprintln!("         GPU information will not be displayed.");
+                return Gpu::None;
             }
         }
     }
@@ -31,6 +33,7 @@ impl Gpu {
             Gpu::Amd(amd) => amd.get_temp(fahrenheit),
             Gpu::Nvidia(nvidia) => nvidia.get_temp(fahrenheit),
             Gpu::Intel(intel) => intel.get_temp(fahrenheit),
+            Gpu::None => 0,
         }
     }
 
@@ -39,6 +42,7 @@ impl Gpu {
             Gpu::Amd(amd) => amd.get_usage(),
             Gpu::Nvidia(nvidia) => nvidia.get_usage(),
             Gpu::Intel(intel) => intel.get_usage(),
+            Gpu::None => 0,
         }
     }
 
@@ -47,6 +51,7 @@ impl Gpu {
             Gpu::Amd(amd) => amd.get_power(),
             Gpu::Nvidia(nvidia) => nvidia.get_power(),
             Gpu::Intel(intel) => intel.get_power(),
+            Gpu::None => 0,
         }
     }
 
@@ -55,6 +60,7 @@ impl Gpu {
             Gpu::Amd(amd) => amd.get_frequency(),
             Gpu::Nvidia(nvidia) => nvidia.get_frequency(),
             Gpu::Intel(intel) => intel.get_frequency(),
+            Gpu::None => 0,
         }
     }
 }
@@ -72,6 +78,7 @@ fn get_vendor() -> String {
         } else if device.ends_with("nvidia") {
             return "nvidia".to_owned();
         } else if device.contains("i915") {
+            // TODO: only accept Intel Arc GPUs
             return "intel".to_owned();
         }
     }
