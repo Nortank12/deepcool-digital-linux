@@ -81,9 +81,10 @@ fn get_vendor() -> String {
             let fields: Vec<&str> = device.split_whitespace().collect(); // creates a vector of substrings containing the PCI device information.
             if fields.len() > 2 {
                 let pci_class = &fields[1][..2]; // PCI class code (first 2 hex digits)
+                let pci_subclass = &fields[1][2..4];
 
                 // Exclude iGPUs: Class code 03 (Display Controller) + subclass 80 (iGPU)
-                if pci_class != "03" {
+                if pci_class == "03" && pci_subclass != "80" {
                     return "intel".to_owned();
                 }
             }
