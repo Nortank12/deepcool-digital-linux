@@ -78,8 +78,16 @@ fn get_vendor() -> String {
         } else if device.ends_with("nvidia") {
             return "nvidia".to_owned();
         } else if device.contains("i915") {
-            // TODO: only accept Intel Arc GPUs
-            return "intel".to_owned();
+            let fields: Vec<&str> = device.split_whitespace().collect(); // creates a vector of substrings containing the PCI device information.
+            if fields.len() > 2 {
+                let pci_class = &fields[1][..2]; // PCI class code (first 2 hex digits)
+
+                // Exclude iGPUs: Class code 03 (Display Controller) + subclass 80 (iGPU)
+                if pci_class != "03" {
+                    return "intel".to_owned();
+                }
+            }
+
         }
     }
 
