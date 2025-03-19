@@ -1,8 +1,8 @@
 //! Reads live data from an AMD, NVIDIA, or Intel Arc GPU.
 
 mod amd;
-mod nvidia;
 mod intel;
+mod nvidia;
 
 use crate::{error, warning};
 use std::{fs::read_to_string, process::exit};
@@ -78,17 +78,7 @@ fn get_vendor() -> String {
         } else if device.ends_with("nvidia") {
             return "nvidia".to_owned();
         } else if device.contains("i915") {
-            let fields: Vec<&str> = device.split_whitespace().collect(); // creates a vector of substrings containing the PCI device information.
-            if fields.len() > 2 {
-                let pci_class = &fields[1][..2]; // PCI class code (first 2 hex digits)
-                let pci_subclass = &fields[1][2..4];
-
-                // Exclude iGPUs: Class code 03 (Display Controller) + subclass 80 (iGPU)
-                if pci_class == "03" && pci_subclass != "80" {
-                    return "intel".to_owned();
-                }
-            }
-
+            return "intel".to_owned();
         }
     }
 
