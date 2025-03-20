@@ -1,8 +1,8 @@
 //! Reads live data from an AMD, NVIDIA, or Intel Arc GPU.
 
 mod amd;
-mod nvidia;
 mod intel;
+mod nvidia;
 
 use crate::{error, warning};
 use std::{fs::read_to_string, process::exit};
@@ -77,11 +77,11 @@ fn get_vendor() -> String {
             return "amd".to_owned();
         } else if device.ends_with("nvidia") {
             return "nvidia".to_owned();
-        } else if device.contains("i915") {
-            // TODO: only accept Intel Arc GPUs
+        } else if device.contains("808656") || device.contains("8086E2") {
+            //56xx (ARC A series PCI_ID) and E2xx (Arc B series PCI_ID)
+            // can't use the name "i915", because it is used by the intel IGPUS too
             return "intel".to_owned();
         }
     }
-
     "".to_owned()
 }

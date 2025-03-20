@@ -37,22 +37,22 @@ impl Gpu {
     pub fn get_usage(&self) -> u8 {
         // Read current frequency and max frequency from DRM
         let current_freq = read_to_string(format!("{}/device/gt_cur_freq_mhz", &self.drm_dir))
-        .unwrap_or_else(|_| {
-            error!("Failed to get GPU current frequency");
-            exit(1);
-        })
-        .trim_end()
-        .parse::<u32>()
-        .unwrap_or(0);
+            .unwrap_or_else(|_| {
+                error!("Failed to get GPU current frequency");
+                exit(1);
+            })
+            .trim_end()
+            .parse::<u32>()
+            .unwrap_or(0);
 
         let max_freq = read_to_string(format!("{}/device/gt_max_freq_mhz", &self.drm_dir))
-        .unwrap_or_else(|_| {
-            error!("Failed to get GPU max frequency");
-            exit(1);
-        })
-        .trim_end()
-        .parse::<u32>()
-        .unwrap_or(0);
+            .unwrap_or_else(|_| {
+                error!("Failed to get GPU max frequency");
+                exit(1);
+            })
+            .trim_end()
+            .parse::<u32>()
+            .unwrap_or(0);
 
         // Estimate usage as a percentage
         if max_freq > 0 {
