@@ -92,10 +92,9 @@ fn find_hwmon_dir() -> String {
             for sensor in sensors {
                 let path = sensor.unwrap().path().to_str().unwrap().to_owned();
                 if let Ok(name) = read_to_string(format!("{}/name", path)) {
-                    if name.contains("i915") {
-                        if has_fans(&path) {
-                            return path;
-                        }
+                    // This is a generic check for Intel GPUs
+                    if name.contains("i915") || name.contains("intel") {
+                        return path;
                     }
                 }
             }
@@ -104,12 +103,6 @@ fn find_hwmon_dir() -> String {
     }
     error!("Failed to locate GPU temperature sensor (Intel)");
     exit(1);
-}
-
-/// Helper function to check if there are fans (Discrete card) present in the hwmon directory.
-fn has_fans(path: &str) -> bool {
-    // Check for fan1_input (indicating a fan is present)
-    std::path::Path::new(&format!("{}/fan1_input", path)).exists()
 }
 
 /// Looks for the DRM device directory corresponding to Intel GPUs in /sys/class/drm.
