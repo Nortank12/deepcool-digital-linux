@@ -77,9 +77,14 @@ fn get_vendor() -> String {
             return "amd".to_owned();
         } else if device.ends_with("nvidia") {
             return "nvidia".to_owned();
-        } else if device.contains("i915") {
-            // TODO: only accept Intel Arc GPUs
-            return "intel".to_owned();
+        } else if device.ends_with("i915") {
+            let pci_id = device.split("\t").nth(1).unwrap();
+            // Check the first 2 digits of the device ID:
+            // 56xx: Arc A-Series
+            // E2xx: Arc B-Series
+            if ["56", "e2"].contains(&&pci_id[4..6]) {
+                return "intel".to_owned();
+            }
         }
     }
 
