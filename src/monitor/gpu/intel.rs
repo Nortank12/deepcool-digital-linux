@@ -92,8 +92,7 @@ fn find_hwmon_dir() -> String {
             for sensor in sensors {
                 let path = sensor.unwrap().path().to_str().unwrap().to_owned();
                 if let Ok(name) = read_to_string(format!("{}/name", path)) {
-                    // This is a generic check for Intel GPUs
-                    if name.contains("i915") || name.contains("intel") {
+                    if name.starts_with("i915") {
                         return path;
                     }
                 }
