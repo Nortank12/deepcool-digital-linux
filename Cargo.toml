@@ -1,6 +1,6 @@
 [package]
 name = "deepcool-digital-linux"
-version = "0.7.3"
+version = "0.7.4"
 edition = "2021"
 
 [dependencies]
