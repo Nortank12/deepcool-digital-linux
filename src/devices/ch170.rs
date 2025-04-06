@@ -39,7 +39,7 @@ impl Display {
         let device = api.open(vid, pid).unwrap_or_else(|_| device_error());
 
         // Check if `rapl_max_uj` was read correctly
-        if matches!(self.mode, Mode::CpuFrequency | Mode::CpuFan) && self.cpu.rapl_max_uj == 0 {
+        if matches!(self.mode, Mode::CpuFrequency | Mode::CpuFan | Mode::Auto) && self.cpu.rapl_max_uj == 0 {
             error!("Failed to get CPU power details");
             exit(1);
         }
@@ -110,7 +110,7 @@ impl Display {
                 data[14] = self.cpu.get_usage(cpu_instant);
 
                 // Frequency
-                if self.mode == Mode::CpuFrequency {
+                if matches!(mode, Mode::CpuFrequency) {
                     let frequency = (self.cpu.get_frequency()).to_be_bytes();
                     data[15] = frequency[0];
                     data[16] = frequency[1];
