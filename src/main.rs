@@ -285,15 +285,15 @@ fn main() {
             // Display loop
             ak620_pro.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
-        // CH170 DIGITAL
-        19 => {
+        // CH170 / CH270 DIGITAL
+        19 | 22 => {
             println!(
                 "Supported modes: {} {} {} {} [default: {}]",
                 "auto cpu_freq".bold(),
                 "cpu_fan".bright_black().strikethrough(),
                 "gpu".bold(),
                 "psu".bright_black().strikethrough(),
-                ch170::DEFAULT_MODE.symbol()
+                ch_series_gen2::DEFAULT_MODE.symbol()
             );
             if args.mode == Mode::CpuFan {
                 warning!("CPU fan speed monitoring is not supported yet");
@@ -303,14 +303,14 @@ fn main() {
                 warning!("Display mode \"auto\" only cycles between fully supported modes");
             }
             // Connect to device
-            let ch170 = ch170::Display::new(&args.mode, args.fahrenheit);
+            let ch_gen2_device = ch_series_gen2::Display::new(&args.mode, args.fahrenheit);
             // Print current configuration & warnings
             print_device_status(
-                &ch170.mode,
+                &ch_gen2_device.mode,
                 None,
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                 Alarm { state: AlarmState::NotSupported, temp_limit: 0, temp_warning: 0 },
-                ch170::POLLING_RATE,
+                ch_series_gen2::POLLING_RATE,
             );
             if args.secondary != Mode::Default {
                 warning!("Secondary display mode is not supported, value will be ignored");
@@ -319,7 +319,7 @@ fn main() {
                 warning!("Alarm is not supported, value will be ignored");
             }
             // Display loop
-            ch170.run(&api, DEFAULT_VENDOR_ID, product_id);
+            ch_gen2_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
         // CH Series & MORPHEUS
         5 | 7 | 21 => {

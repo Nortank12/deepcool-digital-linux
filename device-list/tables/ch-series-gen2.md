@@ -1,4 +1,4 @@
-# CH170 DIGITAL Mapping Table
+# CH Series 2nd Generation Mapping Table
 <table>
     <tr>
         <th>DATA BYTE</th>

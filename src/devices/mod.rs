@@ -3,7 +3,7 @@ pub mod ak_series;
 pub mod ak400_pro;
 pub mod ak620_pro;
 pub mod ch_series;
-pub mod ch170;
+pub mod ch_series_gen2;
 pub mod ch510;
 pub mod ld_series;
 pub mod lp_series;

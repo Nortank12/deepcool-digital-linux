@@ -193,6 +193,10 @@ sudo nixos-rebuild switch
         <td align="center">✔️</td>
     </tr>
     <tr>
+        <td>CH270 DIGITAL</td>
+        <td align="center">✔️</td>
+    </tr>
+    <tr>
         <td>CH360 DIGITAL</td>
         <td align="center">✅</td>
     </tr>
@@ -203,6 +207,10 @@ sudo nixos-rebuild switch
     <tr>
         <td>CH560 DIGITAL</td>
         <td align="center">✅</td>
+    </tr>
+    <tr>
+        <td>CH690 DIGITAL</td>
+        <td align="center">❓</td>
     </tr>
     <tr>
         <td>MORPHEUS</td>
