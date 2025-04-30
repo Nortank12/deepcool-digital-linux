@@ -8,7 +8,7 @@
         <th>USB Data Bytes</th>
     </tr>
     <tr>
-        <td rowspan="28">13875</td>
+        <td rowspan="30">13875</td>
         <td>1</td>
         <td>AK400 DIGITAL</td>
         <td align="center" rowspan="4">
@@ -82,7 +82,7 @@
         <td>LD360</td>
     </tr>
     <tr>
-        <td>...</td>
+        <td>11</td>
         <td>...</td>
         <td></td>
     </tr>
@@ -107,7 +107,7 @@
         <td>LQ360</td>
     </tr>
     <tr>
-        <td>...</td>
+        <td>14</td>
         <td>...</td>
         <td></td>
     </tr>
@@ -126,7 +126,7 @@
         </td>
     </tr>
     <tr>
-        <td>...</td>
+        <td>17</td>
         <td>...</td>
         <td></td>
     </tr>
@@ -145,7 +145,7 @@
         </td>
     </tr>
     <tr>
-        <td>...</td>
+        <td>20</td>
         <td>...</td>
         <td></td>
     </tr>
@@ -159,6 +159,18 @@
     <tr>
         <td>22</td>
         <td>CH270 DIGITAL</td>
+        <td align="center">
+            <a href="tables/ch-series-gen2.md">Mapping Table</a>
+        </td>
+    </tr>
+    <tr>
+        <td>...</td>
+        <td>...</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>27</td>
+        <td>CH690 DIGITAL</td>
         <td align="center">
             <a href="tables/ch-series-gen2.md">Mapping Table</a>
         </td>

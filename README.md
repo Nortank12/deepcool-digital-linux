@@ -210,7 +210,7 @@ sudo nixos-rebuild switch
     </tr>
     <tr>
         <td>CH690 DIGITAL</td>
-        <td align="center">❓</td>
+        <td align="center">✔️</td>
     </tr>
     <tr>
         <td>MORPHEUS</td>

@@ -285,8 +285,8 @@ fn main() {
             // Display loop
             ak620_pro.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
-        // CH170 / CH270 DIGITAL
-        19 | 22 => {
+        // CH170 | CH270 | CH690
+        19 | 22 | 27 => {
             println!(
                 "Supported modes: {} {} {} {} [default: {}]",
                 "auto cpu_freq".bold(),
