@@ -1,12 +1,13 @@
 use crate::{devices::Mode, error, CH510_PRODUCT_ID, CH510_VENDOR_ID, DEFAULT_VENDOR_ID};
 use colored::*;
 use hidapi::HidApi;
-use std::{env::args, process::exit};
+use std::{env::args, process::exit, time::Duration};
 
 pub struct Args {
     pub mode: Mode,
     pub secondary: Mode,
     pub pid: u16,
+    pub update: Duration,
     pub fahrenheit: bool,
     pub alarm: bool,
 }
@@ -17,6 +18,7 @@ impl Args {
         let mut mode = Mode::Default;
         let mut secondary = Mode::Default;
         let mut pid = 0;
+        let mut update = Duration::from_millis(1000);
         let mut fahrenheit = false;
         let mut alarm = false;
 
@@ -75,6 +77,28 @@ impl Args {
                         exit(1);
                     }
                 }
+                "-u" | "--update" => {
+                    if i + 1 < args.len() {
+                        match args[i + 1].parse::<u64>() {
+                            Ok(num) => {
+                                if num >= 100 && num <= 2000 {
+                                    update = Duration::from_millis(num);
+                                    i += 1;
+                                } else {
+                                    error!("Update interval must be between 100 and 2000");
+                                    exit(1);
+                                }
+                            }
+                            Err(_) => {
+                                error!("Invalid update interval");
+                                exit(1);
+                            }
+                        }
+                    } else {
+                        error!("--update requires a value");
+                        exit(1);
+                    }
+                }
                 "-f" | "--fahrenheit" => {
                     fahrenheit = true;
                 }
@@ -118,6 +142,7 @@ impl Args {
                     println!("  {}, {} <MODE>       Change the display mode of your device", "-m".bold(), "--mode".bold());
                     println!("  {}, {} <MODE>  Change the secondary display mode of your device (if supported)", "-s".bold(), "--secondary".bold());
                     println!("      {} <ID>          Specify the Product ID if you use mutiple devices", "--pid".bold());
+                    println!("\n  {}, {} <MILLISEC> Change the update interval of the display [default: 1000]", "-u".bold(), "--update".bold());
                     println!("  {}, {}        Change the temperature unit to °F", "-f".bold(), "--fahrenheit".bold());
                     println!("  {}, {}             Enable the alarm", "-a".bold(), "--alarm".bold());
                     println!("\n{}", "Commands:".bold());
@@ -163,6 +188,28 @@ impl Args {
                                     exit(1);
                                 }
                             }
+                            'u' => {
+                                if i + 1 < args.len() && args[i].ends_with('u') {
+                                    match args[i + 1].parse::<u64>() {
+                                        Ok(num) => {
+                                            if num >= 100 && num <= 2000 {
+                                                update = Duration::from_millis(num);
+                                                i += 1;
+                                            } else {
+                                                error!("Update interval must be between 100 and 2000");
+                                                exit(1);
+                                            }
+                                        }
+                                        Err(_) => {
+                                            error!("Invalid update interval");
+                                            exit(1);
+                                        }
+                                    }
+                                } else {
+                                    error!("--update requires a value");
+                                    exit(1);
+                                }
+                            }
                             'f' => fahrenheit = true,
                             'a' => alarm = true,
                             _ => {
@@ -188,6 +235,7 @@ impl Args {
             mode,
             secondary,
             pid,
+            update,
             fahrenheit,
             alarm,
         }

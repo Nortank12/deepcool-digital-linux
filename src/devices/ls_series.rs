@@ -4,19 +4,19 @@ use hidapi::HidApi;
 use std::{process::exit, thread::sleep, time::Duration};
 
 pub const DEFAULT_MODE: Mode = Mode::CpuTemperature;
-pub const POLLING_RATE: u64 = 750;
 pub const TEMP_LIMIT_C: u8 = 90;
 pub const TEMP_LIMIT_F: u8 = 194;
 
 pub struct Display {
     pub mode: Mode,
+    update: Duration,
     fahrenheit: bool,
     alarm: bool,
     cpu: Cpu,
 }
 
 impl Display {
-    pub fn new(mode: &Mode, fahrenheit: bool, alarm: bool) -> Self {
+    pub fn new(mode: &Mode, update: Duration, fahrenheit: bool, alarm: bool) -> Self {
         // Verify the display mode
         let mode = match mode {
             Mode::Default => DEFAULT_MODE,
@@ -28,6 +28,7 @@ impl Display {
 
         Display {
             mode,
+            update,
             fahrenheit,
             alarm,
             cpu: Cpu::new(),
@@ -81,7 +82,7 @@ impl Display {
         let cpu_energy = if mode == &Mode::CpuPower { self.cpu.read_energy() } else { 0 };
 
         // Wait
-        sleep(Duration::from_millis(POLLING_RATE));
+        sleep(self.update);
 
         // Calculate usage & temperature
         let usage = self.cpu.get_usage(cpu_instant);
@@ -96,7 +97,7 @@ impl Display {
                 data[5] = temp % 10;
             }
             Mode::CpuPower => {
-                let power = self.cpu.get_power(cpu_energy, POLLING_RATE);
+                let power = self.cpu.get_power(cpu_energy, self.update.as_millis() as u64);
                 data[1] = 76;
                 data[3] = (power / 100) as u8;
                 data[4] = (power % 100 / 10) as u8;

@@ -4,17 +4,17 @@ use hidapi::HidApi;
 use std::{process::exit, thread::sleep, time::Duration};
 
 pub const DEFAULT_MODE: Mode = Mode::CpuFrequency;
-pub const POLLING_RATE: u64 = 750;
 
 pub struct Display {
     pub mode: Mode,
+    update: Duration,
     fahrenheit: bool,
     cpu: Cpu,
     gpu: Gpu,
 }
 
 impl Display {
-    pub fn new(mode: &Mode, fahrenheit: bool) -> Self {
+    pub fn new(mode: &Mode, update: Duration, fahrenheit: bool) -> Self {
         // Verify the display mode
         let mode = match mode {
             Mode::Default => DEFAULT_MODE,
@@ -28,6 +28,7 @@ impl Display {
 
         Display {
             mode,
+            update,
             fahrenheit,
             cpu: Cpu::new(),
             gpu: Gpu::new(),
@@ -92,10 +93,10 @@ impl Display {
                 let cpu_energy = self.cpu.read_energy();
 
                 // Wait
-                sleep(Duration::from_millis(POLLING_RATE));
+                sleep(self.update);
 
                 // Power consumption
-                let power = (self.cpu.get_power(cpu_energy, POLLING_RATE)).to_be_bytes();
+                let power = (self.cpu.get_power(cpu_energy, self.update.as_millis() as u64)).to_be_bytes();
                 data[7] = power[0];
                 data[8] = power[1];
 
@@ -118,7 +119,7 @@ impl Display {
             }
             Mode::Gpu => {
                 // Wait
-                sleep(Duration::from_millis(POLLING_RATE));
+                sleep(self.update);
 
                 // Power consumption
                 let power = (self.gpu.get_power()).to_be_bytes();
@@ -142,7 +143,7 @@ impl Display {
             }
             Mode::Psu => {
                 // Wait
-                sleep(Duration::from_millis(POLLING_RATE));
+                sleep(self.update);
             }
             _ => (),
         }

@@ -244,6 +244,8 @@ Options:
   -m, --mode <MODE>       Change the display mode of your device
   -s, --secondary <MODE>  Change the secondary display mode of your device (if supported)
       --pid <ID>          Specify the Product ID if you use mutiple devices
+
+  -u, --update <MILLISEC> Change the update interval of the display [default: 1000]
   -f, --fahrenheit        Change the temperature unit to °F
   -a, --alarm             Enable the alarm
 

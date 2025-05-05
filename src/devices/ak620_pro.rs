@@ -4,7 +4,6 @@ use hidapi::HidApi;
 use std::{process::exit, thread::sleep, time::Duration};
 
 pub const DEFAULT_MODE: Mode = Mode::Auto;
-pub const POLLING_RATE: u64 = 750;
 // The temperature limits are hard-coded in the device
 pub const TEMP_WARNING_C: u8 = 80;
 pub const TEMP_WARNING_F: u8 = 176;
@@ -12,13 +11,15 @@ pub const TEMP_LIMIT_C: u8 = 90;
 pub const TEMP_LIMIT_F: u8 = 194;
 
 pub struct Display {
+    update: Duration,
     fahrenheit: bool,
     cpu: Cpu,
 }
 
 impl Display {
-    pub fn new(fahrenheit: bool) -> Self {
+    pub fn new(update: Duration, fahrenheit: bool) -> Self {
         Display {
+            update,
             fahrenheit,
             cpu: Cpu::new(),
         }
@@ -55,11 +56,11 @@ impl Display {
             let cpu_energy = self.cpu.read_energy();
 
             // Wait
-            sleep(Duration::from_millis(POLLING_RATE));
+            sleep(self.update);
 
             // ----- Write data to the package -----
             // Power consumption
-            let power = (self.cpu.get_power(cpu_energy, POLLING_RATE)).to_be_bytes();
+            let power = (self.cpu.get_power(cpu_energy, self.update.as_millis() as u64)).to_be_bytes();
             status_data[8] = power[0];
             status_data[9] = power[1];
 

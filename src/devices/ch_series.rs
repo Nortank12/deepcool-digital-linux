@@ -4,18 +4,18 @@ use hidapi::HidApi;
 use std::{thread::sleep, time::Duration};
 
 pub const DEFAULT_MODE: Mode = Mode::CpuTemperature;
-pub const POLLING_RATE: u64 = 750;
 
 pub struct Display {
     pub mode: Mode,
     pub secondary: Mode,
+    update: Duration,
     fahrenheit: bool,
     cpu: Cpu,
     gpu: Gpu,
 }
 
 impl Display {
-    pub fn new(mode: &Mode, secondary: &Mode, fahrenheit: bool) -> Self {
+    pub fn new(mode: &Mode, secondary: &Mode, update: Duration, fahrenheit: bool) -> Self {
         // Verify the display mode
         let mode = match mode {
             Mode::Default => DEFAULT_MODE,
@@ -39,6 +39,7 @@ impl Display {
         Display {
             mode,
             secondary,
+            update,
             fahrenheit,
             cpu: Cpu::new(),
             gpu: Gpu::new(),
@@ -85,7 +86,7 @@ impl Display {
         let cpu_instant = self.cpu.read_instant();
 
         // Wait
-        sleep(Duration::from_millis(POLLING_RATE));
+        sleep(self.update);
 
         // Calculate CPU & GPU usage
         let cpu_usage = self.cpu.get_usage(cpu_instant);

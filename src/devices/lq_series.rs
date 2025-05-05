@@ -4,16 +4,17 @@ use hidapi::HidApi;
 use std::{process::exit, thread::sleep, time::Duration};
 
 pub const DEFAULT_MODE: Mode = Mode::Auto;
-pub const POLLING_RATE: u64 = 750;
 
 pub struct Display {
+    update: Duration,
     fahrenheit: bool,
     cpu: Cpu,
 }
 
 impl Display {
-    pub fn new(fahrenheit: bool) -> Self {
+    pub fn new(update: Duration, fahrenheit: bool) -> Self {
         Display {
+            update,
             fahrenheit,
             cpu: Cpu::new(),
         }
@@ -49,11 +50,11 @@ impl Display {
             let cpu_energy = self.cpu.read_energy();
 
             // Wait
-            sleep(Duration::from_millis(POLLING_RATE));
+            sleep(self.update);
 
             // ----- Write data to the package -----
             // Power consumption
-            let power = (self.cpu.get_power(cpu_energy, POLLING_RATE)).to_be_bytes();
+            let power = (self.cpu.get_power(cpu_energy, self.update.as_millis() as u64)).to_be_bytes();
             status_data[7] = power[0];
             status_data[8] = power[1];
 

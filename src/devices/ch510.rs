@@ -4,17 +4,17 @@ use hidapi::HidApi;
 use std::{thread::sleep, time::Duration};
 
 pub const DEFAULT_MODE: Mode = Mode::Cpu;
-pub const POLLING_RATE: u64 = 750;
 
 pub struct Display {
     pub mode: Mode,
+    update: Duration,
     fahrenheit: bool,
     cpu: Cpu,
     gpu: Gpu,
 }
 
 impl Display {
-    pub fn new(mode: &Mode, fahrenheit: bool) -> Self {
+    pub fn new(mode: &Mode, update: Duration, fahrenheit: bool) -> Self {
         // Verify the display mode
         let mode = match mode {
             Mode::Default => DEFAULT_MODE,
@@ -25,6 +25,7 @@ impl Display {
 
         Display {
             mode,
+            update,
             fahrenheit,
             cpu: Cpu::new(),
             gpu: Gpu::new(),
@@ -44,7 +45,7 @@ impl Display {
                 Mode::Cpu => {
                     // Get CPU instant & wait
                     let cpu_instant = self.cpu.read_instant();
-                    sleep(Duration::from_millis(POLLING_RATE));
+                    sleep(self.update);
 
                     // Return the message
                     format!(
@@ -56,7 +57,7 @@ impl Display {
                 }
                 Mode::Gpu => {
                     // Wait
-                    sleep(Duration::from_millis(POLLING_RATE));
+                    sleep(self.update);
 
                     // Return the message
                     format!(

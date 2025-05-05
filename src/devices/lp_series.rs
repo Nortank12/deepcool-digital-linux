@@ -181,18 +181,18 @@ mod dot_matrix {
 }
 
 pub const DEFAULT_MODE: Mode = Mode::CpuUsage;
-pub const POLLING_RATE: u64 = 750;
 
 pub struct Display {
     pub mode: Mode,
     pub secondary: Option<Mode>,
+    update: Duration,
     fahrenheit: bool,
     cpu: Cpu,
     gpu: Gpu,
 }
 
 impl Display {
-    pub fn new(mode: &Mode, secondary: &Mode, fahrenheit: bool) -> Self {
+    pub fn new(mode: &Mode, secondary: &Mode, update: Duration, fahrenheit: bool) -> Self {
         // Verify the display mode
         let mode = match mode {
             Mode::Default => DEFAULT_MODE,
@@ -219,6 +219,7 @@ impl Display {
         Display {
             mode,
             secondary,
+            update,
             fahrenheit,
             cpu: Cpu::new(),
             gpu: Gpu::new(),
@@ -253,7 +254,7 @@ impl Display {
             // Get initial CPU readings & wait
             let cpu_instant = self.cpu.read_instant();
             let cpu_energy = self.cpu.read_energy();
-            sleep(Duration::from_millis(POLLING_RATE));
+            sleep(self.update);
 
             // Set the pixels and calculate the bytes for the display
             match &self.secondary {
@@ -299,7 +300,7 @@ impl Display {
                 if self.fahrenheit { dot_matrix::Unit::Fahrenheit } else { dot_matrix::Unit::Celsius }
             ),
             Mode::CpuPower => (
-                self.cpu.get_power(cpu_energy, POLLING_RATE),
+                self.cpu.get_power(cpu_energy, self.update.as_millis() as u64),
                 dot_matrix::Unit::Watt
             ),
             Mode::GpuUsage => (
