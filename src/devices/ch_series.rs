@@ -1,7 +1,7 @@
 use crate::monitor::{cpu::Cpu, gpu::Gpu};
-use super::{device_error, Mode};
+use super::{device_error, Mode, AUTO_MODE_INTERVAL};
 use hidapi::HidApi;
-use std::{thread::sleep, time::Duration};
+use std::{thread::sleep, time::{Duration, Instant}};
 
 pub const DEFAULT_MODE: Mode = Mode::CpuTemperature;
 
@@ -63,22 +63,38 @@ impl Display {
 
         // Display loop
         match self.mode {
-            Mode::Auto => loop {
-                for _ in 0..8 {
-                    device.write(&self.status_message(&data, &Mode::CpuTemperature)).unwrap();
-                }
-                for _ in 0..8 {
-                    device.write(&self.status_message(&data, &Mode::CpuUsage)).unwrap();
+            Mode::Auto => {
+                let mut initial_update = self.update;
+                let mut mode = Mode::CpuTemperature;
+                loop {
+                    // Initial update
+                    device.write(&self.status_message(&data, &mode, initial_update)).unwrap();
+
+                    // Update until timeout
+                    let timeout = Instant::now() + AUTO_MODE_INTERVAL;
+                    while Instant::now() + self.update < timeout {
+                        device.write(&self.status_message(&data, &mode, self.update)).unwrap();
+                    }
+
+                    // Make the next initial update faster to fit the timeframe
+                    initial_update = timeout - Instant::now();
+
+                    // Switch to the next display mode
+                    mode = match mode {
+                        Mode::CpuTemperature => Mode::CpuUsage,
+                        Mode::CpuUsage => Mode::CpuTemperature,
+                        _ => DEFAULT_MODE,
+                    }
                 }
             }
             _ => loop {
-                device.write(&self.status_message(&data, &self.mode)).unwrap();
+                device.write(&self.status_message(&data, &self.mode, self.update)).unwrap();
             }
         }
     }
 
     /// Reads the CPU status information and returns the data packet.
-    fn status_message(&self, inital_data: &[u8; 64], mode: &Mode) -> [u8; 64] {
+    fn status_message(&self, inital_data: &[u8; 64], mode: &Mode, update: Duration) -> [u8; 64] {
         // Clone the data packet
         let mut data = inital_data.clone();
 
@@ -86,7 +102,7 @@ impl Display {
         let cpu_instant = self.cpu.read_instant();
 
         // Wait
-        sleep(self.update);
+        sleep(update);
 
         // Calculate CPU & GPU usage
         let cpu_usage = self.cpu.get_usage(cpu_instant);

@@ -4,9 +4,9 @@ version = 3
 
 [[package]]
 name = "cc"
-version = "1.2.20"
+version = "1.2.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "04da6a0d40b948dfc4fa8f5bbf402b0fc1a64a28dbf7d12ffd683550f2c1b63a"
+checksum = "8691782945451c1c383942c4874dbe63814f61cb57ef773cda2972682b7bb3c0"
 dependencies = [
  "shlex",
 ]
@@ -38,7 +38,7 @@ dependencies = [
 
 [[package]]
 name = "deepcool-digital-linux"
-version = "0.7.6"
+version = "0.8.0"
 dependencies = [
  "colored",
  "cpu-monitor",
