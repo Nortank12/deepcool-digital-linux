@@ -115,7 +115,7 @@
         <td>15</td>
         <td>ASSASSIN IV VC VISION</td>
         <td align="center">
-            No Table Yet
+            <a href="tables/lq-series.md">Mapping Table</a>
         </td>
     </tr>
     <tr>

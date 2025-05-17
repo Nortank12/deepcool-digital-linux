@@ -4,6 +4,11 @@ use hidapi::HidApi;
 use std::{process::exit, thread::sleep, time::Duration};
 
 pub const DEFAULT_MODE: Mode = Mode::Auto;
+// The temperature limits are hard-coded in the device
+pub const TEMP_WARNING_C: u8 = 80;
+pub const TEMP_WARNING_F: u8 = 176;
+pub const TEMP_LIMIT_C: u8 = 90;
+pub const TEMP_LIMIT_F: u8 = 194;
 
 pub struct Display {
     update: Duration,

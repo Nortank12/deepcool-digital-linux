@@ -138,7 +138,7 @@ sudo nixos-rebuild switch
     </tr>
     <tr>
         <td>ASSASSIN IV VC VISION</td>
-        <td align="center">❓</td>
+        <td align="center">✅</td>
     </tr>
 </table>
 

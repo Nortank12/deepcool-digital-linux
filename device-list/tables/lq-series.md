@@ -1,4 +1,4 @@
-# LQ Series Mapping Table
+# LQ Series / ASSASSIN IV Mapping Table
 <table>
     <tr>
         <th>DATA BYTE</th>

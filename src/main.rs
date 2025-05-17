@@ -186,8 +186,8 @@ fn main() {
             // Display loop
             lp_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
-        // LQ Series
-        13 => {
+        // LQ Series & ASSASSIN IV
+        13 | 15 => {
             println!("Supported modes: {}", "auto".bold());
             // Connect to device
             let lq_device = devices::lq_series::Display::new(args.update, args.fahrenheit);
@@ -196,7 +196,19 @@ fn main() {
                 &lq_series::DEFAULT_MODE,
                 None,
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
-                Alarm { state: AlarmState::NotSupported, temp_limit: 0, temp_warning: 0 },
+                Alarm {
+                    state: AlarmState::Auto,
+                    temp_limit: if args.fahrenheit {
+                        lq_series::TEMP_LIMIT_F
+                    } else {
+                        lq_series::TEMP_LIMIT_C
+                    },
+                    temp_warning: if args.fahrenheit {
+                        lq_series::TEMP_WARNING_F
+                    } else {
+                        lq_series::TEMP_WARNING_C
+                    },
+                },
                 args.update,
             );
             if args.mode != Mode::Default {
@@ -206,7 +218,7 @@ fn main() {
                 warning!("Secondary display mode is not supported, value will be ignored");
             }
             if args.alarm {
-                warning!("Alarm is not supported, value will be ignored");
+                warning!("The alarm is hard-coded in your device, value will be ignored");
             }
             // Display loop
             lq_device.run(&api, DEFAULT_VENDOR_ID, product_id);
