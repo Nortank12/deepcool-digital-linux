@@ -8,7 +8,7 @@
         <th>USB Data Bytes</th>
     </tr>
     <tr>
-        <td rowspan="30">13875</td>
+        <td rowspan="32">13875</td>
         <td>1</td>
         <td>AK400 DIGITAL</td>
         <td align="center" rowspan="4">
@@ -173,6 +173,18 @@
         <td>CH690 DIGITAL</td>
         <td align="center">
             <a href="tables/ch-series-gen2.md">Mapping Table</a>
+        </td>
+    </tr>
+    <tr>
+        <td>...</td>
+        <td>...</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>31</td>
+        <td>ASSASSIN IV VC VISION</td>
+        <td align="center">
+            <a href="tables/lq-series.md">Mapping Table</a>
         </td>
     </tr>
     <tr>

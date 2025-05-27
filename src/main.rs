@@ -187,7 +187,7 @@ fn main() {
             lp_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
         // LQ Series & ASSASSIN IV
-        13 | 15 => {
+        13 | 15 | 31 => {
             println!("Supported modes: {}", "auto".bold());
             // Connect to device
             let lq_device = devices::lq_series::Display::new(args.update, args.fahrenheit);
