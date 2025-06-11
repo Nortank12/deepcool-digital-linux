@@ -122,7 +122,7 @@ sudo nixos-rebuild switch
     </tr>
     <tr>
         <td>AK500 DIGITAL PRO</td>
-        <td align="center">❓</td>
+        <td align="center">✅</td>
     </tr>
     <tr>
         <td>AK500S DIGITAL</td>
