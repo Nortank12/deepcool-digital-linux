@@ -1,4 +1,4 @@
-# AK620 DIGITAL PRO Mapping Table
+# AK500 / AK620 DIGITAL PRO Mapping Table
 <table>
     <tr>
         <th>DATA BYTE</th>

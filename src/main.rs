@@ -260,8 +260,8 @@ fn main() {
             // Display loop
             ak400_pro.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
-        // AK620 PRO
-        18 => {
+        // AK500 / AK620 PRO
+        17 | 18 => {
             println!("Supported modes: {}", "auto".bold());
             // Connect to device
             let ak620_pro = devices::ak620_pro::Display::new(args.update, args.fahrenheit);

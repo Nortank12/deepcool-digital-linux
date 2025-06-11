@@ -127,8 +127,10 @@
     </tr>
     <tr>
         <td>17</td>
-        <td>...</td>
-        <td></td>
+        <td>AK500 DIGITAL PRO</td>
+        <td align="center">
+            <a href="tables/ak620-pro.md">Mapping Table</a>
+        </td>
     </tr>
     <tr>
         <td>18</td>
