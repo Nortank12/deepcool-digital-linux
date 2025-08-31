@@ -104,7 +104,7 @@ fn find_temp_sensor() -> String {
                 let path = sensor.unwrap().path().to_str().unwrap().to_owned();
                 match read_to_string(format!("{path}/name")) {
                     Ok(name) => {
-                        if ["coretemp", "k10temp", "zenpower"].contains(&name.trim_end()) {
+                        if ["asusec", "coretemp", "k10temp", "zenpower"].contains(&name.trim_end()) {
                             return format!("{path}/temp1_input");
                         }
                     }
