@@ -18,7 +18,7 @@ struct Utilization {
     memory: u32,
 }
 
-const LIB_PATHS: [&str; 10] = [
+const LIB_PATHS: [&str; 12] = [
     "/usr/lib/x86_64-linux-gnu/nvidia/current/libnvidia-ml.so",
     "/usr/lib/x86_64-linux-gnu/nvidia/current/libnvidia-ml.so.1",
     "/usr/lib/x86_64-linux-gnu/libnvidia-ml.so",
@@ -29,6 +29,8 @@ const LIB_PATHS: [&str; 10] = [
     "/usr/lib64/libnvidia-ml.so.1",
     "/usr/lib32/libnvidia-ml.so",
     "/usr/lib32/libnvidia-ml.so.1",
+    "/run/opengl-driver/lib/libnvidia-ml.so",
+    "/run/opengl-driver/lib/libnvidia-ml.so.1",
 ];
 
 pub struct Gpu {
