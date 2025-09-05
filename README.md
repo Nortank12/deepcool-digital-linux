@@ -60,6 +60,9 @@ SUBSYSTEM=="hidraw", ATTRS{idVendor}=="34d3", ATTRS{idProduct}=="1100", MODE="06
 <details>
 <summary><b>Steps for NixOS</b></summary>
 
+Use the flake from [this repository](https://github.com/mzonski/deepcool-digital-linux/)
+or
+
 1. Locate and edit your `configuration.nix` file
 ```bash
 sudo nano /etc/nixos/configuration.nix
