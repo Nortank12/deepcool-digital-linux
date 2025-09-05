@@ -147,6 +147,38 @@ mod dot_matrix {
         }
     }
 
+    /// Rotates the matrix values by a given degree.
+    pub fn rotate_matrix(matrix: &mut [[bool; 14]; 14], degrees: u16) {
+        let mut rotated = [[false; 14]; 14];
+        match degrees {
+            90 => {
+                for i in 0..14 {
+                    for j in 0..14 {
+                        rotated[j][13 - i] = matrix[i][j];
+                    }
+                }
+            }
+            180 => {
+                for i in 0..14 {
+                    for j in 0..14 {
+                        rotated[13 - i][13 - j] = matrix[i][j];
+                    }
+                }
+            }
+            270 => {
+                for i in 0..14 {
+                    for j in 0..14 {
+                        rotated[13 - j][i] = matrix[i][j];
+                    }
+                }
+            }
+            _ => {
+                return;
+            }
+        }
+        *matrix = rotated;
+    }
+
     /// Converts the 14x14 matrix to be data bytes.
     pub fn matrix_to_bytes(matrix: [[bool; 14]; 14]) -> [u8; 28] {
         let mut bytes: [u8; 28] = [0; 28];
@@ -187,12 +219,13 @@ pub struct Display {
     pub secondary: Option<Mode>,
     update: Duration,
     fahrenheit: bool,
+    rotate: u16,
     cpu: Cpu,
     gpu: Gpu,
 }
 
 impl Display {
-    pub fn new(mode: &Mode, secondary: &Mode, update: Duration, fahrenheit: bool) -> Self {
+    pub fn new(mode: &Mode, secondary: &Mode, update: Duration, fahrenheit: bool, rotate: u16) -> Self {
         // Verify the display mode
         let mode = match mode {
             Mode::Default => DEFAULT_MODE,
@@ -221,6 +254,7 @@ impl Display {
             secondary,
             update,
             fahrenheit,
+            rotate,
             cpu: Cpu::new(),
             gpu: Gpu::new(),
         }
@@ -269,7 +303,7 @@ impl Display {
                         8,
                         self.get_system_info(secondary, cpu_instant, cpu_energy)
                     );
-                },
+                }
                 None => {
                     self.insert_data_to_matrix(
                         &mut matrix,
@@ -277,6 +311,9 @@ impl Display {
                         self.get_system_info(&self.mode, cpu_instant, cpu_energy)
                     );
                 }
+            }
+            if self.rotate > 0 {
+                dot_matrix::rotate_matrix(&mut matrix, self.rotate);
             }
             status_data[6..=33].copy_from_slice(&dot_matrix::matrix_to_bytes(matrix));
 

@@ -1,6 +1,6 @@
 use crate::Mode;
-use std::time::Duration;
 use colored::*;
+use std::time::Duration;
 
 pub enum TemperatureUnit {
     Celsius,
@@ -29,11 +29,25 @@ pub struct Alarm {
     pub temp_warning: u8,
 }
 
-pub fn print_device_status(mode: &Mode, secondary: Option<&Mode>, temp_unit: TemperatureUnit, alarm: Alarm, update: Duration) {
+pub fn print_device_status(
+    mode: &Mode,
+    secondary: Option<&Mode>,
+    rotation: Option<u16>,
+    temp_unit: TemperatureUnit,
+    alarm: Alarm,
+    update: Duration,
+) {
     println!("-----");
     match secondary {
         Some(s) => println!("DISP. MODE: {} | {}", mode.symbol().bright_cyan(), s.symbol().bright_cyan()),
         None => println!("DISP. MODE: {}", mode.symbol().bright_cyan()),
+    }
+    if let Some(r) = rotation {
+        if r > 0 {
+            println!("ROTATION:   {}", format!("{r}°").bright_cyan());
+        } else {
+            println!("ROTATION:   {}", "none".bright_black());
+        }
     }
     println!("TEMP. UNIT: {}", temp_unit.symbol().bright_cyan());
     match alarm.state {

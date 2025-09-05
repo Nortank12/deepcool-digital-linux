@@ -4,9 +4,9 @@ mod utils;
 
 use colored::*;
 use devices::*;
-use utils::{args::Args, status::*};
 use hidapi::HidApi;
 use std::process::exit;
+use utils::{args::Args, status::*};
 
 /// Common warning checks for command arguments.
 mod common_warnings {
@@ -39,6 +39,12 @@ mod common_warnings {
     pub fn alarm_hardcoded(args: &Args) {
         if args.alarm {
             warning!("The alarm is hard-coded in your device, value will be ignored");
+        }
+    }
+
+    pub fn rotate(args: &Args) {
+        if args.rotate > 0 {
+            warning!("Display rotation is not supported, value will be ignored");
         }
     }
 }
@@ -90,6 +96,7 @@ fn main() {
             print_device_status(
                 &ak_device.mode,
                 None,
+                None,
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                 Alarm {
                     state: if args.alarm { AlarmState::On } else { AlarmState::Off },
@@ -103,6 +110,7 @@ fn main() {
                 args.update,
             );
             common_warnings::secondary_mode(&args);
+            common_warnings::rotate(&args);
             // Display loop
             ak_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -114,6 +122,7 @@ fn main() {
             // Print current configuration & warnings
             print_device_status(
                 &ls_device.mode,
+                None,
                 None,
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                 Alarm {
@@ -128,6 +137,7 @@ fn main() {
                 args.update,
             );
             common_warnings::secondary_mode(&args);
+            common_warnings::rotate(&args);
             // Display loop
             ls_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -140,6 +150,7 @@ fn main() {
             print_device_status(
                 &ag_device.mode,
                 None,
+                None,
                 TemperatureUnit::Celsius,
                 Alarm {
                     state: if args.alarm { AlarmState::On } else { AlarmState::Off },
@@ -150,6 +161,7 @@ fn main() {
             );
             common_warnings::secondary_mode(&args);
             common_warnings::fahrenheit(&args);
+            common_warnings::rotate(&args);
             // Display loop
             ag_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -161,6 +173,7 @@ fn main() {
             // Print current configuration & warnings
             print_device_status(
                 &ld_series::DEFAULT_MODE,
+                None,
                 None,
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                 Alarm {
@@ -177,6 +190,7 @@ fn main() {
             common_warnings::mode_change(&args);
             common_warnings::secondary_mode(&args);
             common_warnings::alarm_hardcoded(&args);
+            common_warnings::rotate(&args);
             // Display loop
             ld_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -192,11 +206,12 @@ fn main() {
                 "cpu_usage cpu_temp cpu_power gpu_usage gpu_temp gpu_power".bold()
             );
             // Connect to device
-            let lp_device = lp_series::Display::new(&args.mode, &args.secondary, args.update, args.fahrenheit);
+            let lp_device = lp_series::Display::new(&args.mode, &args.secondary, args.update, args.fahrenheit, args.rotate);
             // Print current configuration & warnings
             print_device_status(
                 &lp_device.mode,
                 lp_device.secondary.as_ref(),
+                Some(args.rotate),
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                 Alarm { state: AlarmState::NotSupported, temp_limit: 0, temp_warning: 0 },
                 args.update,
@@ -213,6 +228,7 @@ fn main() {
             // Print current configuration & warnings
             print_device_status(
                 &lq_series::DEFAULT_MODE,
+                None,
                 None,
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                 Alarm {
@@ -233,6 +249,7 @@ fn main() {
             common_warnings::mode_change(&args);
             common_warnings::secondary_mode(&args);
             common_warnings::alarm_hardcoded(&args);
+            common_warnings::rotate(&args);
             // Display loop
             lq_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -244,6 +261,7 @@ fn main() {
             // Print current configuration & warnings
             print_device_status(
                 &ak400_pro::DEFAULT_MODE,
+                None,
                 None,
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                 Alarm {
@@ -264,6 +282,7 @@ fn main() {
             common_warnings::mode_change(&args);
             common_warnings::secondary_mode(&args);
             common_warnings::alarm_hardcoded(&args);
+            common_warnings::rotate(&args);
             // Display loop
             ak400_pro.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -275,6 +294,7 @@ fn main() {
             // Print current configuration & warnings
             print_device_status(
                 &ak620_pro::DEFAULT_MODE,
+                None,
                 None,
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                 Alarm {
@@ -295,6 +315,7 @@ fn main() {
             common_warnings::mode_change(&args);
             common_warnings::secondary_mode(&args);
             common_warnings::alarm_hardcoded(&args);
+            common_warnings::rotate(&args);
             // Display loop
             ak620_pro.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -321,12 +342,14 @@ fn main() {
             print_device_status(
                 &ch_gen2_device.mode,
                 None,
+                None,
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                 Alarm { state: AlarmState::NotSupported, temp_limit: 0, temp_warning: 0 },
                 args.update,
             );
             common_warnings::secondary_mode(&args);
             common_warnings::alarm(&args);
+            common_warnings::rotate(&args);
             // Display loop
             ch_gen2_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -340,11 +363,13 @@ fn main() {
             print_device_status(
                 &ch_device.mode,
                 Some(&ch_device.secondary),
+                None,
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                 Alarm { state: AlarmState::NotSupported, temp_limit: 0, temp_warning: 0 },
                 args.update,
             );
             common_warnings::alarm(&args);
+            common_warnings::rotate(&args);
             // Display loop
             ch_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -357,12 +382,14 @@ fn main() {
             print_device_status(
                 &ch510.mode,
                 None,
+                None,
                 if args.fahrenheit { TemperatureUnit::Fahrenheit } else { TemperatureUnit::Celsius },
                 Alarm { state: AlarmState::NotSupported, temp_limit: 0, temp_warning: 0 },
                 args.update,
             );
             common_warnings::secondary_mode(&args);
             common_warnings::alarm(&args);
+            common_warnings::rotate(&args);
             // Display loop
             ch510.run(&api, CH510_VENDOR_ID, product_id);
         }

@@ -10,6 +10,7 @@ pub struct Args {
     pub update: Duration,
     pub fahrenheit: bool,
     pub alarm: bool,
+    pub rotate: u16,
 }
 
 impl Args {
@@ -21,6 +22,7 @@ impl Args {
         let mut update = Duration::from_millis(1000);
         let mut fahrenheit = false;
         let mut alarm = false;
+        let mut rotate = 0;
 
         let mut i = 1;
         while i < args.len() {
@@ -80,9 +82,9 @@ impl Args {
                 "-u" | "--update" => {
                     if i + 1 < args.len() {
                         match args[i + 1].parse::<u64>() {
-                            Ok(num) => {
-                                if num >= 100 && num <= 2000 {
-                                    update = Duration::from_millis(num);
+                            Ok(val) => {
+                                if val >= 100 && val <= 2000 {
+                                    update = Duration::from_millis(val);
                                     i += 1;
                                 } else {
                                     error!("Update interval must be between 100 and 2000");
@@ -104,6 +106,28 @@ impl Args {
                 }
                 "-a" | "--alarm" => {
                     alarm = true;
+                }
+                "-r" | "--rotate" => {
+                    if i + 1 < args.len() {
+                        match args[i + 1].parse::<u16>() {
+                            Ok(val) => {
+                                if [90, 180, 270].contains(&val) {
+                                    rotate = val;
+                                    i += 1;
+                                } else {
+                                    error!("Rotation value must be one of 90, 180, or 270");
+                                    exit(1);
+                                }
+                            }
+                            Err(_) => {
+                                error!("Invalid rotation value");
+                                exit(1);
+                            }
+                        }
+                    } else {
+                        error!("--rotate requires a value");
+                        exit(1);
+                    }
                 }
                 "-l" | "--list" => {
                     println!("Device list [{} | {}]", "PID".bright_green().bold(), "Name".bright_green());
@@ -145,6 +169,7 @@ impl Args {
                     println!("\n  {}, {} <MILLISEC> Change the update interval of the display [default: 1000]", "-u".bold(), "--update".bold());
                     println!("  {}, {}        Change the temperature unit to °F", "-f".bold(), "--fahrenheit".bold());
                     println!("  {}, {}             Enable the alarm", "-a".bold(), "--alarm".bold());
+                    println!("  {}, {} <DEGREE>   Rotate the display (LP Series only)", "-r".bold(), "--rotate".bold());
                     println!("\n{}", "Commands:".bold());
                     println!("  {}, {}         Print Product ID of the connected devices", "-l".bold(), "--list".bold());
                     println!("  {}, {}         Print help", "-h".bold(), "--help".bold());
@@ -191,9 +216,9 @@ impl Args {
                             'u' => {
                                 if i + 1 < args.len() && args[i].ends_with('u') {
                                     match args[i + 1].parse::<u64>() {
-                                        Ok(num) => {
-                                            if num >= 100 && num <= 2000 {
-                                                update = Duration::from_millis(num);
+                                        Ok(val) => {
+                                            if val >= 100 && val <= 2000 {
+                                                update = Duration::from_millis(val);
                                                 i += 1;
                                             } else {
                                                 error!("Update interval must be between 100 and 2000");
@@ -202,6 +227,28 @@ impl Args {
                                         }
                                         Err(_) => {
                                             error!("Invalid update interval");
+                                            exit(1);
+                                        }
+                                    }
+                                } else {
+                                    error!("--update requires a value");
+                                    exit(1);
+                                }
+                            }
+                            'r' => {
+                                if i + 1 < args.len() && args[i].ends_with('r') {
+                                    match args[i + 1].parse::<u16>() {
+                                        Ok(val) => {
+                                            if [90, 180, 270].contains(&val) {
+                                                rotate = val;
+                                                i += 1;
+                                            } else {
+                                                error!("Rotation value must be one of 90, 180, or 270");
+                                                exit(1);
+                                            }
+                                        }
+                                        Err(_) => {
+                                            error!("Invalid rotation value");
                                             exit(1);
                                         }
                                     }
@@ -238,6 +285,7 @@ impl Args {
             update,
             fahrenheit,
             alarm,
+            rotate,
         }
     }
 }
