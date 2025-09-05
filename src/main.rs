@@ -8,6 +8,41 @@ use utils::{args::Args, status::*};
 use hidapi::HidApi;
 use std::process::exit;
 
+/// Common warning checks for command arguments.
+mod common_warnings {
+    use crate::{devices::Mode, utils::args::Args, warning};
+
+    pub fn mode_change(args: &Args) {
+        if args.mode != Mode::Default {
+            warning!("Display mode cannot be changed, value will be ignored");
+        }
+    }
+
+    pub fn secondary_mode(args: &Args) {
+        if args.secondary != Mode::Default {
+            warning!("Secondary display mode is not supported, value will be ignored");
+        }
+    }
+
+    pub fn fahrenheit(args: &Args) {
+        if args.fahrenheit {
+            warning!("Displaying ˚F is not supported, value will be ignored");
+        }
+    }
+
+    pub fn alarm(args: &Args) {
+        if args.alarm {
+            warning!("Alarm is not supported, value will be ignored");
+        }
+    }
+
+    pub fn alarm_hardcoded(args: &Args) {
+        if args.alarm {
+            warning!("The alarm is hard-coded in your device, value will be ignored");
+        }
+    }
+}
+
 fn main() {
     // Read args
     let args = Args::read();
@@ -67,9 +102,7 @@ fn main() {
                 },
                 args.update,
             );
-            if args.secondary != Mode::Default {
-                warning!("Secondary display mode is not supported, value will be ignored");
-            }
+            common_warnings::secondary_mode(&args);
             // Display loop
             ak_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -94,9 +127,7 @@ fn main() {
                 },
                 args.update,
             );
-            if args.secondary != Mode::Default {
-                warning!("Secondary display mode is not supported, value will be ignored");
-            }
+            common_warnings::secondary_mode(&args);
             // Display loop
             ls_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -117,12 +148,8 @@ fn main() {
                 },
                 args.update,
             );
-            if args.secondary != Mode::Default {
-                warning!("Secondary display mode is not supported, value will be ignored");
-            }
-            if args.fahrenheit {
-                warning!("Displaying ˚F is not supported, value will be ignored");
-            }
+            common_warnings::secondary_mode(&args);
+            common_warnings::fahrenheit(&args);
             // Display loop
             ag_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -147,15 +174,9 @@ fn main() {
                 },
                 args.update,
             );
-            if args.mode != Mode::Default {
-                warning!("Display mode cannot be changed, value will be ignored");
-            }
-            if args.secondary != Mode::Default {
-                warning!("Secondary display mode is not supported, value will be ignored");
-            }
-            if args.alarm {
-                warning!("The alarm is hard-coded in your device, value will be ignored");
-            }
+            common_warnings::mode_change(&args);
+            common_warnings::secondary_mode(&args);
+            common_warnings::alarm_hardcoded(&args);
             // Display loop
             ld_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -180,9 +201,7 @@ fn main() {
                 Alarm { state: AlarmState::NotSupported, temp_limit: 0, temp_warning: 0 },
                 args.update,
             );
-            if args.alarm {
-                warning!("Alarm is not supported, value will be ignored");
-            }
+            common_warnings::alarm(&args);
             // Display loop
             lp_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -211,15 +230,9 @@ fn main() {
                 },
                 args.update,
             );
-            if args.mode != Mode::Default {
-                warning!("Display mode cannot be changed, value will be ignored");
-            }
-            if args.secondary != Mode::Default {
-                warning!("Secondary display mode is not supported, value will be ignored");
-            }
-            if args.alarm {
-                warning!("The alarm is hard-coded in your device, value will be ignored");
-            }
+            common_warnings::mode_change(&args);
+            common_warnings::secondary_mode(&args);
+            common_warnings::alarm_hardcoded(&args);
             // Display loop
             lq_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -248,15 +261,9 @@ fn main() {
                 },
                 args.update,
             );
-            if args.mode != Mode::Default {
-                warning!("Display mode cannot be changed, value will be ignored");
-            }
-            if args.secondary != Mode::Default {
-                warning!("Secondary display mode is not supported, value will be ignored");
-            }
-            if args.alarm {
-                warning!("The alarm is hard-coded in your device, value will be ignored");
-            }
+            common_warnings::mode_change(&args);
+            common_warnings::secondary_mode(&args);
+            common_warnings::alarm_hardcoded(&args);
             // Display loop
             ak400_pro.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -285,15 +292,9 @@ fn main() {
                 },
                 args.update,
             );
-            if args.mode != Mode::Default {
-                warning!("Display mode cannot be changed, value will be ignored");
-            }
-            if args.secondary != Mode::Default {
-                warning!("Secondary display mode is not supported, value will be ignored");
-            }
-            if args.alarm {
-                warning!("The alarm is hard-coded in your device, value will be ignored");
-            }
+            common_warnings::mode_change(&args);
+            common_warnings::secondary_mode(&args);
+            common_warnings::alarm_hardcoded(&args);
             // Display loop
             ak620_pro.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -324,12 +325,8 @@ fn main() {
                 Alarm { state: AlarmState::NotSupported, temp_limit: 0, temp_warning: 0 },
                 args.update,
             );
-            if args.secondary != Mode::Default {
-                warning!("Secondary display mode is not supported, value will be ignored");
-            }
-            if args.alarm {
-                warning!("Alarm is not supported, value will be ignored");
-            }
+            common_warnings::secondary_mode(&args);
+            common_warnings::alarm(&args);
             // Display loop
             ch_gen2_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -347,9 +344,7 @@ fn main() {
                 Alarm { state: AlarmState::NotSupported, temp_limit: 0, temp_warning: 0 },
                 args.update,
             );
-            if args.alarm {
-                warning!("Alarm is not supported, value will be ignored");
-            }
+            common_warnings::alarm(&args);
             // Display loop
             ch_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -366,12 +361,8 @@ fn main() {
                 Alarm { state: AlarmState::NotSupported, temp_limit: 0, temp_warning: 0 },
                 args.update,
             );
-            if args.secondary != Mode::Default {
-                warning!("Secondary display mode is not supported, value will be ignored");
-            }
-            if args.alarm {
-                warning!("Alarm is not supported, value will be ignored");
-            }
+            common_warnings::secondary_mode(&args);
+            common_warnings::alarm(&args);
             // Display loop
             ch510.run(&api, CH510_VENDOR_ID, product_id);
         }
