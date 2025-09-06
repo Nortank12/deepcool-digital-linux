@@ -27,8 +27,8 @@ chmod +x deepcool-digital-linux
 You will need root permission to send data to the device.
 
 > [!TIP]
-> On AMD's Zen architecture CPUs, you can install the [zenpower3](https://github.com/PutinVladimir/zenpower3)
-> driver, to have a more accurate reading of the CPU die.
+> For more accurate CPU temperature monitoring, you can use the [zenpower3](https://github.com/PutinVladimir/zenpower3)
+> or [asus-ec-sensors](https://github.com/zeule/asus-ec-sensors) kernel modules on supported hardware.
 
 > [!NOTE]
 > On Intel's Arc GPUs, you have to use kernel version 6.13 or higher for proper temperature monitoring.
@@ -60,9 +60,8 @@ SUBSYSTEM=="hidraw", ATTRS{idVendor}=="34d3", ATTRS{idProduct}=="1100", MODE="06
 <details>
 <summary><b>Steps for NixOS</b></summary>
 
-Use the flake from [this repository](https://github.com/mzonski/deepcool-digital-linux/)
-or
-
+#### Use the flake from [this repository](https://github.com/mzonski/deepcool-digital-linux/)
+-- or --
 1. Locate and edit your `configuration.nix` file
 ```bash
 sudo nano /etc/nixos/configuration.nix
@@ -161,11 +160,11 @@ sudo nixos-rebuild switch
     </tr>
     <tr>
         <td>LP240</td>
-        <td align="center">⚠️</td>
+        <td align="center">✔️</td>
     </tr>
     <tr>
         <td>LP360</td>
-        <td align="center">⚠️</td>
+        <td align="center">✔️</td>
     </tr>
     <tr>
         <td>LQ240</td>
@@ -251,6 +250,7 @@ Options:
   -u, --update <MILLISEC> Change the update interval of the display [default: 1000]
   -f, --fahrenheit        Change the temperature unit to °F
   -a, --alarm             Enable the alarm
+  -r, --rotate <DEGREE>   Rotate the display (LP Series only)
 
 Commands:
   -l, --list         Print Product ID of the connected devices

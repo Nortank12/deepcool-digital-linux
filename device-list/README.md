@@ -128,16 +128,13 @@
     <tr>
         <td>17</td>
         <td>AK500 DIGITAL PRO</td>
-        <td align="center">
+        <td align="center" rowspan="2">
             <a href="tables/ak620-pro.md">Mapping Table</a>
         </td>
     </tr>
     <tr>
         <td>18</td>
         <td>AK620 DIGITAL PRO</td>
-        <td align="center">
-            <a href="tables/ak620-pro.md">Mapping Table</a>
-        </td>
     </tr>
     <tr>
         <td>19</td>
