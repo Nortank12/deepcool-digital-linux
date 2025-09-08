@@ -1,16 +1,17 @@
-//! Reads live data from an AMD, NVIDIA, or Intel Arc GPU.
+//! Reads live data from an AMD, Intel, or NVIDIA GPU.
 
 mod amd;
-mod nvidia;
 mod intel;
+mod nvidia;
+pub mod pci;
 
 use crate::{error, warning};
 use std::{fs::read_to_string, process::exit};
 
 pub enum Gpu {
     Amd(amd::Gpu),
-    Nvidia(nvidia::Gpu),
     Intel(intel::Gpu),
+    Nvidia(nvidia::Gpu),
     None,
 }
 
@@ -31,8 +32,8 @@ impl Gpu {
     pub fn get_temp(&self, fahrenheit: bool) -> u8 {
         match &self {
             Gpu::Amd(amd) => amd.get_temp(fahrenheit),
-            Gpu::Nvidia(nvidia) => nvidia.get_temp(fahrenheit),
             Gpu::Intel(intel) => intel.get_temp(fahrenheit),
+            Gpu::Nvidia(nvidia) => nvidia.get_temp(fahrenheit),
             Gpu::None => 0,
         }
     }
@@ -40,8 +41,8 @@ impl Gpu {
     pub fn get_usage(&self) -> u8 {
         match &self {
             Gpu::Amd(amd) => amd.get_usage(),
-            Gpu::Nvidia(nvidia) => nvidia.get_usage(),
             Gpu::Intel(intel) => intel.get_usage(),
+            Gpu::Nvidia(nvidia) => nvidia.get_usage(),
             Gpu::None => 0,
         }
     }
@@ -49,8 +50,8 @@ impl Gpu {
     pub fn get_power(&self) -> u16 {
         match &self {
             Gpu::Amd(amd) => amd.get_power(),
-            Gpu::Nvidia(nvidia) => nvidia.get_power(),
             Gpu::Intel(intel) => intel.get_power(),
+            Gpu::Nvidia(nvidia) => nvidia.get_power(),
             Gpu::None => 0,
         }
     }
@@ -58,8 +59,8 @@ impl Gpu {
     pub fn get_frequency(&self) -> u16 {
         match &self {
             Gpu::Amd(amd) => amd.get_frequency(),
-            Gpu::Nvidia(nvidia) => nvidia.get_frequency(),
             Gpu::Intel(intel) => intel.get_frequency(),
+            Gpu::Nvidia(nvidia) => nvidia.get_frequency(),
             Gpu::None => 0,
         }
     }

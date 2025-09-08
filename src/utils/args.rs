@@ -1,7 +1,7 @@
-use crate::{devices::Mode, error, CH510_PRODUCT_ID, CH510_VENDOR_ID, DEFAULT_VENDOR_ID};
+use crate::{devices::Mode, error, monitor::gpu::pci::get_gpu_list, CH510_PRODUCT_ID, CH510_VENDOR_ID, DEFAULT_VENDOR_ID};
 use colored::*;
 use hidapi::HidApi;
-use std::{env::args, process::exit, time::Duration};
+use std::{collections::HashMap, env::args, process::exit, time::Duration};
 
 pub struct Args {
     pub mode: Mode,
@@ -155,8 +155,27 @@ impl Args {
                         }
                     }
                     if products == 0 {
-                        error!("No DeepCool device was found");
-                        exit(1);
+                        println!("{}", "No DeepCool device was found".bright_black().italic());
+                    }
+                    exit(0);
+                }
+                "-g" | "--gpulist" => {
+                    println!("GPU list [{} | {} {}]", "ID".bright_green().bold(), "Name".bright_green(), "(PCI Address)".bright_black());
+                    println!("-----");
+                    let gpus = get_gpu_list();
+                    let mut gpu_ids = HashMap::new();
+                    for gpu in &gpus {
+                        let nth = gpu_ids.entry(&gpu.vendor).or_insert(0 as u8);
+                        *nth += 1;
+                        println!(
+                            "{} | {} {}",
+                            format!("{}:{}", gpu.vendor.name().to_lowercase(), *nth).bright_green().bold(),
+                            gpu.name.bright_green(),
+                            format!("({})", gpu.address).bright_black(),
+                        );
+                    }
+                    if gpus.len() == 0 {
+                        println!("{}", "No GPUs were found".bright_black().italic())
                     }
                     exit(0);
                 }
@@ -172,6 +191,7 @@ impl Args {
                     println!("  {}, {} <DEGREE>   Rotate the display (LP Series only)", "-r".bold(), "--rotate".bold());
                     println!("\n{}", "Commands:".bold());
                     println!("  {}, {}         Print Product ID of the connected devices", "-l".bold(), "--list".bold());
+                    println!("  {}, {}      Print all available GPUs", "-g".bold(), "--gpulist".bold());
                     println!("  {}, {}         Print help", "-h".bold(), "--help".bold());
                     println!("  {}, {}      Print version", "-v".bold(), "--version".bold());
                     exit(0);
