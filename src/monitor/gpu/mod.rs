@@ -18,7 +18,7 @@ impl Gpu {
     pub fn new(pci_device: Option<PciDevice>) -> Self {
         match pci_device {
             Some(gpu) => match gpu.vendor {
-                pci::Vendor::Amd => Gpu::Amd(amd::Gpu::new()),
+                pci::Vendor::Amd => Gpu::Amd(amd::Gpu::new(&gpu.address)),
                 pci::Vendor::Intel => Gpu::Intel(intel::Gpu::new()),
                 pci::Vendor::Nvidia => Gpu::Nvidia(nvidia::Gpu::new(&gpu.address)),
             }

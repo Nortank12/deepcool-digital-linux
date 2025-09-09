@@ -1,19 +1,34 @@
-//! Reads live GPU data from the Linux kernel.
+//! Reads live GPU data from the Linux kernel. Supports both GPUs and iGPUs (APU).
 
 use crate::error;
 use std::{fs::read_dir, fs::read_to_string, process::exit};
 
 pub struct Gpu {
-    hwmon_dir: String,
     usage_file: String,
+    hwmon_dir: String,
 }
 
 impl Gpu {
-    pub fn new() -> Self {
-        Gpu {
-            hwmon_dir: find_hwmon_dir(),
-            usage_file: find_card(),
-        }
+    pub fn new(pci_address: &str) -> Self {
+        let path = format!("/sys/bus/pci/devices/{}", pci_address);
+
+        let usage_file = match find_card(&path) {
+            Some(file) => file,
+            None => {
+                error!(format!("Failed access GPU (AMD) PCI_ADDR={pci_address}"));
+                exit(1);
+            }
+        };
+
+        let hwmon_dir = match find_hwmon_dir(&path) {
+            Some(dir) => dir,
+            None => {
+                error!("Failed to locate GPU temperature sensor (AMD)");
+                exit(1);
+            }
+        };
+
+        Gpu { usage_file, hwmon_dir }
     }
 
     /// Reads the value of the GPU temperature sensor and calculates it to be `˚C` or `˚F`.
@@ -66,47 +81,26 @@ impl Gpu {
     }
 }
 
-/// Looks for the hwmon folder of the AMD GPU.
-fn find_hwmon_dir() -> String {
-    match read_dir("/sys/class/hwmon") {
-        Ok(sensors) => {
-            for sensor in sensors {
-                let path = sensor.unwrap().path().to_str().unwrap().to_owned();
-                match read_to_string(format!("{path}/name")) {
-                    Ok(name) => {
-                        if name.starts_with("amdgpu") {
-                            return path;
-                        }
-                    }
-                    Err(_) => (),
-                }
-            }
+/// Confirms that the provided path belongs to an AMD GPU and returns the path of the "GPU Usage" file.
+fn find_card(path: &str) -> Option<String> {
+    match read_to_string(format!("{path}/uevent")) {
+        Ok(data) => {
+            let driver = data.lines().next()?;
+            if driver.ends_with("amdgpu") { Some(format!("{path}/gpu_busy_percent")) }
+            else { None }
         }
-        Err(_) => (),
+        Err(_) => None,
     }
-    error!("Failed to locate GPU temperature sensor (AMD)");
-    exit(1);
 }
 
-/// Looks for the PCI device folder of the AMD GPU.
-fn find_card() -> String {
-    match read_dir("/sys/bus/pci/devices") {
-        Ok(devices) => {
-            for device in devices {
-                let path = device.unwrap().path().to_str().unwrap().to_owned();
-                match read_to_string(format!("{path}/uevent")) {
-                    Ok(data) => {
-                        let driver = data.lines().next().unwrap();
-                        if driver.ends_with("amdgpu") {
-                            return format!("{path}/gpu_busy_percent");
-                        }
-                    }
-                    Err(_) => (),
-                }
-            }
+/// Looks for the hwmon directory of the AMD GPU.
+fn find_hwmon_dir(path: &str) -> Option<String> {
+    let hwmon_path = read_dir(format!("{path}/hwmon")).ok()?.next()?.ok()?.path();
+    match read_to_string(hwmon_path.join("name")) {
+        Ok(name) => {
+            if name.starts_with("amdgpu") { Some(hwmon_path.to_str()?.to_owned()) }
+            else { None }
         }
-        Err(_) => (),
+        Err(_) => None,
     }
-    error!("PCI data was not found (AMD)");
-    exit(1);
 }
