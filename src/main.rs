@@ -5,6 +5,7 @@ mod utils;
 use colored::*;
 use devices::*;
 use hidapi::HidApi;
+use monitor::gpu;
 use std::process::exit;
 use utils::{args::Args, status::*};
 
@@ -84,6 +85,40 @@ fn main() {
         }
         exit(1);
     }
+
+    // Find dedicated or integrated GPU
+    let pci_device = {
+        // Get list of GPUs
+        let gpus = gpu::pci::get_gpu_list();
+        if gpus.is_empty() {
+            None
+        } else {
+            match args.gpuid {
+                // Look for the nth GPU of the specified vendor
+                Some((vendor, id)) => {
+                    let mut nth = 1;
+                    let mut device = None;
+                    if id > 0 {
+                        // Match dedicated GPU
+                        for gpu in gpus.iter() {
+                            if gpu.vendor == vendor && gpu.bus > 0 {
+                                if nth == id { device = Some(gpu.clone()); break; }
+                                else { nth += 1; }
+                            }
+                        }
+                    } else {
+                        // Match integrated (first) GPU
+                        let first_gpu = gpus.first().unwrap();
+                        if first_gpu.vendor == vendor && first_gpu.bus == 0 { device = Some(first_gpu.clone()) }
+                    }
+                    device.or_else(|| { error!("No GPU was found with the specified GPUID"); exit(1) })
+                },
+                // Find the first dedicated GPU if present; otherwise, use the iGPU
+                None => gpus.iter().find(|gpu| gpu.bus > 0).cloned().or_else(|| gpus.first().cloned()),
+            }
+        }
+    };
+    let gpu = gpu::Gpu::new(pci_device);
 
     // Connect to device and send datastream
     match product_id {
@@ -206,7 +241,7 @@ fn main() {
                 "cpu_usage cpu_temp cpu_power gpu_usage gpu_temp gpu_power".bold()
             );
             // Connect to device
-            let lp_device = lp_series::Display::new(&args.mode, &args.secondary, args.update, args.fahrenheit, args.rotate);
+            let lp_device = lp_series::Display::new(&args.mode, &args.secondary, args.update, args.fahrenheit, args.rotate, gpu);
             // Print current configuration & warnings
             print_device_status(
                 &lp_device.mode,
@@ -337,7 +372,7 @@ fn main() {
                 warning!("Display mode \"auto\" only cycles between fully supported modes");
             }
             // Connect to device
-            let ch_gen2_device = ch_series_gen2::Display::new(&args.mode, args.update, args.fahrenheit);
+            let ch_gen2_device = ch_series_gen2::Display::new(&args.mode, args.update, args.fahrenheit, gpu);
             // Print current configuration & warnings
             print_device_status(
                 &ch_gen2_device.mode,
@@ -358,7 +393,7 @@ fn main() {
             println!("Supported modes: {} [default: {}]", "auto cpu_temp cpu_usage".bold(), ch_series::DEFAULT_MODE.symbol());
             println!("Supported secondary: {}", "gpu_temp gpu_usage".bold());
             // Connect to device
-            let ch_device = ch_series::Display::new(&args.mode, &args.secondary, args.update, args.fahrenheit);
+            let ch_device = ch_series::Display::new(&args.mode, &args.secondary, args.update, args.fahrenheit, gpu);
             // Print current configuration & warnings
             print_device_status(
                 &ch_device.mode,
@@ -377,7 +412,7 @@ fn main() {
         CH510_PRODUCT_ID => {
             println!("Supported modes: {} [default: {}]", "cpu gpu".bold(), ch510::DEFAULT_MODE.symbol());
             // Connect to device
-            let ch510 = ch510::Display::new(&args.mode, args.update, args.fahrenheit);
+            let ch510 = ch510::Display::new(&args.mode, args.update, args.fahrenheit, gpu);
             // Print current configuration & warnings
             print_device_status(
                 &ch510.mode,

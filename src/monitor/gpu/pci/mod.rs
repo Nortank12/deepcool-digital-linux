@@ -20,11 +20,21 @@ impl Vendor {
             Vendor::Nvidia => "NVIDIA",
         }
     }
+
+    pub fn get(symbol: &str) -> Option<Vendor> {
+        match symbol {
+            "amd" => Some(Self::Amd),
+            "intel" => Some(Self::Intel),
+            "nvidia" => Some(Self::Nvidia),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Clone)]
 pub struct PciDevice {
     pub vendor: Vendor,
+    pub bus: u8,
     pub address: String,
     pub name: String,
 }
@@ -48,7 +58,6 @@ fn parse_pci_id(id: &str) -> Option<(u16, u16)> {
     let device = u16::from_str_radix(parts.next()?, 16).ok()?;
     Some((vendor, device))
 }
-
 
 /// Get all GPUs from the PCI bus.
 pub fn get_gpu_list() -> Vec<PciDevice> {
@@ -113,6 +122,7 @@ pub fn get_gpu_list() -> Vec<PciDevice> {
                         gpus.push(
                             PciDevice {
                                 vendor,
+                                bus: pci_addr.1,
                                 address: pci_addr_str,
                                 name: gpu_name
                             }

@@ -245,7 +245,8 @@ sudo ./deepcool-digital-linux [OPTIONS]
 Options:
   -m, --mode <MODE>       Change the display mode of your device
   -s, --secondary <MODE>  Change the secondary display mode of your device (if supported)
-      --pid <ID>          Specify the Product ID if you use mutiple devices
+      --pid <ID>          Specify the Product ID if multiple devices are connected
+      --gpuid <VENDOR:ID> Specify the nth GPU of a specific vendor to monitor (use ID 0 for integrated GPU)
 
   -u, --update <MILLISEC> Change the update interval of the display [default: 1000]
   -f, --fahrenheit        Change the temperature unit to °F
@@ -254,6 +255,7 @@ Options:
 
 Commands:
   -l, --list         Print Product ID of the connected devices
+  -g, --gpulist      Print all available GPUs
   -h, --help         Print help
   -v, --version      Print version
 ```

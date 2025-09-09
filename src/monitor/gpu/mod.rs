@@ -5,8 +5,7 @@ mod intel;
 mod nvidia;
 pub mod pci;
 
-use crate::{error, warning};
-use std::{fs::read_to_string, process::exit};
+use crate::monitor::gpu::pci::PciDevice;
 
 pub enum Gpu {
     Amd(amd::Gpu),
@@ -16,16 +15,14 @@ pub enum Gpu {
 }
 
 impl Gpu {
-    pub fn new() -> Self {
-        match get_vendor().as_str() {
-            "amd" => Gpu::Amd(amd::Gpu::new()),
-            "nvidia" => Gpu::Nvidia(nvidia::Gpu::new()),
-            "intel" => Gpu::Intel(intel::Gpu::new()),
-            _ => {
-                warning!("No dedicated GPU was found");
-                eprintln!("         GPU information will not be displayed.");
-                return Gpu::None;
+    pub fn new(pci_device: Option<PciDevice>) -> Self {
+        match pci_device {
+            Some(gpu) => match gpu.vendor {
+                pci::Vendor::Amd => Gpu::Amd(amd::Gpu::new()),
+                pci::Vendor::Intel => Gpu::Intel(intel::Gpu::new()),
+                pci::Vendor::Nvidia => Gpu::Nvidia(nvidia::Gpu::new(&gpu.address)),
             }
+            None => Gpu::None,
         }
     }
 
@@ -64,30 +61,4 @@ impl Gpu {
             Gpu::None => 0,
         }
     }
-}
-
-/// Get GPU vendor from PCI device list.
-fn get_vendor() -> String {
-    let pci_devices = read_to_string("/proc/bus/pci/devices").unwrap_or_else(|_| {
-        error!("Cannot read PCI devices");
-        exit(1);
-    });
-
-    for device in pci_devices.lines() {
-        if device.ends_with("amdgpu") {
-            return "amd".to_owned();
-        } else if device.ends_with("nvidia") {
-            return "nvidia".to_owned();
-        } else if device.ends_with("i915") {
-            let pci_id = device.split("\t").nth(1).unwrap();
-            // Check the first 2 digits of the device ID:
-            // 56xx: Arc A-Series
-            // E2xx: Arc B-Series
-            if ["56", "e2"].contains(&&pci_id[4..6]) {
-                return "intel".to_owned();
-            }
-        }
-    }
-
-    "".to_owned()
 }

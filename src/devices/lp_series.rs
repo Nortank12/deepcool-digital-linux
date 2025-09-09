@@ -225,7 +225,7 @@ pub struct Display {
 }
 
 impl Display {
-    pub fn new(mode: &Mode, secondary: &Mode, update: Duration, fahrenheit: bool, rotate: u16) -> Self {
+    pub fn new(mode: &Mode, secondary: &Mode, update: Duration, fahrenheit: bool, rotate: u16, gpu: Gpu) -> Self {
         // Verify the display mode
         let mode = match mode {
             Mode::Default => DEFAULT_MODE,
@@ -256,7 +256,7 @@ impl Display {
             fahrenheit,
             rotate,
             cpu: Cpu::new(),
-            gpu: Gpu::new(),
+            gpu,
         }
     }
 
