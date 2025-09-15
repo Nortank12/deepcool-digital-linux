@@ -4,15 +4,33 @@ use crate::error;
 use std::{fs::read_dir, fs::read_to_string, process::exit};
 
 pub struct Gpu {
-    hwmon_dir: String,
     drm_dir: String,
+    hwmon_dir: String,
 }
 
 impl Gpu {
-    pub fn new() -> Self {
+    pub fn new(pci_address: &str) -> Self {
+        let path = format!("/sys/bus/pci/devices/{pci_address}");
+
+        let drm_dir = match find_drm_dir(&path) {
+            Some(dir) => dir,
+            None => {
+                error!(format!("Failed access GPU (Intel) PCI_ADDR={pci_address}"));
+                exit(1);
+            }
+        };
+
+        let hwmon_dir = match find_hwmon_dir(&path) {
+            Some(dir) => dir,
+            None => {
+                error!("Failed to locate GPU temperature sensor (Intel)");
+                exit(1);
+            }
+        };
+
         Gpu {
-            hwmon_dir: find_hwmon_dir(),
-            drm_dir: find_drm_dir(),
+            drm_dir,
+            hwmon_dir,
         }
     }
 
@@ -37,22 +55,22 @@ impl Gpu {
     pub fn get_usage(&self) -> u8 {
         // Read current frequency and max frequency from DRM
         let current_freq = read_to_string(format!("{}/device/gt_cur_freq_mhz", &self.drm_dir))
-        .unwrap_or_else(|_| {
-            error!("Failed to get GPU current frequency");
-            exit(1);
-        })
-        .trim_end()
-        .parse::<u32>()
-        .unwrap_or(0);
+            .unwrap_or_else(|_| {
+                error!("Failed to get GPU current frequency");
+                exit(1);
+            })
+            .trim_end()
+            .parse::<u32>()
+            .unwrap_or(0);
 
         let max_freq = read_to_string(format!("{}/device/gt_max_freq_mhz", &self.drm_dir))
-        .unwrap_or_else(|_| {
-            error!("Failed to get GPU max frequency");
-            exit(1);
-        })
-        .trim_end()
-        .parse::<u32>()
-        .unwrap_or(0);
+            .unwrap_or_else(|_| {
+                error!("Failed to get GPU max frequency");
+                exit(1);
+            })
+            .trim_end()
+            .parse::<u32>()
+            .unwrap_or(0);
 
         // Estimate usage as a percentage
         if max_freq > 0 {
@@ -85,39 +103,33 @@ impl Gpu {
     }
 }
 
-/// Looks for the hwmon directory corresponding to Intel GPUs in /sys/class/hwmon.
-fn find_hwmon_dir() -> String {
-    match read_dir("/sys/class/hwmon") {
-        Ok(sensors) => {
-            for sensor in sensors {
-                let path = sensor.unwrap().path().to_str().unwrap().to_owned();
-                if let Ok(name) = read_to_string(format!("{}/name", path)) {
-                    if name.starts_with("i915") {
-                        return path;
+/// Confirms that the provided path belongs to an Intel GPU and looks for the DRM device directory.
+fn find_drm_dir(path: &str) -> Option<String> {
+    match read_to_string(format!("{path}/uevent")) {
+        Ok(data) => {
+            let driver = data.lines().next()?;
+            if driver.ends_with("i915") {
+                for dir in read_dir(format!("{path}/drm")).ok()? {
+                    let dir_name = dir.ok()?.file_name().into_string().ok()?;
+                    if dir_name.starts_with("card") {
+                        return Some(format!("{path}/drm/{dir_name}"));
                     }
                 }
             }
+            None
         }
-        Err(_) => (),
+        Err(_) => None,
     }
-    error!("Failed to locate GPU temperature sensor (Intel)");
-    exit(1);
 }
 
-/// Looks for the DRM device directory corresponding to Intel GPUs in /sys/class/drm.
-fn find_drm_dir() -> String {
-    match read_dir("/sys/class/drm") {
-        Ok(devices) => {
-            for device in devices {
-                let path = device.unwrap().path().to_str().unwrap().to_owned();
-                // Check for Intel GPU directories
-                if path.contains("card") {
-                    return path;
-                }
-            }
+/// Looks for the hwmon directory of the provided Intel GPU.
+fn find_hwmon_dir(path: &str) -> Option<String> {
+    let hwmon_path = read_dir(format!("{path}/hwmon")).ok()?.next()?.ok()?.path();
+    match read_to_string(hwmon_path.join("name")) {
+        Ok(name) => {
+            if name.starts_with("i915") { Some(hwmon_path.to_str()?.to_owned()) }
+            else { None }
         }
-        Err(_) => (),
+        Err(_) => None,
     }
-    error!("Failed to locate DRM device (Intel)");
-    exit(1);
 }
