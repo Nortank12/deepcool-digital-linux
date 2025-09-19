@@ -9,17 +9,17 @@ pub const TEMP_LIMIT_C: u8 = 85;
 pub const TEMP_LIMIT_F: u8 = 185;
 
 pub struct Display {
+    cpu: Cpu,
     update: Duration,
     fahrenheit: bool,
-    cpu: Cpu,
 }
 
 impl Display {
-    pub fn new(update: Duration, fahrenheit: bool) -> Self {
+    pub fn new(cpu: Cpu, update: Duration, fahrenheit: bool) -> Self {
         Display {
+            cpu,
             update,
             fahrenheit,
-            cpu: Cpu::new(),
         }
     }
 

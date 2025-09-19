@@ -215,17 +215,17 @@ mod dot_matrix {
 pub const DEFAULT_MODE: Mode = Mode::CpuUsage;
 
 pub struct Display {
+    cpu: Cpu,
+    gpu: Gpu,
     pub mode: Mode,
     pub secondary: Option<Mode>,
     update: Duration,
     fahrenheit: bool,
     rotate: u16,
-    cpu: Cpu,
-    gpu: Gpu,
 }
 
 impl Display {
-    pub fn new(mode: &Mode, secondary: &Mode, update: Duration, fahrenheit: bool, rotate: u16) -> Self {
+    pub fn new(cpu: Cpu, gpu: Gpu, mode: &Mode, secondary: &Mode, update: Duration, fahrenheit: bool, rotate: u16) -> Self {
         // Verify the display mode
         let mode = match mode {
             Mode::Default => DEFAULT_MODE,
@@ -250,13 +250,13 @@ impl Display {
         };
 
         Display {
+            cpu,
+            gpu,
             mode,
             secondary,
             update,
             fahrenheit,
             rotate,
-            cpu: Cpu::new(),
-            gpu: Gpu::new(),
         }
     }
 

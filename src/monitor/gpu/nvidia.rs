@@ -5,8 +5,7 @@ use libloading::{Library, Symbol};
 use std::{path::Path, process::exit, ptr::null_mut};
 
 type NvmlInit = unsafe extern "C" fn() -> u16;
-type NvmlDeviceGetCount = unsafe extern "C" fn(count: *mut u32) -> u16;
-type NvmlDeviceGetHandleByIndex = unsafe extern "C" fn(index: u32, device: *mut *mut u8) -> u16;
+type NvmlDeviceGetHandleByPciBusId = unsafe extern "C" fn(pci_bus_id: *const u8, device: *mut *mut u8) -> u16;
 type NvmlDeviceGetUtilizationRates = unsafe extern "C" fn(device: *mut u8, utilization: *mut Utilization) -> u16;
 type NvmlDeviceGetTemperature = unsafe extern "C" fn(device: *mut u8, sensor: u32, temp: *mut u32) -> u16;
 type NvmlDeviceGetPowerUsage = unsafe extern "C" fn(device: *mut u8, power: *mut u32) -> u16;
@@ -39,8 +38,8 @@ pub struct Gpu {
 }
 
 impl Gpu {
-    /// Initializes NVML with the first GPU installed in the system.
-    pub fn new() -> Self {
+    /// Initializes NVML with the GPU specified by its PCI address.
+    pub fn new(pci_address: &str) -> Self {
         unsafe {
             // Try to open `libnvidia-ml.so` directly, on error use `LIB_PATHS` as fallback
             let lib = Library::new("libnvidia-ml.so").unwrap_or_else(|_| {
@@ -66,19 +65,11 @@ impl Gpu {
                 exit(1);
             }
 
-            // Count devices
-            let mut dev_count: u32 = 0;
-            let get_device_count: Symbol<NvmlDeviceGetCount> = lib.get(b"nvmlDeviceGetCount").unwrap();
-            if get_device_count(&mut dev_count as *mut u32) != 0 || dev_count < 1 {
-                error!("No NVIDIA GPU was found");
-                exit(1);
-            }
-
-            // Get device handle for GPU 0
+            // Get device handle at the specified PCI address
             let mut device: *mut u8 = null_mut();
-            let get_handle: Symbol<NvmlDeviceGetHandleByIndex> = lib.get(b"nvmlDeviceGetHandleByIndex").unwrap();
-            if get_handle(0, &mut device as *mut *mut u8) != 0 {
-                error!("Failed to get handle for GPU 0 (NVIDIA)");
+            let get_handle: Symbol<NvmlDeviceGetHandleByPciBusId> = lib.get(b"nvmlDeviceGetHandleByPciBusId_v2").unwrap();
+            if get_handle(pci_address.as_ptr(), &mut device as *mut *mut u8) != 0 {
+                error!(format!("Failed access GPU (NVIDIA) PCI_ADDR={pci_address}"));
                 exit(1);
             }
 

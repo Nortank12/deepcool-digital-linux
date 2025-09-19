@@ -7,14 +7,14 @@ pub const DEFAULT_MODE: Mode = Mode::CpuTemperature;
 pub const TEMP_LIMIT_C: u8 = 90;
 
 pub struct Display {
+    cpu: Cpu,
     pub mode: Mode,
     update: Duration,
     alarm: bool,
-    cpu: Cpu,
 }
 
 impl Display {
-    pub fn new(mode: &Mode, update: Duration, alarm: bool) -> Self {
+    pub fn new(cpu: Cpu, mode: &Mode, update: Duration, alarm: bool) -> Self {
         // Verify the display mode
         let mode = match mode {
             Mode::Default => DEFAULT_MODE,
@@ -25,10 +25,10 @@ impl Display {
         };
 
         Display {
+            cpu,
             mode,
             update,
             alarm,
-            cpu: Cpu::new(),
         }
     }
 

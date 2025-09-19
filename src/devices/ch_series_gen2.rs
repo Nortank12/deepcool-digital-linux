@@ -6,15 +6,15 @@ use std::{process::exit, thread::sleep, time::{Duration, Instant}};
 pub const DEFAULT_MODE: Mode = Mode::CpuFrequency;
 
 pub struct Display {
+    cpu: Cpu,
+    gpu: Gpu,
     pub mode: Mode,
     update: Duration,
     fahrenheit: bool,
-    cpu: Cpu,
-    gpu: Gpu,
 }
 
 impl Display {
-    pub fn new(mode: &Mode, update: Duration, fahrenheit: bool) -> Self {
+    pub fn new(cpu: Cpu, gpu: Gpu, mode: &Mode, update: Duration, fahrenheit: bool) -> Self {
         // Verify the display mode
         let mode = match mode {
             Mode::Default => DEFAULT_MODE,
@@ -27,11 +27,11 @@ impl Display {
         };
 
         Display {
+            cpu,
+            gpu,
             mode,
             update,
             fahrenheit,
-            cpu: Cpu::new(),
-            gpu: Gpu::new(),
         }
     }
 
