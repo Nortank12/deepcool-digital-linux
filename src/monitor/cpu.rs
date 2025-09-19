@@ -2,7 +2,7 @@
 
 use crate::error;
 use cpu_monitor::CpuInstant;
-use std::{fs::read_dir, fs::read_to_string, process::exit};
+use std::{fs::{read_dir, read_to_string, File}, io::{BufRead, BufReader}, process::exit};
 
 pub struct Cpu {
     temp_sensor: String,
@@ -96,7 +96,7 @@ impl Cpu {
     }
 }
 
-/// Looks for the appropriate CPU temperature sensor datastream in the hwmon folder.
+/// Looks for the appropriate CPU temperature sensor datastream in the hwmon directory.
 fn find_temp_sensor() -> String {
     match read_dir("/sys/class/hwmon") {
         Ok(sensors) => {
@@ -126,4 +126,20 @@ fn get_max_energy() -> u64 {
         Ok(data) => data.trim_end().parse::<u64>().unwrap(),
         Err(_) => 0,
     }
+}
+
+/// Gets the CPU model name.
+pub fn get_name() -> Option<String> {
+    let file = File::open("/proc/cpuinfo").ok()?;
+    let reader = BufReader::new(file);
+    for line in reader.lines() {
+        let line = line.ok()?;
+        if line.starts_with("model name") {
+            if let Some(colon_pos) = line.find(':') {
+                return Some(line[colon_pos + 1..].trim().to_string());
+            }
+        }
+    }
+
+    None
 }
