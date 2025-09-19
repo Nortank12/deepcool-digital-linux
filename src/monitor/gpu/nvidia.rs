@@ -38,7 +38,7 @@ pub struct Gpu {
 }
 
 impl Gpu {
-    /// Initializes NVML with the first GPU installed in the system.
+    /// Initializes NVML with the GPU specified by its PCI address.
     pub fn new(pci_address: &str) -> Self {
         unsafe {
             // Try to open `libnvidia-ml.so` directly, on error use `LIB_PATHS` as fallback

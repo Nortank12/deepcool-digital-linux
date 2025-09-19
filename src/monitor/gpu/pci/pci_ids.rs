@@ -26,7 +26,7 @@ pub fn get_device_names() -> Option<HashMap<(Vendor, u16, Option<(u16, u16)>), S
         let mut current_device = None;
 
         for line in reader.lines() {
-            let line = line.unwrap();
+            let line = line.ok()?;
             // Skip comments and empty lines
             if line.starts_with('#') || line.trim().is_empty() { continue; }
             if line.starts_with("\t\t") {
@@ -36,8 +36,8 @@ pub fn get_device_names() -> Option<HashMap<(Vendor, u16, Option<(u16, u16)>), S
                     devices.remove(&(vendor, device, None));
 
                     let mut parts = line.split_whitespace();
-                    let subsys_vendor = u16::from_str_radix(parts.next().unwrap(), 16).unwrap();
-                    let subsys_device = u16::from_str_radix(parts.next().unwrap(), 16).unwrap();
+                    let subsys_vendor = u16::from_str_radix(parts.next()?, 16).ok()?;
+                    let subsys_device = u16::from_str_radix(parts.next()?, 16).ok()?;
                     let dev_name = {
                         // Use the name in square brackets when available
                         let start = line.find('[').unwrap_or(0) + 1;
@@ -55,7 +55,7 @@ pub fn get_device_names() -> Option<HashMap<(Vendor, u16, Option<(u16, u16)>), S
                 // Parse Device ID
                 if let Some(vendor) = current_vendor {
                     let mut parts = line.split_whitespace();
-                    let dev_id = u16::from_str_radix(parts.next().unwrap(), 16).unwrap();
+                    let dev_id = u16::from_str_radix(parts.next()?, 16).ok()?;
                     current_device = Some(dev_id);
                     let dev_name = {
                         // Use the name in square brackets when available
@@ -73,7 +73,7 @@ pub fn get_device_names() -> Option<HashMap<(Vendor, u16, Option<(u16, u16)>), S
             } else {
                 // Parse Vendor ID
                 let mut parts = line.split_whitespace();
-                let vendor_id = u16::from_str_radix(parts.next().unwrap(), 16).unwrap();
+                let vendor_id = u16::from_str_radix(parts.next()?, 16).ok()?;
                 current_vendor = match vendor_id {
                     0x1002 | 0x1022 => Some(Vendor::Amd),
                     0x8086 => Some(Vendor::Intel),

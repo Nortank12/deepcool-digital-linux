@@ -103,33 +103,31 @@ impl Gpu {
     }
 }
 
-/// Confirms that the provided path belongs to an Intel GPU and looks for the DRM device directory.
+/// Confirms that the specified path belongs to an Intel GPU and looks for the DRM device directory.
 fn find_drm_dir(path: &str) -> Option<String> {
-    match read_to_string(format!("{path}/uevent")) {
-        Ok(data) => {
-            let driver = data.lines().next()?;
-            if driver.ends_with("i915") {
-                for dir in read_dir(format!("{path}/drm")).ok()? {
-                    let dir_name = dir.ok()?.file_name().into_string().ok()?;
-                    if dir_name.starts_with("card") {
-                        return Some(format!("{path}/drm/{dir_name}"));
-                    }
+    if let Ok(data) = read_to_string(format!("{path}/uevent")) {
+        let driver = data.lines().next()?;
+        if driver.ends_with("i915") {
+            for dir in read_dir(format!("{path}/drm")).ok()? {
+                let dir_name = dir.ok()?.file_name().into_string().ok()?;
+                if dir_name.starts_with("card") {
+                    return Some(format!("{path}/drm/{dir_name}"));
                 }
             }
-            None
         }
-        Err(_) => None,
     }
+
+    None
 }
 
-/// Looks for the hwmon directory of the provided Intel GPU.
+/// Looks for the hwmon directory of the specified Intel GPU.
 fn find_hwmon_dir(path: &str) -> Option<String> {
     let hwmon_path = read_dir(format!("{path}/hwmon")).ok()?.next()?.ok()?.path();
-    match read_to_string(hwmon_path.join("name")) {
-        Ok(name) => {
-            if name.starts_with("i915") { Some(hwmon_path.to_str()?.to_owned()) }
-            else { None }
+    if let Ok(name) = read_to_string(hwmon_path.join("name")) {
+        if name.starts_with("i915") {
+            return Some(hwmon_path.to_str()?.to_owned());
         }
-        Err(_) => None,
     }
+
+    None
 }

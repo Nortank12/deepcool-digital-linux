@@ -10,7 +10,7 @@ pub struct Gpu {
 
 impl Gpu {
     pub fn new(pci_address: &str) -> Self {
-        let path = format!("/sys/bus/pci/devices/{}", pci_address);
+        let path = format!("/sys/bus/pci/devices/{pci_address}");
 
         let usage_file = match find_card(&path) {
             Some(file) => file,
@@ -81,26 +81,26 @@ impl Gpu {
     }
 }
 
-/// Confirms that the provided path belongs to an AMD GPU and returns the path of the "GPU Usage" file.
+/// Confirms that the specified path belongs to an AMD GPU and returns the path of the "GPU Usage" file.
 fn find_card(path: &str) -> Option<String> {
-    match read_to_string(format!("{path}/uevent")) {
-        Ok(data) => {
-            let driver = data.lines().next()?;
-            if driver.ends_with("amdgpu") { Some(format!("{path}/gpu_busy_percent")) }
-            else { None }
+    if let Ok(data) = read_to_string(format!("{path}/uevent")) {
+        let driver = data.lines().next()?;
+        if driver.ends_with("amdgpu") {
+            return Some(format!("{path}/gpu_busy_percent"));
         }
-        Err(_) => None,
     }
+
+    None
 }
 
-/// Looks for the hwmon directory of the AMD GPU.
+/// Looks for the hwmon directory of the specified AMD GPU.
 fn find_hwmon_dir(path: &str) -> Option<String> {
     let hwmon_path = read_dir(format!("{path}/hwmon")).ok()?.next()?.ok()?.path();
-    match read_to_string(hwmon_path.join("name")) {
-        Ok(name) => {
-            if name.starts_with("amdgpu") { Some(hwmon_path.to_str()?.to_owned()) }
-            else { None }
+    if let Ok(name) = read_to_string(hwmon_path.join("name")) {
+        if name.starts_with("amdgpu") {
+            return Some(hwmon_path.to_str()?.to_owned());
         }
-        Err(_) => None,
     }
+
+    None
 }
