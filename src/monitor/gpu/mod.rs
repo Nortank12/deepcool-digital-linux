@@ -5,7 +5,7 @@ mod intel;
 mod nvidia;
 pub mod pci;
 
-use crate::monitor::gpu::pci::PciDevice;
+use crate::{monitor::gpu::pci::PciDevice, warning};
 
 pub enum Gpu {
     Amd(amd::Gpu),
@@ -23,6 +23,13 @@ impl Gpu {
                 pci::Vendor::Nvidia => Gpu::Nvidia(nvidia::Gpu::new(&gpu.address)),
             }
             None => Gpu::None,
+        }
+    }
+
+    pub fn warn_missing(&self) {
+        if matches!(self, Gpu::None) {
+            warning!("No supported GPU was found");
+            eprintln!("         GPU information will not be displayed.");
         }
     }
 

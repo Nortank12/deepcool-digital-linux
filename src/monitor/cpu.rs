@@ -1,12 +1,12 @@
 //! Reads live CPU data from the Linux kernel.
 
-use crate::error;
+use crate::{error, warning};
 use cpu_monitor::CpuInstant;
 use std::{fs::{read_dir, read_to_string, File}, io::{BufRead, BufReader}, process::exit};
 
 pub struct Cpu {
-    temp_sensor: String,
-    pub rapl_max_uj: u64,
+    temp_sensor: Option<String>,
+    rapl_max_uj: u64,
 }
 
 impl Cpu {
@@ -17,46 +17,71 @@ impl Cpu {
         }
     }
 
+    /// Displays a warning message if temperature sensor is not initialized.
+    pub fn warn_temp(&self) {
+        if self.temp_sensor == None {
+            warning!("No supported CPU temperature sensor was found");
+            eprintln!("         CPU temperature will not be displayed, and alarm will be disabled.");
+            eprintln!("         Supported kernel modules are: asusec, coretemp, k10temp, and zenpower.");
+        }
+    }
+
+    /// Displays a warning message if RAPL module is not initialized.
+    pub fn warn_rapl(&self) {
+        if self.rapl_max_uj == 0 {
+            warning!("RAPL module was not found");
+            eprintln!("         CPU power consumption will not be displayed.");
+        }
+    }
+
     /// Reads the value of the CPU temperature sensor and calculates it to be `˚C` or `˚F`.
     pub fn get_temp(&self, fahrenheit: bool) -> u8 {
-        // Read sensor data
-        let data = read_to_string(&self.temp_sensor).unwrap_or_else(|_| {
-            error!("Failed to get CPU temperature");
-            exit(1);
-        });
-
-        // Calculate temperature
-        let mut temp = data.trim_end().parse::<u32>().unwrap();
-        if fahrenheit {
-            temp = temp * 9 / 5 + 32000
+        if let Some(sensor) = &self.temp_sensor {
+            // Read sensor data
+            let data = read_to_string(sensor).unwrap_or_else(|_| {
+                error!("Failed to get CPU temperature");
+                exit(1);
+            });
+            // Calculate temperature
+            let mut temp = data.trim_end().parse::<u32>().unwrap();
+            if fahrenheit {
+                temp = temp * 9 / 5 + 32000
+            }
+            return (temp as f32 / 1000.0).round() as u8;
         }
 
-        (temp as f32 / 1000.0).round() as u8
+        0
     }
 
     /// Reads the energy consumption of the CPU in microjoules.
     pub fn read_energy(&self) -> u64 {
-        let data = read_to_string("/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj").unwrap_or_else(|_| {
-            error!("Failed to get CPU power");
-            exit(1);
-        });
+        if self.rapl_max_uj > 0 {
+            let data = read_to_string("/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj").unwrap_or_else(|_| {
+                error!("Failed to get CPU power");
+                exit(1);
+            });
+            return data.trim_end().parse::<u64>().unwrap();
+        }
 
-        data.trim_end().parse::<u64>().unwrap()
+        0
     }
 
     /// Reads the energy consumption one more time and calculates the CPU power by using the inital energy and the delta time.
     ///
     /// Formula: `W = ΔμJ / (Δms * 1000)`
     pub fn get_power(&self, initial_energy: u64, delta_millisec: u64) -> u16 {
-        let current_energy = self.read_energy();
-        let delta_energy = if current_energy > initial_energy {
-            current_energy - initial_energy
-        } else {
-            // Offset the current measurement if the counter resets
-            (self.rapl_max_uj + current_energy) - initial_energy
-        };
+        if self.rapl_max_uj > 0 {
+            let current_energy = self.read_energy();
+            let delta_energy = if current_energy > initial_energy {
+                current_energy - initial_energy
+            } else {
+                // Offset the current measurement if the counter resets
+                (self.rapl_max_uj + current_energy) - initial_energy
+            };
+            return (delta_energy as f64 / (delta_millisec * 1000) as f64).round() as u16;
+        }
 
-        (delta_energy as f64 / (delta_millisec * 1000) as f64).round() as u16
+        0
     }
 
     /// Reads the CPU instant and provides usage statistics.
@@ -97,30 +122,20 @@ impl Cpu {
 }
 
 /// Looks for the appropriate CPU temperature sensor datastream in the hwmon directory.
-fn find_temp_sensor() -> String {
-    match read_dir("/sys/class/hwmon") {
-        Ok(sensors) => {
-            for sensor in sensors {
-                let path = sensor.unwrap().path().to_str().unwrap().to_owned();
-                match read_to_string(format!("{path}/name")) {
-                    Ok(name) => {
-                        if ["asusec", "coretemp", "k10temp", "zenpower"].contains(&name.trim_end()) {
-                            return format!("{path}/temp1_input");
-                        }
-                    }
-                    Err(_) => (),
-                }
+fn find_temp_sensor() -> Option<String> {
+    for sensor in read_dir("/sys/class/hwmon").ok()? {
+        let path = sensor.ok()?.path().to_str()?.to_owned();
+        if let Ok(name) = read_to_string(format!("{path}/name")) {
+            if ["asusec", "coretemp", "k10temp", "zenpower"].contains(&name.trim_end()) {
+                return Some(format!("{path}/temp1_input"));
             }
         }
-        Err(_) => (),
     }
-    error!("Failed to locate CPU temperature sensor");
-    exit(1);
+
+    None
 }
 
 /// Gets the limit of the displayed energy value so it can be applied as an offset when the counter resets.
-///
-/// Errors will be handled per device since not all of them require power consumption readings.
 fn get_max_energy() -> u64 {
     match read_to_string("/sys/class/powercap/intel-rapl/intel-rapl:0/max_energy_range_uj") {
         Ok(data) => data.trim_end().parse::<u64>().unwrap(),

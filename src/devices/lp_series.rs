@@ -1,8 +1,8 @@
-use crate::{error, monitor::{cpu::Cpu, gpu::Gpu}};
+use crate::monitor::{cpu::Cpu, gpu::Gpu};
 use super::{device_error, Mode};
 use cpu_monitor::CpuInstant;
 use hidapi::HidApi;
-use std::{process::exit, thread::sleep, time::Duration};
+use std::{thread::sleep, time::Duration};
 
 /// Helper module for the LP Series.
 mod dot_matrix {
@@ -264,10 +264,18 @@ impl Display {
         // Connect to device
         let device = api.open(vid, pid).unwrap_or_else(|_| device_error());
 
-        // Check if `rapl_max_uj` was read correctly
-        if self.cpu.rapl_max_uj == 0 {
-            error!("Failed to get CPU power details");
-            exit(1);
+        // Display warning if a required module is missing
+        if matches!(self.mode, Mode::CpuTemperature) || matches!(self.secondary, Some(Mode::CpuTemperature)) {
+            self.cpu.warn_temp();
+        }
+        if matches!(self.mode, Mode::CpuPower) || matches!(self.secondary, Some(Mode::CpuPower)) {
+            self.cpu.warn_rapl();
+        }
+        if
+            matches!(self.mode, Mode::GpuUsage | Mode::GpuTemperature | Mode::GpuPower) ||
+            matches!(self.secondary, Some(Mode::GpuUsage) | Some(Mode::GpuTemperature) | Some(Mode::GpuPower))
+        {
+            self.gpu.warn_missing();
         }
 
         // Data packet

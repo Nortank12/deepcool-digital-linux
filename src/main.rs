@@ -377,13 +377,6 @@ fn main() {
                 "psu".bright_black().strikethrough(),
                 ch_series_gen2::DEFAULT_MODE.symbol()
             );
-            if args.mode == Mode::CpuFan {
-                warning!("CPU fan speed monitoring is not supported yet");
-            } else if args.mode == Mode::Psu {
-                warning!("PSU monitoring is not supported yet");
-            } else if args.mode == Mode::Auto {
-                warning!("Display mode \"auto\" only cycles between fully supported modes");
-            }
             // Connect to device
             let ch_gen2_device = ch_series_gen2::Display::new(cpu, gpu, &args.mode, args.update, args.fahrenheit);
             // Print current configuration & warnings

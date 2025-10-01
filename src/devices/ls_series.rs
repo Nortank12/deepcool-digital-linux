@@ -1,7 +1,7 @@
-use crate::{error, monitor::cpu::Cpu};
+use crate::monitor::cpu::Cpu;
 use super::{device_error, Mode, AUTO_MODE_INTERVAL};
 use hidapi::HidApi;
-use std::{process::exit, thread::sleep, time::{Duration, Instant}};
+use std::{thread::sleep, time::{Duration, Instant}};
 
 pub const DEFAULT_MODE: Mode = Mode::CpuTemperature;
 pub const TEMP_LIMIT_C: u8 = 90;
@@ -39,11 +39,9 @@ impl Display {
         // Connect to device
         let device = api.open(vid, pid).unwrap_or_else(|_| device_error());
 
-        // Check if `rapl_max_uj` was read correctly
-        if self.cpu.rapl_max_uj == 0 {
-            error!("Failed to get CPU power details");
-            exit(1);
-        }
+        // Display warning if a required module is missing
+        self.cpu.warn_temp();
+        self.cpu.warn_rapl();
 
         // Data packet
         let mut data: [u8; 64] = [0; 64];

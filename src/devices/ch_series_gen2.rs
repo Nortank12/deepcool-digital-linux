@@ -1,7 +1,7 @@
-use crate::{error, monitor::{cpu::Cpu, gpu::Gpu}};
+use crate::{monitor::{cpu::Cpu, gpu::Gpu}, warning};
 use super::{device_error, Mode, AUTO_MODE_INTERVAL};
 use hidapi::HidApi;
-use std::{process::exit, thread::sleep, time::{Duration, Instant}};
+use std::{thread::sleep, time::{Duration, Instant}};
 
 pub const DEFAULT_MODE: Mode = Mode::CpuFrequency;
 
@@ -39,10 +39,21 @@ impl Display {
         // Connect to device
         let device = api.open(vid, pid).unwrap_or_else(|_| device_error());
 
-        // Check if `rapl_max_uj` was read correctly
-        if matches!(self.mode, Mode::CpuFrequency | Mode::CpuFan | Mode::Auto) && self.cpu.rapl_max_uj == 0 {
-            error!("Failed to get CPU power details");
-            exit(1);
+        // Display warning to address limitated display modes
+        match self.mode {
+            Mode::CpuFan => { warning!("CPU fan speed monitoring is not yet supported"); }
+            Mode::Psu => { warning!("PSU monitoring is not yet supported"); }
+            Mode::Auto => { warning!("Display mode \"auto\" only cycles between fully supported modes"); }
+            _ => (),
+        }
+
+        // Display warning if a required module is missing
+        if matches!(self.mode, Mode::CpuFrequency | Mode::CpuFan | Mode::Auto) {
+            self.cpu.warn_temp();
+            self.cpu.warn_rapl();
+        }
+        if matches!(self.mode, Mode::Gpu | Mode::Auto) {
+            self.gpu.warn_missing();
         }
 
         // Data packet

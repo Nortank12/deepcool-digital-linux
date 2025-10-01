@@ -39,6 +39,9 @@ impl Display {
         // Connect to device
         let device = api.open(vid, pid).unwrap_or_else(|_| device_error());
 
+        // Display warning if a required module is missing
+        self.cpu.warn_temp();
+
         // Data packet
         let mut data: [u8; 64] = [0; 64];
         data[0] = 16;

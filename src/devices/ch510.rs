@@ -36,6 +36,13 @@ impl Display {
         // Connect to device
         let device = api.open(vid, pid).unwrap_or_else(|_| device_error());
 
+        // Display warning if a required module is missing
+        match self.mode {
+            Mode::Cpu => self.cpu.warn_temp(),
+            Mode::Gpu => self.gpu.warn_missing(),
+            _ => (),
+        }
+
         // Get temperature unit
         let unit = if self.fahrenheit { "F" } else { "C" };
 

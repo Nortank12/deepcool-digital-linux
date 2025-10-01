@@ -50,6 +50,12 @@ impl Display {
         // Connect to device
         let device = api.open(vid, pid).unwrap_or_else(|_| device_error());
 
+        // Display warning if a required module is missing
+        if matches!(self.mode, Mode::CpuTemperature) {
+            self.cpu.warn_temp();
+        }
+        self.gpu.warn_missing();
+
         // Data packet
         let mut data: [u8; 64] = [0; 64];
         data[0] = 16;
