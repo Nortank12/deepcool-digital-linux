@@ -1,3 +1,7 @@
+//! Display module for:
+//! - LS520 SE DIGITAL
+//! - LS720 SE DIGITAL
+
 use crate::monitor::cpu::Cpu;
 use super::{device_error, Mode, AUTO_MODE_INTERVAL};
 use hidapi::HidApi;

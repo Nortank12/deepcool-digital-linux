@@ -1,3 +1,7 @@
+//! Display module for:
+//! - LP240
+//! - LP360
+
 use crate::monitor::{cpu::Cpu, gpu::Gpu};
 use super::{device_error, Mode};
 use cpu_monitor::CpuInstant;

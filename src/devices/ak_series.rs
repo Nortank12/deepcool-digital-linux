@@ -1,3 +1,9 @@
+//! Display module for:
+//! - AK400 DIGITAL
+//! - AK500 DIGITAL
+//! - AK500S DIGITAL
+//! - AK620 DIGITAL
+
 use crate::{devices::AUTO_MODE_INTERVAL, monitor::cpu::Cpu};
 use super::{device_error, Mode};
 use hidapi::HidApi;

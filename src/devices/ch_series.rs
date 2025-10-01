@@ -1,3 +1,8 @@
+//! Display module for:
+//! - CH360 DIGITAL
+//! - CH560 DIGITAL
+//! - MORPHEUS
+
 use crate::monitor::{cpu::Cpu, gpu::Gpu};
 use super::{device_error, Mode, AUTO_MODE_INTERVAL};
 use hidapi::HidApi;

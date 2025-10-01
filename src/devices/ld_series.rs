@@ -1,3 +1,7 @@
+//! Display module for:
+//! - LD240
+//! - LD360
+
 use crate:: monitor::cpu::Cpu;
 use super::{device_error, Mode};
 use hidapi::HidApi;

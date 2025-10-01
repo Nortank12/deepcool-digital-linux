@@ -1,3 +1,6 @@
+//! Display module for:
+//! - AK400 DIGITAL PRO
+
 use crate::monitor::cpu::Cpu;
 use super::{device_error, Mode};
 use hidapi::HidApi;

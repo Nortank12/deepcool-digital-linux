@@ -51,7 +51,7 @@ impl Gpu {
         (temp as f32 / 1000.0).round() as u8
     }
 
-    /// Estimate GPU usage based on frequency scaling, using the current and maximum frequency.
+    /// Estimates GPU usage based on frequency scaling, using the current and maximum frequency.
     pub fn get_usage(&self) -> u8 {
         // Read current frequency and max frequency from DRM
         let current_freq = read_to_string(format!("{}/device/gt_cur_freq_mhz", &self.drm_dir))

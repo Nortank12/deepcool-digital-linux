@@ -59,7 +59,7 @@ fn parse_pci_id(id: &str) -> Option<(u16, u16)> {
     Some((vendor, device))
 }
 
-/// Get all GPUs from the PCI bus.
+/// Gets all GPUs from the PCI bus.
 pub fn get_gpu_list() -> Vec<PciDevice> {
     let pci_devices = read_dir("/sys/bus/pci/devices").unwrap_or_else(|_| {
         error!("Cannot read PCI devices");

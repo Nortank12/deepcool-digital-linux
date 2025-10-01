@@ -1,3 +1,6 @@
+//! Display module for:
+//! - CH510 MESH DIGITAL
+
 use crate::monitor::{cpu::Cpu, gpu::Gpu};
 use super::{device_error, Mode};
 use hidapi::HidApi;

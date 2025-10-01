@@ -1,3 +1,8 @@
+//! Display module for:
+//! - ASSASSIN IV VC VISION
+//! - LQ240
+//! - LQ360
+
 use crate::monitor::cpu::Cpu;
 use super::{device_error, Mode};
 use hidapi::HidApi;

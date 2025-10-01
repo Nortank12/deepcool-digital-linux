@@ -1,3 +1,9 @@
+//! Display module for:
+//! - AG300 DIGITAL
+//! - AG400 DIGITAL
+//! - AG500 DIGITAL
+//! - AG620 DIGITAL
+
 use crate::monitor::cpu::Cpu;
 use super::{device_error, Mode, AUTO_MODE_INTERVAL};
 use hidapi::HidApi;

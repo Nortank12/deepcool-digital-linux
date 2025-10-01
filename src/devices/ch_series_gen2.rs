@@ -1,3 +1,8 @@
+//! Display module for:
+//! - CH170 DIGITAL
+//! - CH270 DIGITAL
+//! - CH690 DIGITAL
+
 use crate::{monitor::{cpu::Cpu, gpu::Gpu}, warning};
 use super::{device_error, Mode, AUTO_MODE_INTERVAL};
 use hidapi::HidApi;
