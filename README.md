@@ -60,14 +60,33 @@ SUBSYSTEM=="hidraw", ATTRS{idVendor}=="34d3", ATTRS{idProduct}=="1100", MODE="06
 <details>
 <summary><b>Steps for NixOS</b></summary>
 
-#### Use the flake from [this repository](https://github.com/mzonski/deepcool-digital-linux/)
--- or --
-1. Locate and edit your `configuration.nix` file
-```bash
-sudo nano /etc/nixos/configuration.nix
-```
-2. Insert the following:
+
+#### From Nixpkgs
+
+`deepcool-digital-linux` is packaged in Nixpkgs, available under `pkgs.deepcool-digital-linux`. A
+NixOS module is also available as `services.hardware.deepcool-digital-linux.enable`. In your NixOS
+configuration, for example in your `configuration.nix`, enabling the service will add the package
+to your `PATH`, and start the Systemd service for the persistent daemon.
+
 ```nix
+{
+  # Enable deepcool-digital-linux
+  services.hardware.deepcool-digital-linux.enable = true;
+
+  # ... rest of your configuration ...
+}
+```
+
+
+<!-- TODO: remove this once the Nixpkgs module receives an update -->
+
+You may also want to add the relevant udev rules to your configuration if your hardware requires it.
+In your configuration, you may use `services.udev.extraRules` to add any of the rules that you need.
+This is an alternative to using paths such as `udev.d` that you might be used to from FHS distributions.
+
+```nix
+{
+  # ... rest of our configuration ...
   services.udev.extraRules = ''
     # Intel RAPL energy usage file
     ACTION=="add", SUBSYSTEM=="powercap", KERNEL=="intel-rapl:0", RUN+="${pkgs.coreutils}/bin/chmod 444 /sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj"
@@ -78,13 +97,36 @@ sudo nano /etc/nixos/configuration.nix
     # CH510 MESH DIGITAL
     SUBSYSTEM=="hidraw", ATTRS{idVendor}=="34d3", ATTRS{idProduct}=="1100", MODE="0666"
   '';
+}
 ```
-3. Rebuild your system
-```bash
-sudo nixos-rebuild switch
+
+Once you enable the service, rebuild your configuration and reboot.
+
+#### From Nix Flake
+
+[this repository]: https://github.com/mzonski/deepcool-digital-linux/
+
+You may wish to use the Nix flake provided by [this repository] to get an up-to-date build of
+deepcool-digital-linux. While Nixpkgs might take some time to receive updates, the flake will
+always remain up to date as it will build directly from source.
+
+It is still possible to use the the NixOS module provided by nixpkgs if using flake, but you
+must adjust the modules' **pacakage** option to use the correct package. In a  setup with flakes
+enabled, this would require you to pass `inputs` in `specialArgs`, and then obtain the package
+from `inputs.deepcool-digital-linux.packages` as such:
+
+```nix
+{inputs, pkgs, ...}: {
+  services.hardware.deepcool-digitial-linux = {
+    enable = true;
+    package = inputs.deepcool-digital-linux.packages.${pkgs.system}.default;
+  };
+}
 ```
-4. Reboot your computer
-</details>
+
+Do note that you will be building deepcool-digital-linux from the source each time the flake is
+updated, because the Nixpkgs binary cache will not be able to provide you cached binaries.
+
 
 # Supported Devices
 
