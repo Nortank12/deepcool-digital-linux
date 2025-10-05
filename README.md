@@ -65,8 +65,8 @@ SUBSYSTEM=="hidraw", ATTRS{idVendor}=="34d3", ATTRS{idProduct}=="1100", MODE="06
 
 `deepcool-digital-linux` is packaged in Nixpkgs, available under `pkgs.deepcool-digital-linux`. A
 NixOS module is also available as `services.hardware.deepcool-digital-linux.enable`. In your NixOS
-configuration, for example in your `configuration.nix`, enabling the service will add the package
-to your `PATH`, and start the Systemd service for the persistent daemon.
+configuration (for example in your `configuration.nix`), enabling the service will add the package
+to your `PATH` and start the Systemd service for the persistent daemon.
 
 ```nix
 {
@@ -80,7 +80,7 @@ to your `PATH`, and start the Systemd service for the persistent daemon.
 
 <!-- TODO: remove this once the Nixpkgs module receives an update -->
 
-You may also want to add the relevant udev rules to your configuration if your hardware requires it.
+You may also want to add the relevant udev rules to your configuration if your hardware requires them.
 In your configuration, you may use `services.udev.extraRules` to add any of the rules that you need.
 This is an alternative to using paths such as `udev.d` that you might be used to from FHS distributions.
 
@@ -110,14 +110,14 @@ You may wish to use the Nix flake provided by [this repository] to get an up-to-
 deepcool-digital-linux. While Nixpkgs might take some time to receive updates, the flake will
 always remain up to date as it will build directly from source.
 
-It is still possible to use the the NixOS module provided by nixpkgs if using flake, but you
-must adjust the modules' **pacakage** option to use the correct package. In a  setup with flakes
+It is still possible to use the NixOS module provided by nixpkgs if using flake, but you
+must adjust the modules' **package** option to use the correct package. In a setup with flakes
 enabled, this would require you to pass `inputs` in `specialArgs`, and then obtain the package
 from `inputs.deepcool-digital-linux.packages` as such:
 
 ```nix
 {inputs, pkgs, ...}: {
-  services.hardware.deepcool-digitial-linux = {
+  services.hardware.deepcool-digital-linux = {
     enable = true;
     package = inputs.deepcool-digital-linux.packages.${pkgs.system}.default;
   };
