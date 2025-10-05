@@ -126,7 +126,7 @@ from `inputs.deepcool-digital-linux.packages` as such:
 
 Do note that you will be building deepcool-digital-linux from the source each time the flake is
 updated, because the Nixpkgs binary cache will not be able to provide you cached binaries.
-
+</details>
 
 # Supported Devices
 
