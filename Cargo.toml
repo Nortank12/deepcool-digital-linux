@@ -8,6 +8,7 @@ libloading = "0.8.9"
 hidapi = "2.6.3"
 cpu-monitor = "0.1.1"
 colored = "3.0.0"
+clap = { version = "4.5.51", features = ["derive"] }
 
 [profile.release]
 opt-level = 3
