@@ -16,3 +16,15 @@ macro_rules! error {
         eprintln!("{}", format!("{} {}", "Error!".red(), $input).bold());
     };
 }
+
+#[macro_export]
+macro_rules! assign_if_some {
+    ($variable:expr, $option:expr) => {
+        match $option {
+            Some(value) => {
+                $variable = value;
+            }
+            None => {} // Do nothing
+        }
+    };
+}
