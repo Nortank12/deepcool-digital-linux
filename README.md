@@ -346,6 +346,8 @@ Description=DeepCool Digital
 
 [Service]
 ExecStart=/usr/sbin/deepcool-digital-linux
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
