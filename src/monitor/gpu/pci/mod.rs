@@ -92,6 +92,7 @@ pub fn get_gpu_list() -> Vec<PciDevice> {
                     let vendor = match driver {
                         "amdgpu" => Some(Vendor::Amd),
                         "nvidia" => Some(Vendor::Nvidia),
+                        "xe" => Some(Vendor::Intel),
                         "i915" => {
                             // Check the first 2 digits of the device ID:
                             // 56xx: Arc A-Series
