@@ -47,7 +47,7 @@ impl Gpu {
                     .iter()
                     .find_map(|path| {
                         if Path::new(path).exists() {
-                            Library::new(path).ok()
+                            Library::new(*path).ok()
                         } else {
                             None
                         }
