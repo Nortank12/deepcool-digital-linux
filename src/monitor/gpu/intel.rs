@@ -1,7 +1,10 @@
 //! Reads live GPU data from the Linux kernel.
 
 use crate::error;
-use std::{fs::read_dir, fs::read_to_string, process::exit};
+use std::{
+    fs::{read_dir, read_to_string},
+    process::exit,
+};
 
 pub struct Gpu {
     drm_dir: String,
@@ -28,91 +31,110 @@ impl Gpu {
             }
         };
 
-        Gpu {
-            drm_dir,
-            hwmon_dir,
-        }
+        Gpu { drm_dir, hwmon_dir }
     }
 
-    /// Reads the value of the GPU temperature sensor and calculates it to be `˚C` or `˚F`.
+    /// Reads GPU temperature (A-series + B-series)
     pub fn get_temp(&self, fahrenheit: bool) -> u8 {
-        // Read temperature data from hwmon
-        let data = read_to_string(format!("{}/temp1_input", &self.hwmon_dir)).unwrap_or_else(|_| {
-            error!("Failed to get GPU temperature");
-            exit(1);
-        });
-
-        // Calculate temperature
-        let mut temp = data.trim_end().parse::<u32>().unwrap();
-        if fahrenheit {
-            temp = temp * 9 / 5 + 32000;
+        // ===== A-series (unchanged) =====
+        if let Ok(data) = read_to_string(format!("{}/temp1_input", &self.hwmon_dir)) {
+            let mut temp = data.trim().parse::<u32>().unwrap_or(0);
+            if fahrenheit {
+                temp = temp * 9 / 5 + 32000;
+            }
+            return (temp as f32 / 1000.0).round() as u8;
         }
 
-        (temp as f32 / 1000.0).round() as u8
+        // ===== B-series (pkg temp) =====
+        for idx in [2, 3] {
+            let label = read_to_string(format!("{}/temp{}_label", &self.hwmon_dir, idx));
+            let data  = read_to_string(format!("{}/temp{}_input", &self.hwmon_dir, idx));
+
+            if let (Ok(label), Ok(data)) = (label, data) {
+                if label.trim() == "pkg" {
+                    let mut temp = data.trim().parse::<u32>().unwrap_or(0);
+                    if fahrenheit {
+                        temp = temp * 9 / 5 + 32000;
+                    }
+                    return (temp as f32 / 1000.0).round() as u8;
+                }
+            }
+        }
+
+        error!("Failed to get GPU temperature");
+        exit(1);
     }
 
-    /// Estimates GPU usage based on frequency scaling, using the current and maximum frequency.
+    /// Estimates GPU usage (A-series + B-series)
     pub fn get_usage(&self) -> u8 {
-        // Read current frequency and max frequency from DRM
-        let current_freq = read_to_string(format!("{}/device/gt_cur_freq_mhz", &self.drm_dir))
-            .unwrap_or_else(|_| {
-                error!("Failed to get GPU current frequency");
-                exit(1);
-            })
-            .trim_end()
-            .parse::<u32>()
-            .unwrap_or(0);
+        // ===== A-series (unchanged) =====
+        let cur = read_to_string(format!("{}/device/gt_cur_freq_mhz", &self.drm_dir))
+        .ok()
+        .and_then(|v| v.trim().parse::<u32>().ok());
 
-        let max_freq = read_to_string(format!("{}/device/gt_max_freq_mhz", &self.drm_dir))
-            .unwrap_or_else(|_| {
-                error!("Failed to get GPU max frequency");
-                exit(1);
-            })
-            .trim_end()
-            .parse::<u32>()
-            .unwrap_or(0);
+        let max = read_to_string(format!("{}/device/gt_max_freq_mhz", &self.drm_dir))
+        .ok()
+        .and_then(|v| v.trim().parse::<u32>().ok());
 
-        // Estimate usage as a percentage
-        if max_freq > 0 {
-            ((current_freq as f32 / max_freq as f32) * 100.0).round() as u8
-        } else {
-            0
+        if let (Some(cur), Some(max)) = (cur, max) {
+            if max > 0 {
+                return ((cur as f32 / max as f32) * 100.0).round() as u8;
+            }
         }
+
+        // ===== B-series (xe) fallback =====
+        let base = format!("{}/device/tile0/gt0/freq0", &self.drm_dir);
+
+        let cur = read_to_string(format!("{}/cur_freq", base))
+        .ok()
+        .and_then(|v| v.trim().parse::<u32>().ok());
+
+        let max = read_to_string(format!("{}/max_freq", base))
+        .ok()
+        .and_then(|v| v.trim().parse::<u32>().ok());
+
+        if let (Some(cur), Some(max)) = (cur, max) {
+            if max > 0 {
+                return ((cur as f32 / max as f32) * 100.0).round() as u8;
+            }
+        }
+
+        0
     }
 
-    /// Reads the value of the GPU power consumption in Watts from hwmon.
+    /// Reads GPU power in Watts
     pub fn get_power(&self) -> u16 {
-        let data = read_to_string(format!("{}/power1_average", &self.hwmon_dir)).unwrap_or_else(|_| {
+        let data = read_to_string(format!("{}/power1_average", &self.hwmon_dir))
+        .or_else(|_| read_to_string(format!("{}/power/average", &self.hwmon_dir)))
+        .unwrap_or_else(|_| {
             error!("Failed to get GPU power");
             exit(1);
         });
-        let power = data.trim_end().parse::<u64>().unwrap_or(0);
 
-        (power / 1_000_000) as u16
+        (data.trim().parse::<u64>().unwrap_or(0) / 1_000_000) as u16
     }
 
-    /// Reads the GPU core frequency in MHz from hwmon.
+    /// Reads GPU frequency (A-series only)
     pub fn get_frequency(&self) -> u16 {
-        let data = read_to_string(format!("{}/freq1_input", &self.hwmon_dir)).unwrap_or_else(|_| {
+        let data = read_to_string(format!("{}/freq1_input", &self.hwmon_dir))
+        .unwrap_or_else(|_| {
             error!("Failed to get GPU core frequency");
             exit(1);
         });
-        let frequency = data.trim_end().parse::<u64>().unwrap_or(0);
 
-        (frequency / 1_000_000) as u16
+        (data.trim().parse::<u64>().unwrap_or(0) / 1_000_000) as u16
     }
 }
 
-/// Confirms that the specified path belongs to an Intel GPU and looks for the DRM device directory.
+/// Finds DRM directory
 fn find_drm_dir(path: &str) -> Option<String> {
-    if let Ok(data) = read_to_string(format!("{path}/uevent")) {
-        let driver = data.lines().next()?;
-        if driver.ends_with("i915") {
-            for dir in read_dir(format!("{path}/drm")).ok()? {
-                let dir_name = dir.ok()?.file_name().into_string().ok()?;
-                if dir_name.starts_with("card") {
-                    return Some(format!("{path}/drm/{dir_name}"));
-                }
+    let data = read_to_string(format!("{path}/uevent")).ok()?;
+
+    if data.lines().any(|l| l == "DRIVER=i915" || l == "DRIVER=xe") {
+        for dir in read_dir(format!("{path}/drm")).ok()? {
+            let name = dir.ok()?.file_name().into_string().ok()?;
+            if name.starts_with("card") {
+                return Some(format!("{path}/drm/{name}"));
             }
         }
     }
@@ -120,12 +142,14 @@ fn find_drm_dir(path: &str) -> Option<String> {
     None
 }
 
-/// Looks for the hwmon directory of the specified Intel GPU.
+/// Finds hwmon directory
 fn find_hwmon_dir(path: &str) -> Option<String> {
-    let hwmon_path = read_dir(format!("{path}/hwmon")).ok()?.next()?.ok()?.path();
-    if let Ok(name) = read_to_string(hwmon_path.join("name")) {
-        if name.starts_with("i915") {
-            return Some(hwmon_path.to_str()?.to_owned());
+    for entry in read_dir(format!("{path}/hwmon")).ok()? {
+        let hwmon = entry.ok()?.path();
+        let name = read_to_string(hwmon.join("name")).ok()?;
+
+        if name.trim() == "i915" || name.trim() == "xe" {
+            return Some(hwmon.to_string_lossy().into_owned());
         }
     }
 
