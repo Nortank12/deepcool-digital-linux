@@ -131,7 +131,14 @@ fn main() {
 
     // Initialize CPU & GPU monitoring
     let cpu = cpu::Cpu::new();
-    let gpu = gpu::Gpu::new(pci_device);
+    let gpu = gpu::Gpu::new(pci_device.clone());
+
+    // Warn if GPU sensor missing despite PCI device being found
+    if pci_device.is_some() {
+        if let gpu::Gpu::None = gpu {
+            warning!("GPU sensor not found. Defaulting to CPU-only mode");
+        }
+    }
 
     // Connect to device and send datastream
     match product_id {
