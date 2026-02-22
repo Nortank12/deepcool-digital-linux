@@ -1,4 +1,5 @@
 //! Display module for:
+//! - AK620 G2 DIGITAL NYX
 //! - AK700 DIGITAL NYX
 //! - ASSASSIN IV VC VISION
 //! - LQ240

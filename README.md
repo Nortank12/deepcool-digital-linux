@@ -190,7 +190,7 @@ updated, because the Nixpkgs binary cache will not be able to provide you cached
     </tr>
     <tr>
         <td>AK620 G2 DIGITAL NYX</td>
-        <td align="center">❓</td>
+        <td align="center">✅</td>
     </tr>
     <tr>
         <td>AK700 DIGITAL NYX</td>
