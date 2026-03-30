@@ -27,7 +27,7 @@
         <td>22</td>
     </tr>
     <tr>
-        <td>#2</td>
+        <td>#2 (leading zeros on)</td>
         <td>16</td>
         <td>104</td>
         <td>1</td>
@@ -36,6 +36,18 @@
         <td>2</td>
         <td>1</td>
         <td>111</td>
+        <td>22</td>
+    </tr>
+    <tr>
+        <td>#3 (leading zeros off)</td>
+        <td>16</td>
+        <td>104</td>
+        <td>1</td>
+        <td>1</td>
+        <td>2</td>
+        <td>2</td>
+        <td>0</td>
+        <td>110</td>
         <td>22</td>
     </tr>
 </table>
