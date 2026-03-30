@@ -13,7 +13,7 @@ pub struct Args {
     pub alarm: bool,
     pub rotate: u16,
     pub leading_zeros: u8,
-    pub leading_zeros_switch: bool,
+    pub leading_zeros_switch: u8,
 }
 
 impl Args {
@@ -28,7 +28,7 @@ impl Args {
         let mut alarm = false;
         let mut rotate = 0;
         let mut leading_zeros = 0;
-        let mut leading_zeros_switch = false;
+        let mut leading_zeros_switch = 0;
 
         let mut i = 1;
         while i < args.len() {
@@ -212,10 +212,10 @@ impl Args {
                     leading_zeros = 2;
                 }
                 "-zy" => {
-                    leading_zeros_switch = true;
+                    leading_zeros_switch = 1;
                 }
                 "-zn" => {
-                    leading_zeros_switch = false;
+                    leading_zeros_switch = 2;
                 }
                 "-h" | "--help" => {
                     println!("{} [OPTIONS]", "Usage: deepcool-digital-linux".bold());

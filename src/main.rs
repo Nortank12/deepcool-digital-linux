@@ -54,6 +54,11 @@ mod common_warnings {
             warning!("Padding leading zeros is not supported, value will be ignored");
         }
     }
+    pub fn leading_zeros_switch(args: &Args) {
+        if args.leading_zeros_switch > 0 {
+            warning!("Padding leading zeros is not supported, value will be ignored");
+        }
+    }
 }
 
 fn main() {
@@ -166,6 +171,7 @@ fn main() {
             common_warnings::secondary_mode(&args);
             common_warnings::rotate(&args);
             common_warnings::leading_zeros(&args);
+            common_warnings::leading_zeros_switch(&args);
             // Display loop
             ak_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -194,6 +200,7 @@ fn main() {
             common_warnings::secondary_mode(&args);
             common_warnings::rotate(&args);
             common_warnings::leading_zeros(&args);
+            common_warnings::leading_zeros_switch(&args);
             // Display loop
             ls_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -219,6 +226,7 @@ fn main() {
             common_warnings::fahrenheit(&args);
             common_warnings::rotate(&args);
             common_warnings::leading_zeros(&args);
+            common_warnings::leading_zeros_switch(&args);
             // Display loop
             ag_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -264,7 +272,7 @@ fn main() {
             common_warnings::rotate(&args);
 
             // Display loop
-            ld_device.run(&api, DEFAULT_VENDOR_ID, product_id, args.leading_zeros_switch);
+            ld_device.run(&api, DEFAULT_VENDOR_ID, product_id, args.leading_zeros_switch == 1);
         }
         // LP Series
         12 => {
@@ -290,6 +298,7 @@ fn main() {
             );
             common_warnings::alarm(&args);
             common_warnings::leading_zeros(&args);
+            common_warnings::leading_zeros_switch(&args);
             // Display loop
             lp_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -324,6 +333,7 @@ fn main() {
             common_warnings::alarm_hardcoded(&args);
             common_warnings::rotate(&args);
             common_warnings::leading_zeros(&args);
+            common_warnings::leading_zeros_switch(&args);
             // Display loop
             lq_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -358,6 +368,7 @@ fn main() {
             common_warnings::alarm_hardcoded(&args);
             common_warnings::rotate(&args);
             common_warnings::leading_zeros(&args);
+            common_warnings::leading_zeros_switch(&args);
             // Display loop
             ak400_pro.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -392,6 +403,7 @@ fn main() {
             common_warnings::alarm_hardcoded(&args);
             common_warnings::rotate(&args);
             common_warnings::leading_zeros(&args);
+            common_warnings::leading_zeros_switch(&args);
             // Display loop
             ak620_pro.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -420,6 +432,7 @@ fn main() {
             common_warnings::alarm(&args);
             common_warnings::rotate(&args);
             common_warnings::leading_zeros(&args);
+            common_warnings::leading_zeros_switch(&args);
             // Display loop
             ch_gen2_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -441,6 +454,7 @@ fn main() {
             common_warnings::alarm(&args);
             common_warnings::rotate(&args);
             common_warnings::leading_zeros(&args);
+            common_warnings::leading_zeros_switch(&args);
             // Display loop
             ch_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
@@ -462,6 +476,7 @@ fn main() {
             common_warnings::alarm(&args);
             common_warnings::rotate(&args);
             common_warnings::leading_zeros(&args);
+            common_warnings::leading_zeros_switch(&args);
             // Display loop
             ch510.run(&api, CH510_VENDOR_ID, product_id);
         }
