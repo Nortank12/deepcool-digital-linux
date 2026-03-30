@@ -1,0 +1,164 @@
+Data summary for LD240WH
+
+    =========================== USB Port2 ===========================
+
+Connection Status        : 0x01 (Device is connected)
+Port Chain               : 1-2
+Properties               : 0x01
+ IsUserConnectable       : yes
+ PortIsDebugCapable      : no
+ PortHasMultiCompanions  : no
+ PortConnectorIsTypeC    : no
+ConnectionIndex          : 0x02 (Port 2)
+CompanionIndex           : 0
+ CompanionHubSymLnk      : USB#ROOT_HUB30#4&24054718&0&0#{f18a0e88-c30c-11d0-8815-00a0c906bed8}
+ CompanionPortNumber     : 0x0A (Port 10)
+ -> CompanionPortChain   : 1-10
+
+      ========================== Summary =========================
+Vendor ID                : 0x3633 (Beijing Deepcool Industries Co., Ltd.)
+Product ID               : 0x000A
+Manufacturer String      : "DeepCool"
+Product String           : "LD-Series"
+Serial                   : "4029ECC34C42"
+USB Version              : 2.0 (but 12 Mbit/s FullSpeed only)
+Port maximum Speed       : High-Speed (Companion Port 1-10 is doing the SuperSpeed)
+Device maximum Speed     : Full-Speed
+Device Connection Speed  : Full-Speed
+Self powered             : yes
+Demanded Current         : 500 mA
+Used Endpoints           : 3
+
+      ======================== USB Device ========================
+
+        +++++++++++++++++ Device Information ++++++++++++++++++
+Device Description       : USB Input Device
+BusReported Device Desc  : LD-Series
+Device Path              : \\?\USB#VID_3633&PID_000A#4029ECC34C42#{a5dcbf10-6530-11d2-901f-00c04fb951ed} (GUID_DEVINTERFACE_USB_DEVICE)
+Kernel Name              : \Device\USBPDO-2
+Device ID                : USB\VID_3633&PID_000A\4029ECC34C42
+Hardware IDs             : USB\VID_3633&PID_000A&REV_0200 USB\VID_3633&PID_000A
+Driver KeyName           : {745a17a0-74d3-11d0-b6fe-00a0c90f57da}\0001 (GUID_DEVCLASS_HIDCLASS)
+Driver                   : \SystemRoot\System32\drivers\hidusb.sys (Version: 10.0.19041.3031  Date: 2023-07-25  Company: Microsoft Corporation)
+Driver Inf               : C:\Windows\inf\input.inf
+Legacy BusType           : PNPBus
+Class                    : HIDClass
+Class GUID               : {745a17a0-74d3-11d0-b6fe-00a0c90f57da} (GUID_DEVCLASS_HIDCLASS)
+Service                  : HidUsb
+Enumerator               : USB
+Location Info            : Port_#0002.Hub_#0001
+Address                  : 2
+Location IDs             : PCIROOT(0)#PCI(0C00)#USBROOT(0)#USB(2), ACPI(_SB_)#ACPI(PCI0)#PCI(0C00)#USBROOT(0)#USB(2)
+Container ID             : {2f11bc54-9e2c-59c5-b16d-b56ee17cd142}
+Manufacturer Info        : (Standard system devices)
+Capabilities             : 0x94 (Removable, UniqueID, SurpriseRemovalOK)
+Status                   : 0x0180600A (DN_DRIVER_LOADED, DN_STARTED, DN_DISABLEABLE, DN_REMOVABLE, DN_NT_ENUMERATOR, DN_NT_DRIVER)
+First Install Date       : 2026-03-30 13:22:03
+Last Arrival Date        : 2026-03-30 13:22:03
+SelectiveSuspendEnabled  : 0
+EnhancedPowerMgmtEnabled : 1
+Power State              : D3 (supported: D0, D3, wake from D0)
+
+        +++++++++++++++++ Registry USB Flags +++++++++++++++++
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\usbflags\3633000A0200
+ osvc                    : REG_BINARY 00 00
+
+        ---------------- Connection Information ---------------
+Connection Index         : 0x02 (Port 2)
+Connection Status        : 0x01 (DeviceConnected)
+Current Config Value     : 0x01 (Configuration 1)
+Device Address           : 0x02 (2)
+Is Hub                   : 0x00 (no)
+Device Bus Speed         : 0x01 (Full-Speed)
+Number of open Pipes     : 0x02 (2 pipes to data endpoints)
+Pipe[0]                  : EndpointID=1  Direction=IN   ScheduleOffset=0  Type=Interrupt  wMaxPacketSize=0x40    bInterval=10  -> 718 Bits/ms = 89750 Bytes/s
+Pipe[1]                  : EndpointID=1  Direction=OUT  ScheduleOffset=0  Type=Interrupt  wMaxPacketSize=0x40    bInterval=10  -> 718 Bits/ms = 89750 Bytes/s
+
+        --------------- Connection Information V2 -------------
+Connection Index         : 0x02 (2)
+Length                   : 0x10 (16 bytes)
+SupportedUsbProtocols    : 0x03
+ Usb110                  : 1 (yes, port supports USB 1.1)
+ Usb200                  : 1 (yes, port supports USB 2.0)
+ Usb300                  : 0 (no, port not supports USB 3.0) -> but Companion Port 1-10 does
+ ReservedMBZ             : 0x00
+Flags                    : 0x00
+ DevIsOpAtSsOrHigher     : 0 (Device is not operating at SuperSpeed or higher)
+ DevIsSsCapOrHigher      : 0 (Device is not SuperSpeed capable or higher)
+ DevIsOpAtSsPlusOrHigher : 0 (Device is not operating at SuperSpeedPlus or higher)
+ DevIsSsPlusCapOrHigher  : 0 (Device is not SuperSpeedPlus capable or higher)
+ ReservedMBZ             : 0x00
+
+    ---------------------- Device Descriptor ----------------------
+bLength                  : 0x12 (18 bytes)
+bDescriptorType          : 0x01 (Device Descriptor)
+bcdUSB                   : 0x200 (USB Version 2.0) -> but device is Full-Speed only
+bDeviceClass             : 0x00 (defined by the interface descriptors)
+bDeviceSubClass          : 0x00
+bDeviceProtocol          : 0x00
+bMaxPacketSize0          : 0x40 (64 bytes)
+idVendor                 : 0x3633 (Beijing Deepcool Industries Co., Ltd.)
+idProduct                : 0x000A
+bcdDevice                : 0x0200
+iManufacturer            : 0x01 (String Descriptor 1)
+iProduct                 : 0x02 (String Descriptor 2)
+iSerialNumber            : 0x03 (String Descriptor 3)
+bNumConfigurations       : 0x01 (1 Configuration)
+
+    ------------------ Configuration Descriptor -------------------
+bLength                  : 0x09 (9 bytes)
+bDescriptorType          : 0x02 (Configuration Descriptor)
+wTotalLength             : 0x0029 (41 bytes)
+bNumInterfaces           : 0x01 (1 Interface)
+bConfigurationValue      : 0x01 (Configuration 1)
+iConfiguration           : 0x00 (No String Descriptor)
+bmAttributes             : 0xC0
+ D7: Reserved, set 1     : 0x01
+ D6: Self Powered        : 0x01 (yes)
+ D5: Remote Wakeup       : 0x00 (no)
+ D4..0: Reserved, set 0  : 0x00
+MaxPower                 : 0xFA (500 mA)
+
+        ---------------- Interface Descriptor -----------------
+bLength                  : 0x09 (9 bytes)
+bDescriptorType          : 0x04 (Interface Descriptor)
+bInterfaceNumber         : 0x00 (Interface 0)
+bAlternateSetting        : 0x00
+bNumEndpoints            : 0x02 (2 Endpoints)
+bInterfaceClass          : 0x03 (HID - Human Interface Device)
+bInterfaceSubClass       : 0x00 (None)
+bInterfaceProtocol       : 0x00 (None)
+iInterface               : 0x00 (No String Descriptor)
+
+        ------------------- HID Descriptor --------------------
+bLength                  : 0x09 (9 bytes)
+bDescriptorType          : 0x21 (HID Descriptor)
+bcdHID                   : 0x0110 (HID Version 1.10)
+bCountryCode             : 0x00 (00 = not localized)
+bNumDescriptors          : 0x01
+Descriptor 1:
+bDescriptorType          : 0x22 (Class=Report)
+wDescriptorLength        : 0x007E (126 bytes)
+Error reading descriptor : ERROR_GEN_FAILURE (due to a obscure limitation of the Win32 USB API, see F1 Help)
+
+        ----------------- Endpoint Descriptor -----------------
+bLength                  : 0x07 (7 bytes)
+bDescriptorType          : 0x05 (Endpoint Descriptor)
+bEndpointAddress         : 0x81 (Direction=IN EndpointID=1)
+bmAttributes             : 0x03 (TransferType=Interrupt)
+wMaxPacketSize           : 0x0040 (64 bytes)
+bInterval                : 0x0A (10 ms)
+
+        ----------------- Endpoint Descriptor -----------------
+bLength                  : 0x07 (7 bytes)
+bDescriptorType          : 0x05 (Endpoint Descriptor)
+bEndpointAddress         : 0x01 (Direction=OUT EndpointID=1)
+bmAttributes             : 0x03 (TransferType=Interrupt)
+wMaxPacketSize           : 0x0040 (64 bytes)
+bInterval                : 0x0A (10 ms)
+
+    ----------------- Device Qualifier Descriptor -----------------
+Error                    : request skipped because low-speed device
+
+      -------------------- String Descriptors -------------------
+String descriptors are not available  (because the device is in low power state D3)
