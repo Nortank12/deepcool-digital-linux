@@ -264,7 +264,7 @@ fn main() {
             common_warnings::rotate(&args);
 
             // Display loop
-            ld_device.run(&api, DEFAULT_VENDOR_ID, product_id);
+            ld_device.run(&api, DEFAULT_VENDOR_ID, product_id, args.leading_zeros_switch);
         }
         // LP Series
         12 => {

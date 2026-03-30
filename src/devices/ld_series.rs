@@ -4,7 +4,7 @@
 
 use crate:: monitor::cpu::Cpu;
 use super::{device_error, Mode};
-use hidapi::HidApi;
+use hidapi::{HidApi, HidDevice};
 use std::{thread::sleep, time::Duration};
 
 pub const DEFAULT_MODE: Mode = Mode::Auto;
@@ -27,9 +27,9 @@ impl Display {
         }
     }
 
-    pub fn run(&self, api: &HidApi, vid: u16, pid: u16) {
+    pub fn run(&self, api: &HidApi, vid: u16, pid: u16, zeros_on: bool) {
         // Connect to device
-        let device = api.open(vid, pid).unwrap_or_else(|_| device_error());
+        let mut device = api.open(vid, pid).unwrap_or_else(|_| device_error());
 
         // Display warning if a required module is missing
         self.cpu.warn_temp();
@@ -55,6 +55,8 @@ impl Display {
             init_data[7] = 111;
             device.write(&init_data).unwrap();
         }
+        
+        Self::set_leading_zeros_int(&mut device, zeros_on);
 
         // Display loop
         data[4] = 11;
@@ -100,8 +102,12 @@ impl Display {
 
     pub fn set_leading_zeros(&self, api: &HidApi, vid: u16, pid: u16, zeros_on: bool) {
         // Connect to device
-        let device = api.open(vid, pid).unwrap_or_else(|_| device_error());
+        let mut device = api.open(vid, pid).unwrap_or_else(|_| device_error());
+        Self::set_leading_zeros_int(&mut device, zeros_on);
+    }
 
+    fn set_leading_zeros_int(device: &mut HidDevice, zeros_on: bool) {
+        //HidResult<HidDevice>
         // message for zeros off
         // 10 68 01 01 02 02 00 6E 16
         // message for zeros on

@@ -13,6 +13,7 @@ pub struct Args {
     pub alarm: bool,
     pub rotate: u16,
     pub leading_zeros: u8,
+    pub leading_zeros_switch: bool,
 }
 
 impl Args {
@@ -27,6 +28,7 @@ impl Args {
         let mut alarm = false;
         let mut rotate = 0;
         let mut leading_zeros = 0;
+        let mut leading_zeros_switch = false;
 
         let mut i = 1;
         while i < args.len() {
@@ -209,6 +211,12 @@ impl Args {
                 "--zno" => {
                     leading_zeros = 2;
                 }
+                "-zy" => {
+                    leading_zeros_switch = true;
+                }
+                "-zn" => {
+                    leading_zeros_switch = false;
+                }
                 "-h" | "--help" => {
                     println!("{} [OPTIONS]", "Usage: deepcool-digital-linux".bold());
                     println!("\n{}", "Options:".bold());
@@ -223,7 +231,8 @@ impl Args {
                     println!("\n{}", "Commands:".bold());
                     println!("  {}, {}         Print Product ID of the connected devices", "-l".bold(), "--list".bold());
                     println!("  {}, {}      Print all available GPUs", "-g".bold(), "--gpulist".bold());
-                    println!("  {}, {}         Set leading zeros on/off", "--zyes".bold(), "--zno".bold());
+                    println!("  {}, {}      Set leading zeros on/off as a command", "--zyes".bold(), "--zno".bold());
+                    println!("  {}, {}           Set leading zeros on/off when starting service", "-zy".bold(), "-zn".bold());
                     println!("  {}, {}         Print help", "-h".bold(), "--help".bold());
                     println!("  {}, {}      Print version", "-v".bold(), "--version".bold());
                     exit(0);
@@ -340,6 +349,7 @@ impl Args {
             alarm,
             rotate,
             leading_zeros,
+            leading_zeros_switch,
         }
     }
 }
