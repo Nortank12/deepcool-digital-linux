@@ -97,4 +97,35 @@ impl Display {
             device.write(&status_data).unwrap();
         }
     }
+
+    pub fn set_leading_zeros(&self, api: &HidApi, vid: u16, pid: u16, zeros_on: bool) {
+        // Connect to device
+        let device = api.open(vid, pid).unwrap_or_else(|_| device_error());
+
+        // message for zeros off
+        // 10 68 01 01 02 02 00 6E 16
+        // message for zeros on
+        // 10 68 01 01 02 02 01 6F 16
+
+        // Data packet
+        let mut data: [u8; 64] = [0; 64];
+        data[0] = 16;
+        data[1] = 104;
+        data[2] = 1;
+        data[3] = 1;
+        data[4] = 2;
+        data[5] = 2;
+        if zeros_on {
+            data[6] = 1;
+            data[7] = 111;
+            data[8] = 22;
+        } else {
+            data[6] = 0;
+            data[7] = 110;
+            data[8] = 22;
+        }
+
+        // Send zero toggle sequence
+        device.write(&data).unwrap();
+    }
 }
