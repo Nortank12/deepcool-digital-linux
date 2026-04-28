@@ -33,6 +33,7 @@ pub fn print_device_status(
     mode: &Mode,
     secondary: Option<&Mode>,
     rotation: Option<u16>,
+    lead_zeros: Option<bool>,
     temp_unit: TemperatureUnit,
     alarm: Alarm,
     update: Duration,
@@ -47,6 +48,12 @@ pub fn print_device_status(
             println!("ROTATION:   {}", format!("{r}°").bright_cyan());
         } else {
             println!("ROTATION:   {}", "none".bright_black());
+        }
+    }
+    if let Some(z) = lead_zeros {
+        match z {
+            true => println!("LEAD. ZERO: {}", "on".bright_green()),
+            false => println!("LEAD. ZERO: {}", "off".bright_red()),
         }
     }
     println!("TEMP. UNIT: {}", temp_unit.symbol().bright_cyan());
