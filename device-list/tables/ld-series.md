@@ -27,7 +27,19 @@
         <td>22</td>
     </tr>
     <tr>
-        <td>#2</td>
+        <td>#2 | LEADING ZEROS OFF</td>
+        <td>16</td>
+        <td>104</td>
+        <td>1</td>
+        <td>1</td>
+        <td>2</td>
+        <td>2</td>
+        <td>0</td>
+        <td>110</td>
+        <td>22</td>
+    </tr>
+    <tr>
+        <td>#2 | LEADING ZEROS ON</td>
         <td>16</td>
         <td>104</td>
         <td>1</td>

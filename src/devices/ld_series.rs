@@ -16,14 +16,16 @@ pub struct Display {
     cpu: Cpu,
     update: Duration,
     fahrenheit: bool,
+    lead_zeros: bool,
 }
 
 impl Display {
-    pub fn new(cpu: Cpu, update: Duration, fahrenheit: bool) -> Self {
+    pub fn new(cpu: Cpu, update: Duration, fahrenheit: bool, lead_zeros: bool) -> Self {
         Display {
             cpu,
             update,
             fahrenheit,
+            lead_zeros,
         }
     }
 
@@ -51,8 +53,14 @@ impl Display {
             init_data[7] = 112;
             init_data[8] = 22;
             device.write(&init_data).unwrap();
+            // Set display format (show/hide leading zeros)
             init_data[5] = 2;
-            init_data[7] = 111;
+            if self.lead_zeros {
+                init_data[7] = 111;
+            } else {
+                init_data[6] = 0;
+                init_data[7] = 110;
+            }
             device.write(&init_data).unwrap();
         }
 

@@ -12,6 +12,7 @@ pub struct Args {
     pub fahrenheit: bool,
     pub alarm: bool,
     pub rotate: u16,
+    pub lead_zeros: bool,
 }
 
 impl Args {
@@ -25,6 +26,7 @@ impl Args {
         let mut fahrenheit = false;
         let mut alarm = false;
         let mut rotate = 0;
+        let mut lead_zeros = false;
 
         let mut i = 1;
         while i < args.len() {
@@ -151,6 +153,9 @@ impl Args {
                         exit(1);
                     }
                 }
+                "-z" | "--zeros" => {
+                    lead_zeros = true;
+                }
                 "-l" | "--list" => {
                     println!("Device list [{} | {}]", "PID".bright_green().bold(), "Name".bright_green());
                     println!("-----");
@@ -212,6 +217,7 @@ impl Args {
                     println!("  {}, {}        Change the temperature unit to °F", "-f".bold(), "--fahrenheit".bold());
                     println!("  {}, {}             Enable the alarm", "-a".bold(), "--alarm".bold());
                     println!("  {}, {} <DEGREE>   Rotate the display (LP Series only)", "-r".bold(), "--rotate".bold());
+                    println!("  {}, {}             Display leading zeros (LD Series only)", "-z".bold(), "--zeros".bold());
                     println!("\n{}", "Commands:".bold());
                     println!("  {}, {}         Print Product ID of the connected devices", "-l".bold(), "--list".bold());
                     println!("  {}, {}      Print all available GPUs", "-g".bold(), "--gpulist".bold());
@@ -302,6 +308,7 @@ impl Args {
                             }
                             'f' => fahrenheit = true,
                             'a' => alarm = true,
+                            'z' => lead_zeros = true,
                             _ => {
                                 if arg.starts_with("--") {
                                     error!(format!("Invalid option {arg}"));
@@ -330,6 +337,7 @@ impl Args {
             fahrenheit,
             alarm,
             rotate,
+            lead_zeros,
         }
     }
 }
