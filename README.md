@@ -310,6 +310,7 @@ Options:
   -f, --fahrenheit        Change the temperature unit to °F
   -a, --alarm             Enable the alarm
   -r, --rotate <DEGREE>   Rotate the display (LP Series only)
+  -z, --zeros             Display leading zeros (LD Series only)
 
 Commands:
   -l, --list         Print Product ID of the connected devices
