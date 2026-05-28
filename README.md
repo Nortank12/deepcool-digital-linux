@@ -162,7 +162,7 @@ updated, because the Nixpkgs binary cache will not be able to provide you cached
     </tr>
     <tr>
         <td>AK400 G2 DIGITAL NYX</td>
-        <td align="center">❓</td>
+        <td align="center">✅</td>
     </tr>
     <tr>
         <td>AK500 DIGITAL</td>
@@ -174,7 +174,7 @@ updated, because the Nixpkgs binary cache will not be able to provide you cached
     </tr>
     <tr>
         <td>AK500 G2 DIGITAL NYX</td>
-        <td align="center">❓</td>
+        <td align="center">✅</td>
     </tr>
     <tr>
         <td>AK500S DIGITAL</td>

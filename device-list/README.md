@@ -8,7 +8,7 @@
         <th>USB Data Bytes</th>
     </tr>
     <tr>
-        <td rowspan="35">13875</td>
+        <td rowspan="37">13875</td>
         <td>1</td>
         <td>AK400 DIGITAL</td>
         <td align="center" rowspan="4">
@@ -194,13 +194,21 @@
     <tr>
         <td>41</td>
         <td>AK620 G2 DIGITAL NYX</td>
-        <td align="center" rowspan="2">
+        <td align="center" rowspan="4">
             <a href="tables/lq-series.md">Mapping Table</a>
         </td>
     </tr>
     <tr>
         <td>42</td>
         <td>AK700 DIGITAL NYX</td>
+    </tr>
+    <tr>
+        <td>43</td>
+        <td>AK400 G2 DIGITAL NYX</td>
+    </tr>
+    <tr>
+        <td>44</td>
+        <td>AK500 G2 DIGITAL NYX</td>
     </tr>
     <tr>
         <td colspan="4"></td>

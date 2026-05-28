@@ -284,7 +284,7 @@ fn main() {
             lp_device.run(&api, DEFAULT_VENDOR_ID, product_id);
         }
         // LQ Series & ASSASSIN IV & AK G2 Series & AK700
-        13 | 15 | 31 | 41 | 42 => {
+        13 | 15 | 31 | 41 | 42 | 43 | 44 => {
             println!("Supported modes: {}", "auto".bold());
             // Connect to device
             let lq_device = devices::lq_series::Display::new(cpu, args.update, args.fahrenheit);
