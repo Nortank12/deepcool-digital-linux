@@ -30,6 +30,8 @@ You will need root permission to send data to the device.
 > For more accurate CPU temperature monitoring, you can use the [zenpower3](https://github.com/PutinVladimir/zenpower3)
 > or [asus-ec-sensors](https://github.com/zeule/asus-ec-sensors) kernel modules on supported hardware.
 
+CPU power monitoring supports Intel RAPL and the AMD `zenergy`/`amd_energy` hwmon drivers.
+
 > [!NOTE]
 > On Intel's Arc GPUs, you have to use kernel version 6.13 or higher for proper temperature monitoring.
 
