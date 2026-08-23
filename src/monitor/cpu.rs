@@ -56,10 +56,10 @@ impl Cpu {
     /// Reads the energy consumption of the CPU in microjoules.
     pub fn read_energy(&self) -> u64 {
         if self.rapl_max_uj > 0 {
-            let data = read_to_string("/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj").unwrap_or_else(|_| {
-                error!("Failed to get CPU power");
-                exit(1);
-            });
+            let data = match read_to_string("/sys/class/powercap/intel-rapl/intel-rapl:0/energy_uj") {
+                Ok(data) => data,
+                Err(_) => return 0,
+            };
             return data.trim_end().parse::<u64>().unwrap();
         }
 
