@@ -1,12 +1,12 @@
 //! Display module for:
-//! - AK400 DIGITAL
+//! - AK400 DIGITAL & DIGITAL SE
 //! - AK500 DIGITAL
-//! - AK500S DIGITAL
-//! - AK620 DIGITAL
+//! - AK500S DIGITAL & DIGITAL SE
+//! - AK620 DIGITAL & DIGITAL SE
 
 use crate::{devices::AUTO_MODE_INTERVAL, monitor::cpu::Cpu};
 use super::{device_error, Mode};
-use hidapi::HidApi;
+use hidapi::{HidApi, HidDevice};
 use std::{thread::sleep, time::{Duration, Instant}};
 
 pub const DEFAULT_MODE: Mode = Mode::CpuTemperature;
@@ -19,6 +19,7 @@ pub struct Display {
     update: Duration,
     fahrenheit: bool,
     alarm: bool,
+    se_mode: bool,
 }
 
 impl Display {
@@ -38,12 +39,21 @@ impl Display {
             update,
             fahrenheit,
             alarm,
+            se_mode: false,
         }
     }
 
-    pub fn run(&self, api: &HidApi, vid: u16, pid: u16) {
+    pub fn run(&mut self, api: &HidApi, vid: u16, pid: u16) {
         // Connect to device
         let device = api.open(vid, pid).unwrap_or_else(|_| device_error());
+
+        // Identify device type based on product name. E.g.:
+        // AK400 -> AK400 DIGITAL
+        // A400  -> AK400 DIGITAL SE
+        let prod_name = device.get_product_string().unwrap().unwrap();
+        if !prod_name.starts_with("AK") {
+            self.se_mode = true;
+        }
 
         // Display warning if a required module is missing
         self.cpu.warn_temp();
@@ -56,7 +66,7 @@ impl Display {
         {
             let mut init_data = data.clone();
             init_data[1] = 170;
-            device.write(&init_data).unwrap();
+            self.write(&device, init_data);
         }
 
         // Display loop
@@ -66,12 +76,12 @@ impl Display {
                 let mut mode = Mode::CpuTemperature;
                 loop {
                     // Initial update
-                    device.write(&self.status_message(&data, &mode, initial_update)).unwrap();
+                    self.write(&device, self.status_message(&data, &mode, initial_update));
 
                     // Update until timeout
                     let timeout = Instant::now() + AUTO_MODE_INTERVAL;
                     while Instant::now() + self.update < timeout {
-                        device.write(&self.status_message(&data, &mode, self.update)).unwrap();
+                        self.write(&device, self.status_message(&data, &mode, self.update));
                     }
 
                     // Make the next initial update faster to fit the timeframe
@@ -86,7 +96,7 @@ impl Display {
                 }
             }
             _ => loop {
-                device.write(&self.status_message(&data, &self.mode, self.update)).unwrap();
+                self.write(&device, self.status_message(&data, &self.mode, self.update));
             }
         }
     }
@@ -128,5 +138,13 @@ impl Display {
         data[6] = (self.alarm && temp >= if self.fahrenheit { TEMP_LIMIT_F } else { TEMP_LIMIT_C }) as u8;
 
         data
+    }
+
+    fn write(&self, device: &HidDevice, mut data: [u8; 64]) {
+        // On "DIGITAL SE" devices, the report ID is not sent, making a -1 offset necessary for all bytes.
+        if self.se_mode {
+            data.copy_within(1.., 0);
+        }
+        device.write(&data).unwrap();
     }
 }

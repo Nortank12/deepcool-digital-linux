@@ -59,3 +59,5 @@
         <td>- NOT USED -</td>
     </tr>
 </table>
+
+***SE** variants use the same communication method but do not send the `REPORT ID`, meaning all bytes are offset by -1.*

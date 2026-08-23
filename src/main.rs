@@ -145,7 +145,7 @@ fn main() {
         1..=4 => {
             println!("Supported modes: {} [default: {}]", "auto cpu_temp cpu_usage".bold(), ak_series::DEFAULT_MODE.symbol());
             // Connect to device
-            let ak_device = ak_series::Display::new(cpu, &args.mode, args.update, args.fahrenheit, args.alarm);
+            let mut ak_device = ak_series::Display::new(cpu, &args.mode, args.update, args.fahrenheit, args.alarm);
             // Print current configuration & warnings
             print_device_status(
                 &ak_device.mode,
