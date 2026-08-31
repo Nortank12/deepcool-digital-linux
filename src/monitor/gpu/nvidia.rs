@@ -160,9 +160,13 @@ mod tests {
     use std::{ffi::c_char, ptr::null_mut, slice, str};
 
     const EXPECTED_PCI_BUS_ID: &[u8] = b"0000:06:00.0\0";
-    const PCI_BUS_ID_WITH_SENTINEL: &[u8] = b"0000:06:00.0x";
+    static PCI_BUS_ID_WITH_SENTINEL: [u8; EXPECTED_PCI_BUS_ID.len()] = *b"0000:06:00.0x";
 
     unsafe extern "C" fn validate_pci_bus_id(pci_bus_id: *const c_char, _device: *mut *mut u8) -> u16 {
+        if pci_bus_id.cast::<u8>() == PCI_BUS_ID_WITH_SENTINEL.as_ptr() {
+            return 1;
+        }
+
         let pci_bus_id = unsafe { slice::from_raw_parts(pci_bus_id.cast::<u8>(), EXPECTED_PCI_BUS_ID.len()) };
 
         if pci_bus_id == EXPECTED_PCI_BUS_ID {
