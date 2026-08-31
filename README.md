@@ -26,12 +26,6 @@ chmod +x deepcool-digital-linux
 ```
 You will need root permission to send data to the device.
 
-> [!TIP]
-> For more accurate CPU temperature monitoring, you can use the [zenpower3](https://github.com/PutinVladimir/zenpower3)
-> or [asus-ec-sensors](https://github.com/zeule/asus-ec-sensors) kernel modules on supported hardware.
-
-CPU power monitoring supports Intel RAPL and the AMD `zenergy`/`amd_energy` hwmon drivers.
-
 > [!NOTE]
 > On Intel's Arc GPUs, you have to use kernel version 6.13 or higher for proper temperature monitoring.
 
@@ -155,7 +149,7 @@ updated, because the Nixpkgs binary cache will not be able to provide you cached
         <td align="center">✅</td>
     </tr>
     <tr>
-        <td>AK400 DIGITAL</td>
+        <td>AK400 DIGITAL | DIGITAL SE</td>
         <td align="center">✅</td>
     </tr>
     <tr>
@@ -179,11 +173,11 @@ updated, because the Nixpkgs binary cache will not be able to provide you cached
         <td align="center">✅</td>
     </tr>
     <tr>
-        <td>AK500S DIGITAL</td>
+        <td>AK500S DIGITAL | DIGITAL SE</td>
         <td align="center">✅</td>
     </tr>
     <tr>
-        <td>AK620 DIGITAL</td>
+        <td>AK620 DIGITAL | DIGITAL SE</td>
         <td align="center">✅</td>
     </tr>
     <tr>

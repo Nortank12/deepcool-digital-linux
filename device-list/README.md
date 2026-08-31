@@ -8,24 +8,33 @@
         <th>USB Data Bytes</th>
     </tr>
     <tr>
-        <td rowspan="37">13875</td>
-        <td>1</td>
+        <td rowspan="40">13875</td>
+        <td rowspan="2">1</td>
         <td>AK400 DIGITAL</td>
-        <td align="center" rowspan="4">
+        <td align="center" rowspan="7">
             <a href="tables/ak-series.md">Mapping Table</a>
         </td>
     </tr>
     <tr>
-        <td>2</td>
+        <td>AK400 DIGITAL SE</td>
+    </tr>
+    <tr>
+        <td rowspan="2">2</td>
         <td>AK620 DIGITAL</td>
+    </tr>
+    <tr>
+        <td>AK620 DIGITAL SE</td>
     </tr>
     <tr>
         <td>3</td>
         <td>AK500 DIGITAL</td>
     </tr>
     <tr>
-        <td>4</td>
+        <td rowspan="2">4</td>
         <td>AK500S DIGITAL</td>
+    </tr>
+    <tr>
+        <td>AK500S DIGITAL SE</td>
     </tr>
     <tr>
         <td>5</td>

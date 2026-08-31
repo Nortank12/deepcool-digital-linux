@@ -41,6 +41,7 @@ impl Cpu {
         if self.energy_sensor.is_none() {
             warning!("No supported CPU energy sensor was found");
             eprintln!("         CPU power consumption will not be displayed.");
+            eprintln!("         Supported kernel modules are: amd_energy, intel_rapl, and zenergy.");
         }
     }
 
@@ -78,7 +79,7 @@ impl Cpu {
 
     /// Reads the energy consumption one more time and calculates the CPU power by using the inital energy and the delta time.
     ///
-    /// Formula: `W = ΔμJ / (Δms * 1000)`
+    /// Formula: `P[W] = ΔE[μJ] / (Δt[ms] * 1000)`
     pub fn get_power(&self, initial_energy: u64, delta_millisec: u64) -> u16 {
         if let Some(sensor) = &self.energy_sensor {
             let current_energy = self.read_energy();
