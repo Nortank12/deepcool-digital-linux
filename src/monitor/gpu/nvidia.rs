@@ -2,10 +2,15 @@
 
 use crate::error;
 use libloading::{Library, Symbol};
-use std::{path::Path, process::exit, ptr::null_mut};
+use std::{
+    ffi::{c_char, CString},
+    path::Path,
+    process::exit,
+    ptr::null_mut,
+};
 
 type NvmlInit = unsafe extern "C" fn() -> u16;
-type NvmlDeviceGetHandleByPciBusId = unsafe extern "C" fn(pci_bus_id: *const u8, device: *mut *mut u8) -> u16;
+type NvmlDeviceGetHandleByPciBusId = unsafe extern "C" fn(pci_bus_id: *const c_char, device: *mut *mut u8) -> u16;
 type NvmlDeviceGetUtilizationRates = unsafe extern "C" fn(device: *mut u8, utilization: *mut Utilization) -> u16;
 type NvmlDeviceGetTemperature = unsafe extern "C" fn(device: *mut u8, sensor: u32, temp: *mut u32) -> u16;
 type NvmlDeviceGetPowerUsage = unsafe extern "C" fn(device: *mut u8, power: *mut u32) -> u16;
@@ -31,6 +36,16 @@ const LIB_PATHS: [&str; 12] = [
     "/run/opengl-driver/lib/libnvidia-ml.so",
     "/run/opengl-driver/lib/libnvidia-ml.so.1",
 ];
+
+unsafe fn nvml_device_get_handle_by_pci_bus_id(
+    get_handle: NvmlDeviceGetHandleByPciBusId,
+    pci_address: &str,
+    device: *mut *mut u8,
+) -> u16 {
+    let pci_bus_id = CString::new(pci_address).expect("PCI address contains an embedded NUL byte");
+
+    unsafe { get_handle(pci_bus_id.as_ptr(), device) }
+}
 
 pub struct Gpu {
     lib: Library,
@@ -67,8 +82,9 @@ impl Gpu {
 
             // Get device handle at the specified PCI address
             let mut device: *mut u8 = null_mut();
-            let get_handle: Symbol<NvmlDeviceGetHandleByPciBusId> = lib.get(b"nvmlDeviceGetHandleByPciBusId_v2").unwrap();
-            if get_handle(pci_address.as_ptr(), &mut device as *mut *mut u8) != 0 {
+            let get_handle: Symbol<NvmlDeviceGetHandleByPciBusId> =
+                lib.get(b"nvmlDeviceGetHandleByPciBusId_v2").unwrap();
+            if nvml_device_get_handle_by_pci_bus_id(*get_handle, pci_address, &mut device as *mut *mut u8) != 0 {
                 error!(format!("Failed access GPU (NVIDIA) PCI_ADDR={pci_address}"));
                 exit(1);
             }
@@ -135,5 +151,34 @@ impl Gpu {
         }
 
         clock as u16
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::nvml_device_get_handle_by_pci_bus_id;
+    use std::{ffi::c_char, ptr::null_mut, slice, str};
+
+    const EXPECTED_PCI_BUS_ID: &[u8] = b"0000:06:00.0\0";
+    const PCI_BUS_ID_WITH_SENTINEL: &[u8] = b"0000:06:00.0x";
+
+    unsafe extern "C" fn validate_pci_bus_id(pci_bus_id: *const c_char, _device: *mut *mut u8) -> u16 {
+        let pci_bus_id = unsafe { slice::from_raw_parts(pci_bus_id.cast::<u8>(), EXPECTED_PCI_BUS_ID.len()) };
+
+        if pci_bus_id == EXPECTED_PCI_BUS_ID {
+            0
+        } else {
+            1
+        }
+    }
+
+    #[test]
+    fn passes_null_terminated_pci_bus_id_to_nvml() {
+        let pci_address = str::from_utf8(&PCI_BUS_ID_WITH_SENTINEL[..EXPECTED_PCI_BUS_ID.len() - 1]).unwrap();
+        let mut device: *mut u8 = null_mut();
+
+        let result = unsafe { nvml_device_get_handle_by_pci_bus_id(validate_pci_bus_id, pci_address, &mut device) };
+
+        assert_eq!(result, 0);
     }
 }
