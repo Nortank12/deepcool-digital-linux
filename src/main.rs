@@ -392,8 +392,8 @@ fn main() {
         19 | 22 | 27 => {
             println!(
                 "Supported modes: {} {} {} {} [default: {}]",
-                "auto cpu_freq".bold(),
-                "cpu_fan".bright_black().strikethrough(),
+                "off auto cpu_freq".bold(),
+                "cpu_fan".bold(),
                 "gpu".bold(),
                 "psu".bright_black().strikethrough(),
                 ch_series_gen2::DEFAULT_MODE.symbol()
