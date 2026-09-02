@@ -23,6 +23,7 @@ impl Display {
         // Verify the display mode
         let mode = match mode {
             Mode::Default => DEFAULT_MODE,
+            Mode::Off => Mode::Off,
             Mode::Auto => Mode::Auto,
             Mode::CpuFrequency => Mode::CpuFrequency,
             Mode::CpuFan => Mode::CpuFan,
@@ -46,9 +47,7 @@ impl Display {
 
         // Display warning to address limitated display modes
         match self.mode {
-            Mode::CpuFan => { warning!("CPU fan speed monitoring is not yet supported"); }
             Mode::Psu => { warning!("PSU monitoring is not yet supported"); }
-            Mode::Auto => { warning!("Display mode \"auto\" only cycles between fully supported modes"); }
             _ => (),
         }
 
@@ -56,6 +55,9 @@ impl Display {
         if matches!(self.mode, Mode::CpuFrequency | Mode::CpuFan | Mode::Auto) {
             self.cpu.warn_temp();
             self.cpu.warn_rapl();
+        }
+        if matches!(self.mode, Mode::CpuFan | Mode::Auto) {
+            self.cpu.warn_fan();
         }
         if matches!(self.mode, Mode::Gpu | Mode::Auto) {
             self.gpu.warn_missing();
@@ -91,7 +93,8 @@ impl Display {
 
                     // Switch to the next display mode
                     mode = match mode {
-                        Mode::CpuFrequency => Mode::Gpu,
+                        Mode::CpuFrequency => Mode::CpuFan,
+                        Mode::CpuFan => Mode::Gpu,
                         Mode::Gpu => Mode::CpuFrequency,
                         _ => DEFAULT_MODE,
                     }
@@ -110,6 +113,7 @@ impl Display {
 
         // Set the display mode
         data[6] = match mode {
+            Mode::Off => 0,
             Mode::CpuFrequency => 2,
             Mode::CpuFan => 3,
             Mode::Gpu => 4,
@@ -119,6 +123,10 @@ impl Display {
 
         // Main display
         match mode {
+            Mode::Off => {
+                data[9] = 0;
+                sleep(update);
+            }
             Mode::CpuFrequency | Mode::CpuFan => {
                 // Read CPU utilization & energy consumption
                 let cpu_instant = self.cpu.read_instant();
@@ -147,6 +155,11 @@ impl Display {
                     let frequency = (self.cpu.get_frequency()).to_be_bytes();
                     data[15] = frequency[0];
                     data[16] = frequency[1];
+                }
+                if matches!(mode, Mode::CpuFan) {
+                    let fan_speed = self.cpu.get_fan_speed().to_be_bytes();
+                    data[17] = fan_speed[0];
+                    data[18] = fan_speed[1];
                 }
             }
             Mode::Gpu => {

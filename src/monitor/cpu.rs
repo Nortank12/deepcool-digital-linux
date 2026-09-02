@@ -17,6 +17,7 @@ struct EnergySensor {
 pub struct Cpu {
     temp_sensor: Option<String>,
     energy_sensor: Option<EnergySensor>,
+    fan_sensor: Option<PathBuf>,
 }
 
 impl Cpu {
@@ -24,6 +25,7 @@ impl Cpu {
         Cpu {
             temp_sensor: find_temp_sensor(),
             energy_sensor: find_energy_sensor(),
+            fan_sensor: find_fan_sensor(),
         }
     }
 
@@ -43,6 +45,27 @@ impl Cpu {
             eprintln!("         CPU power consumption will not be displayed.");
             eprintln!("         Supported kernel modules are: amd_energy, intel_rapl, and zenergy.");
         }
+    }
+
+    /// Displays a warning message if no CPU fan speed sensor is available.
+    pub fn warn_fan(&self) {
+        if self.fan_sensor.is_none() {
+            warning!("No CPU fan speed sensor was found");
+            eprintln!("         CPU fan speed will not be displayed.");
+        }
+    }
+
+    /// Reads CPU fan speed in RPM.
+    pub fn get_fan_speed(&self) -> u16 {
+        let Some(sensor) = &self.fan_sensor else {
+            return 0;
+        };
+
+        read_to_string(sensor)
+            .ok()
+            .and_then(|data| data.trim_end().parse::<u32>().ok())
+            .unwrap_or(0)
+            .min(u16::MAX as u32) as u16
     }
 
     /// Reads the value of the CPU temperature sensor and calculates it to be `˚C` or `˚F`.
@@ -174,6 +197,42 @@ fn find_energy_sensor() -> Option<EnergySensor> {
 
         if let Some(path) = find_socket_energy(&path) {
             return Some(EnergySensor { path, max_uj: None });
+        }
+    }
+
+    None
+}
+
+/// Finds a hwmon channel labelled as the CPU fan.
+fn find_fan_sensor() -> Option<PathBuf> {
+    for entry in read_dir("/sys/class/hwmon").ok()?.flatten() {
+        let path = entry.path();
+
+        let Ok(label_entries) = read_dir(&path) else {
+            continue;
+        };
+
+        for label_entry in label_entries.flatten() {
+            let label_path = label_entry.path();
+            let Some(file_name) = label_path.file_name().and_then(|name| name.to_str()) else {
+                continue;
+            };
+            let Some(channel) = file_name
+                .strip_prefix("fan")
+                .and_then(|name| name.strip_suffix("_label"))
+            else {
+                continue;
+            };
+            let Ok(label) = read_to_string(&label_path) else {
+                continue;
+            };
+
+            if label.trim().eq_ignore_ascii_case("CPU Fan") {
+                let input_path = path.join(format!("fan{channel}_input"));
+                if input_path.is_file() {
+                    return Some(input_path);
+                }
+            }
         }
     }
 

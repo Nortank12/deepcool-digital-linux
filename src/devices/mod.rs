@@ -23,6 +23,7 @@ pub const AUTO_MODE_INTERVAL: Duration = Duration::from_millis(5000);
 #[derive(PartialEq)]
 pub enum Mode {
     Default,
+    Off,
     Auto,
     CpuTemperature,
     CpuUsage,
@@ -41,6 +42,7 @@ impl Mode {
     pub const fn symbol(&self) -> &'static str {
         match self {
             Mode::Default => "",
+            Mode::Off => "off",
             Mode::Auto => "auto",
             Mode::CpuTemperature => "cpu_temp",
             Mode::CpuUsage => "cpu_usage",
@@ -58,6 +60,7 @@ impl Mode {
 
     pub fn get(symbol: &str) -> Option<Mode> {
         match symbol {
+            "off" => Some(Self::Off),
             "auto" => Some(Self::Auto),
             "cpu_temp" => Some(Self::CpuTemperature),
             "cpu_usage" => Some(Self::CpuUsage),
